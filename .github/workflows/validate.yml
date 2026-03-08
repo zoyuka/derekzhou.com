@@ -1,0 +1,109 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          files=(
+            index.html
+            style.css
+            site.js
+            robots.txt
+            _headers
+            _redirects
+            assets/favicon.png
+            .well-known/security.txt
+          )
+          missing=0
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              missing=1
+            else
+              echo "OK: $f"
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            exit 1
+          fi
+
+      - name: No secrets in code
+        run: |
+          # Scan for common secret patterns in tracked files
+          patterns=(
+            'AKIA[0-9A-Z]{16}'
+            'sk-[a-zA-Z0-9]{20,}'
+            'ghp_[a-zA-Z0-9]{36}'
+            'password\s*[:=]\s*["\x27][^"\x27]{8,}'
+          )
+          found=0
+          for pattern in "${patterns[@]}"; do
+            if grep -rEn "$pattern" --include='*.html' --include='*.css' --include='*.js' --include='*.json' --include='*.yml' --include='*.yaml' --include='*.md' --include='*.txt' . 2>/dev/null | grep -v node_modules; then
+              echo "POTENTIAL SECRET found matching: $pattern"
+              found=1
+            fi
+          done
+          if [ "$found" -eq 1 ]; then
+            echo "::error::Potential secrets detected in source files"
+            exit 1
+          fi
+          echo "No secrets found"
+
+      - name: Validate HTML
+        run: |
+          # Basic HTML validity checks
+          file="index.html"
+
+          # Must start with doctype
+          if ! head -1 "$file" | grep -qi '<!doctype html>'; then
+            echo "::error::Missing <!DOCTYPE html>"
+            exit 1
+          fi
+
+          # Check required tags exist
+          for tag in '<html' '<head' '</head>' '<body' '</body>' '</html>'; do
+            if ! grep -qi "$tag" "$file"; then
+              echo "::error::Missing $tag in $file"
+              exit 1
+            fi
+          done
+
+          # Check charset meta
+          if ! grep -qi 'charset.*utf-8' "$file"; then
+            echo "::error::Missing charset utf-8 meta tag"
+            exit 1
+          fi
+
+          # Check viewport meta
+          if ! grep -qi 'viewport' "$file"; then
+            echo "::error::Missing viewport meta tag"
+            exit 1
+          fi
+
+          # Check title
+          if ! grep -qi '<title>' "$file"; then
+            echo "::error::Missing <title> tag"
+            exit 1
+          fi
+
+          # Check for unclosed tags (basic)
+          for tag in html head body main; do
+            opens=$(grep -oi "<$tag" "$file" | wc -l)
+            closes=$(grep -oi "</$tag>" "$file" | wc -l)
+            if [ "$opens" -ne "$closes" ]; then
+              echo "::error::Mismatched <$tag> tags (open=$opens, close=$closes)"
+              exit 1
+            fi
+          done
+
+          echo "HTML validation passed"

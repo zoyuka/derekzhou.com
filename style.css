@@ -1,0 +1,270 @@
+/* ------------------------------------------------
+   @font-face — self-hosted WOFF2
+   ------------------------------------------------ */
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/assets/fonts/DMSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/assets/fonts/DMSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ------------------------------------------------
+   Custom properties
+   ------------------------------------------------ */
+
+:root {
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  --color-bg: #fafaf8;
+  --color-text: #111110;
+  --color-dimmed: #555550;
+  --color-border: #e0e0dc;
+  --color-link: #111110;
+  --color-link-hover: #555550;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #111110;
+    --color-text: #fafaf8;
+    --color-dimmed: #a0a098;
+    --color-border: #2a2a28;
+    --color-link: #fafaf8;
+    --color-link-hover: #a0a098;
+  }
+}
+
+/* ------------------------------------------------
+   Reset & base
+   ------------------------------------------------ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: crosshair;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ------------------------------------------------
+   Layout
+   ------------------------------------------------ */
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20vh 1.5rem 4rem;
+}
+
+section {
+  margin-bottom: 3rem;
+}
+
+/* ------------------------------------------------
+   Typography
+   ------------------------------------------------ */
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-dimmed);
+  margin-bottom: 1rem;
+}
+
+.role {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-dimmed);
+}
+
+.bio {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  line-height: 1.7;
+}
+
+.bio strong {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dimmed {
+  color: var(--color-dimmed);
+}
+
+/* ------------------------------------------------
+   Experience
+   ------------------------------------------------ */
+
+.experience {
+  list-style: none;
+}
+
+.experience li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.experience li:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.exp-title {
+  font-weight: 500;
+}
+
+.exp-place {
+  color: var(--color-dimmed);
+}
+
+.exp-date {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--color-dimmed);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------
+   Footer
+   ------------------------------------------------ */
+
+footer {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+footer a {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-link);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.1em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+footer a:hover {
+  color: var(--color-link-hover);
+  border-color: var(--color-link-hover);
+}
+
+/* ------------------------------------------------
+   Scroll reveal
+   ------------------------------------------------ */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-reveal].visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------
+   Responsive
+   ------------------------------------------------ */
+
+@media (max-width: 480px) {
+  main {
+    padding-top: 12vh;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .bio {
+    font-size: 1.1rem;
+  }
+
+  .experience li {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .exp-date {
+    margin-left: 0;
+  }
+}
+
+/* ------------------------------------------------
+   Print
+   ------------------------------------------------ */
+
+@media print {
+  footer {
+    display: none;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  body {
+    cursor: default;
+  }
+}
