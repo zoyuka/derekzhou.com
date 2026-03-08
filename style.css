@@ -13,7 +13,7 @@
 @font-face {
   font-family: 'Newsreader';
   src: url('/assets/fonts/Newsreader-Bold.woff2') format('woff2');
-  font-weight: 700;
+  font-weight: 500 700;
   font-style: normal;
   font-display: swap;
 }
