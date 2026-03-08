@@ -39,19 +39,27 @@
    ------------------------------------------------ */
 
 :root {
+  color-scheme: light dark;
+
   --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
   --color-bg: #fafaf8;
   --color-text: #111110;
-  --color-dimmed: #999990;
+  --color-dimmed: #74746b;
+  --color-focus: #3b5998;
+  --color-selection-bg: #111110;
+  --color-selection-text: #fafaf8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #111110;
-    --color-text: #e8e8e4;
-    --color-dimmed: #706f6a;
+    --color-text: #d4d4d0;
+    --color-dimmed: #8a8a82;
+    --color-focus: #7aa2f7;
+    --color-selection-bg: #d4d4d0;
+    --color-selection-text: #111110;
   }
 }
 
@@ -65,15 +73,33 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 100%;
+}
+
 body {
   font-family: var(--font-sans);
   font-size: 1rem;
   background: var(--color-bg);
   color: var(--color-text);
   cursor: crosshair;
-  line-height: 1.6;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-selection-bg);
+  color: var(--color-selection-text);
+}
+
+/* ------------------------------------------------
+   Focus
+   ------------------------------------------------ */
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* ------------------------------------------------
@@ -83,46 +109,46 @@ body {
 main {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20vh 1.5rem 6rem;
+  padding: clamp(4rem, 15vh, 10rem) 1.5rem clamp(3rem, 8vh, 6rem);
 }
 
-section + section {
-  margin-top: 4.5rem;
+section + section,
+header + section {
+  margin-top: 3.5rem;
 }
 
 /* ------------------------------------------------
-   Typography — three sizes only
+   Typography
    ------------------------------------------------ */
 
-/* 1. Name — large serif */
 h1 {
   font-family: var(--font-serif);
   font-weight: 400;
   font-size: 3.5rem;
+  font-optical-sizing: auto;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
 
-/* 2. Section labels — small caps sans */
 h2 {
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.07em;
   color: var(--color-dimmed);
   margin-bottom: 1.25rem;
 }
 
-/* 3. Body — serif */
 .bio {
   font-family: var(--font-serif);
   font-size: 1.15rem;
-  line-height: 1.75;
+  line-height: 1.6;
+  max-width: 520px;
 }
 
 .bio strong {
-  font-weight: 400;
+  font-weight: 500;
   color: var(--color-text);
 }
 
@@ -146,13 +172,18 @@ h2 {
   padding: 0.6rem 0;
 }
 
+.experience li + li {
+  border-top: 1px solid color-mix(in srgb, var(--color-dimmed) 20%, transparent);
+}
+
 .exp-title {
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .exp-place {
   color: var(--color-dimmed);
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .exp-date {
@@ -169,7 +200,7 @@ h2 {
 footer {
   max-width: 600px;
   margin: 0 auto;
-  padding: 0 1.5rem 6rem;
+  padding: 0 1.5rem clamp(3rem, 8vh, 6rem);
 }
 
 footer a {
@@ -177,9 +208,16 @@ footer a {
   font-size: 0.9rem;
   color: var(--color-text);
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 footer a:hover {
+  color: var(--color-dimmed);
+}
+
+.noscript-email {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
   color: var(--color-dimmed);
 }
 
@@ -188,12 +226,9 @@ footer a:hover {
    ------------------------------------------------ */
 
 @media (max-width: 480px) {
-  main {
-    padding-top: 12vh;
-  }
-
   h1 {
     font-size: 2.5rem;
+    letter-spacing: -0.02em;
   }
 
   .experience li {
@@ -217,5 +252,15 @@ footer a:hover {
 
   body {
     cursor: default;
+    color: #000;
+    background: #fff;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .dimmed {
+    color: #555;
   }
 }

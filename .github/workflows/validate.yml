@@ -21,6 +21,7 @@ jobs:
             robots.txt
             _headers
             _redirects
+            404.html
             assets/favicon.png
             .well-known/security.txt
           )
