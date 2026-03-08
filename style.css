@@ -44,20 +44,14 @@
 
   --color-bg: #fafaf8;
   --color-text: #111110;
-  --color-dimmed: #555550;
-  --color-border: #e0e0dc;
-  --color-link: #111110;
-  --color-link-hover: #555550;
+  --color-dimmed: #999990;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #111110;
-    --color-text: #fafaf8;
-    --color-dimmed: #a0a098;
-    --color-border: #2a2a28;
-    --color-link: #fafaf8;
-    --color-link-hover: #a0a098;
+    --color-text: #e8e8e4;
+    --color-dimmed: #706f6a;
   }
 }
 
@@ -73,6 +67,7 @@
 
 body {
   font-family: var(--font-sans);
+  font-size: 1rem;
   background: var(--color-bg);
   color: var(--color-text);
   cursor: crosshair;
@@ -86,52 +81,48 @@ body {
    ------------------------------------------------ */
 
 main {
-  max-width: 640px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 20vh 1.5rem 4rem;
+  padding: 20vh 1.5rem 6rem;
 }
 
-section {
-  margin-bottom: 3rem;
+section + section {
+  margin-top: 4.5rem;
 }
 
 /* ------------------------------------------------
-   Typography
+   Typography — three sizes only
    ------------------------------------------------ */
 
+/* 1. Name — large serif */
 h1 {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: 2.5rem;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
+  font-size: 3.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
+/* 2. Section labels — small caps sans */
 h2 {
   font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 0.85rem;
+  font-weight: 400;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--color-dimmed);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.role {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--color-dimmed);
-}
-
+/* 3. Body — serif */
 .bio {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
-  line-height: 1.7;
+  font-size: 1.15rem;
+  line-height: 1.75;
 }
 
 .bio strong {
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
 }
 
@@ -152,20 +143,16 @@ h2 {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
-  padding: 0.75rem 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.experience li:last-child {
-  border-bottom: 1px solid var(--color-border);
+  padding: 0.6rem 0;
 }
 
 .exp-title {
-  font-weight: 500;
+  font-size: 1rem;
 }
 
 .exp-place {
   color: var(--color-dimmed);
+  font-size: 1rem;
 }
 
 .exp-date {
@@ -176,51 +163,24 @@ h2 {
 }
 
 /* ------------------------------------------------
-   Footer
+   Footer / links
    ------------------------------------------------ */
 
 footer {
-  max-width: 640px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 0 1.5rem 4rem;
+  padding: 0 1.5rem 6rem;
 }
 
 footer a {
   font-family: var(--font-sans);
   font-size: 0.9rem;
-  color: var(--color-link);
+  color: var(--color-text);
   text-decoration: none;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.1em;
-  transition: color 0.2s, border-color 0.2s;
 }
 
 footer a:hover {
-  color: var(--color-link-hover);
-  border-color: var(--color-link-hover);
-}
-
-/* ------------------------------------------------
-   Scroll reveal
-   ------------------------------------------------ */
-
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-[data-reveal].visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
+  color: var(--color-dimmed);
 }
 
 /* ------------------------------------------------
@@ -233,16 +193,12 @@ footer a:hover {
   }
 
   h1 {
-    font-size: 2rem;
-  }
-
-  .bio {
-    font-size: 1.1rem;
+    font-size: 2.5rem;
   }
 
   .experience li {
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.1rem;
   }
 
   .exp-date {
@@ -257,11 +213,6 @@ footer a:hover {
 @media print {
   footer {
     display: none;
-  }
-
-  [data-reveal] {
-    opacity: 1;
-    transform: none;
   }
 
   body {
