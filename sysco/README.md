@@ -266,6 +266,39 @@ evidence in the whole model and cannot be queried live at all — UCC filings, b
 schedules, FDD Item 8, checkbook data and court dockets. A result is a floor on what
 exists, never a ceiling. Without that list, a thin result reads as exoneration.
 
+## 6a. Every inference path considered
+
+An exhaustive sweep, including the ones that turned out not to work. A path that
+fails is worth recording — otherwise it gets re-proposed forever.
+
+### Wired up and verified live
+
+| Path | Verdict |
+| --- | --- |
+| **SEC EDGAR full-text search** | **The best find of this pass.** Free, no key, and the *only* Tier A source queryable in real time. Public operators name distributors in 10-K risk factors and file distribution agreements as exhibits. A live query surfaced Champps' **Master Distribution Agreement with Sysco Corporation, Exhibit 10.27** — an executed contract on SEC servers. |
+| **Sysco Studio / Menu Services fingerprints** | Sysco sells its customers a menu-design tool that exports print-ready PDFs. The generating application survives in document metadata, and Sysco-hosted asset URLs survive in HTML. Near a signed receipt, because the tool is offered to customers rather than the open market. Cheap to check and far stronger than ingredient inference. |
+| Socrata cross-portal records, USAspending, curated corpus | Covered in §6. |
+
+### Researched, real, but not live-queryable
+
+| Path | Why it holds up | Why it is not wired |
+| --- | --- | --- |
+| **IRS Form 990, Part VII §B** | Every filing nonprofit must name its five highest-paid contractors over $100k. Catches nonprofit hospitals, universities, senior living and private schools paying Sysco. | Needs the IRS XML bulk corpus; not a per-query lookup. |
+| **Product-liability / foodborne-illness suits** | Chain-of-distribution liability means plaintiffs name the restaurant *and* the distributor as co-defendants. **Fixes the distressed-operator bias** that collection suits have — it reaches healthy restaurants, which no other court source does. | PACER plus county dockets; no unified API. |
+| **FDA recall consignee lists** | Recalls trace product from distributor to receiving establishment. openFDA is a free API. | FDA publishes retail consignee lists only case-by-case, and this has been a live transparency fight. Coverage is too erratic to score. |
+| **Sysco distribution-centre proximity** | Broadline delivery economics are distance-sensitive, so distance to the nearest Sysco DC versus a competitor's is a legitimate *prior* adjustment rather than evidence. | Would refine the base rate, not identify a customer. Worth adding; not evidence. |
+| **Sysco stock food photography** | Sysco supplies marketing imagery to customers. Perceptual-hash matching a restaurant's site against that library would be strong. | Needs a hash index of Sysco's image library. |
+| **Industry forum disclosures** | Line cooks routinely name their distributor on r/KitchenConfidential and similar. | Unverifiable identity; would need heavy moderation. Crowd tier at best. |
+
+### Considered and rejected
+
+- **Circana SupplyTrack / Datassential** — licence forbids operator-level identification. Fatal, not incidental.
+- **Customs / bill-of-lading data** — describes Sysco's *own* imports, not its customers. Wrong end of the chain.
+- **Building permits, grease-trap and waste-hauling contracts** — no supplier linkage.
+- **Street View / satellite imagery of loading docks** — a truck at a dock is a delivery, not an account, and the cost per observation is enormous.
+- **Union contracts, WARN notices, H-2B filings** — no supplier field exists.
+- **Consumer reviews asserting "this is Sysco food"** — an aesthetic judgement about frozen product, not an observation of a supply relationship. Scoring it would encode snobbery as evidence.
+
 ### Security of the live endpoint
 
 The menu analyser fetches a URL supplied by whoever is using the page, which makes it

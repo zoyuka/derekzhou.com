@@ -137,3 +137,33 @@ test('an operator with genuinely nothing still reads as no-evidence', () => {
   const s = scoreOperator({ id: 'x', name: 'X', evidence: [] }, { asOf: NOW });
   assert.equal(s.verdict, 'no-evidence');
 });
+
+test("detects Sysco's own menu-design tooling in the raw document", () => {
+  // The giveaway lives in PDF metadata or an asset URL, never in visible copy.
+  const raw = '<html><head><meta name="generator" content="Sysco Studio"></head><body>Burger $12</body></html>';
+  const r = analyzeMenu({ text: 'Burger $12', raw, observedAt: NOW });
+  assert.ok(types(r).includes('menu_sysco_studio'));
+});
+
+test('tooling detection reads the raw document, not the stripped text', () => {
+  const raw = '<img src="https://syscostudio.com/assets/hero.jpg">Burger $12';
+  const stripped = 'Burger $12';
+  assert.ok(types(analyzeMenu({ text: stripped, raw, observedAt: NOW })).includes('menu_sysco_studio'));
+  // Without the raw document the signal is invisible — which is the whole point.
+  assert.ok(!types(analyzeMenu({ text: stripped, observedAt: NOW })).includes('menu_sysco_studio'));
+});
+
+test('Sysco tooling outweighs ordinary menu forensics but still cannot confirm', () => {
+  const raw = 'Producer: Sysco Studio\nBurger $12.00';
+  const s = scoreOperator(
+    { id: 'x', name: 'X', evidence: analyzeMenu({ text: 'Burger $12.00', raw, observedAt: NOW }) },
+    { asOf: NOW }
+  );
+  assert.ok(s.probability > 0.85);
+  assert.notEqual(s.verdict, 'confirmed', 'tier B evidence must never confirm');
+});
+
+test('an ordinary menu triggers no tooling signal', () => {
+  const raw = '<html><head><meta name="generator" content="WordPress"></head><body>Burger $12</body></html>';
+  assert.ok(!types(analyzeMenu({ text: 'Burger $12', raw, observedAt: NOW })).includes('menu_sysco_studio'));
+});

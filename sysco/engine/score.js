@@ -26,6 +26,9 @@ export const SEGMENT_PRIORS = {
   government: 0.30,
 };
 
+// Minimum identity/interpretation confidence for a documentary item to confirm.
+export const CONFIRM_MIN_RESOLUTION = 0.7;
+
 const logit = (p) => Math.log(p / (1 - p));
 const sigmoid = (x) => 1 / (1 + Math.exp(-x));
 
@@ -181,16 +184,23 @@ export function applyTierCap(probability, bestTier, contributions) {
     };
   }
 
-  // A single decayed Tier-A item shouldn't read as freshly confirmed either.
+  // A documentary item only confirms if it is current AND we are actually confident
+  // it refers to this operator. Resolution below this threshold means the identity
+  // match or the reading of the document is itself in doubt — a filing whose prose
+  // is ambiguous between "we buy from Sysco" and "we compete with Sysco" is not
+  // confirmation of anything, however recent it is.
   if (band === 'confirmed') {
-    const freshDocumentary = positives.some(
-      (c) => c.tier === TIER.A && !c.propagated && c.decay > 0.35
+    const confirming = positives.filter(
+      (c) => c.tier === TIER.A && !c.propagated && c.decay > 0.35 && c.resolution >= CONFIRM_MIN_RESOLUTION
     );
-    if (!freshDocumentary) {
+    if (!confirming.length) {
+      const stale = positives.some((c) => c.tier === TIER.A && !c.propagated);
       return {
         band: 'likely',
         capped: true,
-        reason: 'Capped below "confirmed": all documentary evidence is stale.',
+        reason: stale
+          ? 'Capped below "confirmed": documentary evidence is stale, or too uncertain to attribute to this operator.'
+          : 'Capped below "confirmed": all documentary evidence is stale.',
       };
     }
   }

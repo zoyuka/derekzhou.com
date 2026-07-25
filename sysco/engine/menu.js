@@ -61,6 +61,28 @@ const LOCAL_CLAIM = /\b(locally\s+sourced|locally\s+grown|farm[\s-]?to[\s-]?tabl
 // unattributed "locally sourced".
 const NAMED_FARM = /\b([A-Z][A-Za-z'’-]+(?:\s+[A-Z][A-Za-z'’-]+){0,3})\s+(Farms?|Ranch|Creamery|Orchards?|Dairy|Fishery|Apiary|Gardens?)\b/g;
 
+// Fingerprints left by Sysco's own menu-design product. Sysco Studio exports
+// print-ready PDFs, and PDF metadata records the generating application, so these
+// strings survive into the published file. Also covers Sysco-hosted asset domains,
+// which appear when an operator embeds artwork straight from the tool.
+const SYSCO_STUDIO_MARKERS = [
+  'sysco studio', 'syscostudio.com', 'solutions.sysco.com', 'foodie.sysco.com',
+  'sysco menu services', 'gobeyondfood.com', 'shop.sysco.com', 'sysco.com/menu',
+];
+
+/**
+ * Detect Sysco's own tooling in a menu document.
+ *
+ * @param {string} raw - the unprocessed document: PDF metadata block, raw HTML with
+ *        attributes intact, or HTTP headers. Must NOT be the text-stripped version,
+ *        since the giveaway usually lives in a Producer field or an asset URL rather
+ *        than in visible copy.
+ */
+export function detectSyscoTooling(raw) {
+  const lower = String(raw || '').toLowerCase();
+  return SYSCO_STUDIO_MARKERS.filter((m) => lower.includes(m));
+}
+
 const norm = (s) => String(s || '').toLowerCase();
 
 /**
@@ -76,6 +98,20 @@ export function analyzeMenu(menu, ctx = {}) {
   const text = String(menu.text || '');
   const lower = norm(text);
   const out = [];
+
+  // Checked against the raw document, before tag stripping, because PDF producer
+  // fields and asset URLs never survive into visible text.
+  const tooling = detectSyscoTooling(menu.raw ?? text);
+  if (tooling.length) {
+    out.push({
+      observedAt: menu.observedAt,
+      sourceUrl: menu.sourceUrl,
+      sourceLabel: menu.sourceLabel || 'Menu',
+      type: 'menu_sysco_studio',
+      note: `Menu document carries Sysco tooling fingerprints: ${tooling.join(', ')}`,
+      resolution: 0.85,
+    });
+  }
   const base = {
     observedAt: menu.observedAt,
     sourceUrl: menu.sourceUrl,

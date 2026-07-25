@@ -147,3 +147,22 @@ test('refuses to guess when a string names both Sysco and a competitor', () => {
 test('normalizeOpCo collapses legal boilerplate', () => {
   assert.equal(normalizeOpCo('SYSCO FOOD SERVICES OF PORTLAND, INC.'), 'Sysco Portland');
 });
+
+test('a fresh documentary item cannot confirm if its resolution is low', () => {
+  // Resolution 0.4 is what an SEC filing gets when its prose is ambiguous between
+  // "we purchase from Sysco" and "we compete with Sysco". Recency must not rescue it.
+  const uncertain = scoreOperator(
+    op(Array.from({ length: 6 }, () => ({ type: 'sec_filing_disclosure', observedAt: NOW, resolution: 0.4 }))),
+    { asOf: NOW }
+  );
+  assert.ok(uncertain.probability > 0.9, 'raw probability should clear the bar');
+  assert.notEqual(uncertain.verdict, 'confirmed');
+  assert.equal(uncertain.capped, true);
+
+  // The same evidence, clearly interpreted, does confirm.
+  const certain = scoreOperator(
+    op([{ type: 'sec_filing_disclosure', observedAt: NOW, resolution: 0.9 }]),
+    { asOf: NOW }
+  );
+  assert.equal(certain.verdict, 'confirmed');
+});

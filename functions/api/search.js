@@ -10,6 +10,7 @@
 // live at all. Without it, a thin result reads as exoneration.
 
 import { searchOperators } from './lib/socrata.js';
+import { findFilingEvidence } from './lib/edgar.js';
 import { guardedFetch, FetchError } from './lib/http.js';
 import { scoreOperator, describeVerdict, VERDICT_LABELS } from '../../sysco/engine/score.js';
 import { deriveEdges, propagateEvidence } from '../../sysco/engine/graph.js';
@@ -73,6 +74,33 @@ export async function onRequestGet(context) {
     operators = toOperators(records);
   } catch (err) {
     coverage.failed.push({ name: 'Socrata discovery', reason: String(err?.message || err) });
+  }
+
+  // --- SEC filings: the only documentary source that can be queried live ---
+  try {
+    const { evidence, examined, discarded, classified } = await findFilingEvidence(q);
+    coverage.searched.push({
+      name: 'SEC EDGAR full-text search (10-K supplier disclosures)',
+      kind: 'sec',
+      matches: evidence.length,
+      link: 'https://efts.sec.gov/LATEST/search-index?q=%22Sysco%22&forms=10-K',
+      note: discarded
+        ? `${examined} filings examined, ${discarded} discarded as competitor mentions by a food distributor, ${classified} read in context.`
+        : undefined,
+    });
+    for (const e of evidence) {
+      const existing = operators.find((o) => matches(o.name, e.filerName) || matches(e.filerName, o.name));
+      if (existing) existing.evidence.push(e.evidence);
+      else operators.push({
+        id: `sec:${slug(e.filerName)}`,
+        name: e.filerName,
+        segment: 'regional-chain',
+        evidence: [e.evidence],
+        sources: [{ name: 'SEC EDGAR', link: e.evidence.sourceUrl, dataset: 'edgar' }],
+      });
+    }
+  } catch (err) {
+    coverage.failed.push({ name: 'SEC EDGAR', reason: String(err?.message || err) });
   }
 
   // --- Curated corpus: the documentary findings that cannot be fetched live ---
@@ -199,6 +227,9 @@ async function analyzeMenuUrl(menuUrl, { state }) {
     const plain = stripHtml(text);
     const evidence = analyzeMenu(
       {
+        // `raw` keeps tags, asset URLs and PDF metadata intact. Sysco's own menu tool
+        // leaves its fingerprint there, never in the visible copy.
+        raw: text,
         text: plain,
         observedAt: new Date().toISOString(),
         sourceUrl: url,

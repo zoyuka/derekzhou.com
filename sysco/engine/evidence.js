@@ -130,6 +130,40 @@ export const EVIDENCE_TYPES = {
       'A given franchisee may buy from a different name on the list.',
   },
 
+  sec_filing_disclosure: {
+    tier: TIER.A,
+    lr: 350,
+    halfLifeYears: 3,
+    label: 'SEC filing names Sysco as a supplier',
+    basis:
+      'Public foodservice operators name their distributors in 10-K risk factors and ' +
+      'supplier-concentration disclosures, and file master distribution agreements as ' +
+      'material-contract exhibits. A 10-K carries a Sarbanes-Oxley certification, so this ' +
+      'is a party admission in a federally filed document. Verified live against EDGAR ' +
+      'full-text search, which is free and needs no key — the only Tier A source that can ' +
+      'be queried in real time.',
+    falsePositives:
+      'A mention is not automatically a purchase: distributors name Sysco as a competitor ' +
+      'in every filing. Industry code and surrounding language both have to agree before ' +
+      'this scores at full weight, and filings that read as competitive are discarded.',
+  },
+
+  menu_sysco_studio: {
+    tier: TIER.B,
+    lr: 60,
+    halfLifeYears: 2,
+    label: 'Menu produced with Sysco\'s own design tool',
+    basis:
+      'Sysco Studio is a menu-design product Sysco offers its customers, which exports ' +
+      'print-ready PDFs. Those files carry the generating application in their metadata, so ' +
+      'a menu PDF produced by it is close to a signed receipt — the tool is offered to Sysco ' +
+      'customers, not to the general market. Much stronger than ordinary menu forensics ' +
+      'because it identifies the distributor directly rather than inferring from ingredients.',
+    falsePositives:
+      'A design agency could produce a menu through a Sysco account for a non-customer; ' +
+      'metadata can be stripped or rewritten by later editing.',
+  },
+
   state_vendor_payment: {
     tier: TIER.A,
     lr: 300,
