@@ -1,4 +1,4 @@
-import { scoreOperator, VERDICT_LABELS, describeVerdict } from '../engine/score.js';
+import { scoreOperator, VERDICT_LABELS, describeVerdict } from './engine/score.js';
 
 const BAND_ORDER = ['no-evidence', 'weak', 'possible', 'likely', 'confirmed'];
 

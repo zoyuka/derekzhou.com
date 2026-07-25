@@ -60,6 +60,31 @@ jobs:
           fi
           echo "No secrets found"
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run tests
+        run: |
+          # Auth middleware first: a regression here silently exposes /private/.
+          node --test "functions/private/*.test.js"
+          node --test "private/sysco/engine/*.test.js"
+
+      - name: Private routes must be gated
+        run: |
+          # Guards against the failure mode where someone adds a page under
+          # /private/ but the middleware or its routing has been removed.
+          if [ -d private ] && [ ! -f functions/private/_middleware.js ]; then
+            echo "::error::private/ exists but the auth middleware is missing"
+            exit 1
+          fi
+          if ! grep -q '"/private/\*"' _routes.json; then
+            echo "::error::_routes.json does not route /private/* through Functions"
+            exit 1
+          fi
+          echo "Private route gating OK"
+
       - name: Validate HTML
         run: |
           # Basic HTML validity checks

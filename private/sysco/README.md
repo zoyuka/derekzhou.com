@@ -171,21 +171,29 @@ engine/evidence.js    Evidence registry: likelihood ratios, half-lives, stated b
 engine/score.js       Log-odds scoring: priors, decay, resolution scaling, correlation damping, tier cap
 engine/score.test.js  16 tests, including the guardrails above
 pipeline/usaspending.js  Live connector against the public USAspending API (no key)
-app/                  Static UI: search, verdict bands, per-item evidence math, citations
+index.html app.js app.css  Static UI: search, verdict bands, per-item evidence math, citations
+data.seed.json        Curated corpus; entries flagged "synthetic" are demo fixtures
+data.usaspending.json Real data from a live API pull
 ```
 
-Run it:
+Run it, from this directory:
 
 ```sh
-npm test                                              # 16/16
-node pipeline/usaspending.js --years 3 --out app/data.usaspending.json
-npm run serve                                         # then open /app/index.html
+npm test                                          # 16/16
+node pipeline/usaspending.js --years 3 --out data.usaspending.json
+npm run serve                                     # then open http://localhost:8080/
 ```
 
-The shipped `app/data.usaspending.json` is real data from a live pull. Entries in
-`app/data.seed.json` marked `"synthetic": true` are demo fixtures that exercise the
-scoring bands; they are labelled as such in the UI and must never be presented as
+Entries in `data.seed.json` marked `"synthetic": true` are demo fixtures that exercise
+the scoring bands. They are labelled as such in the UI and must never be presented as
 findings about a real business.
+
+## Access
+
+This app lives under `/private/`, which is gated at the Cloudflare edge by
+`functions/private/_middleware.js`. It is not linked from derekzhou.com and is served
+only to a verified Access identity on the allowlist. See `../SETUP.md` — the gate
+denies everything, including you, until it is configured.
 
 ## 7. Honest limits
 
