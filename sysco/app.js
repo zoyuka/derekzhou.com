@@ -1,6 +1,8 @@
 import { scoreOperator, VERDICT_LABELS, describeVerdict } from './engine/score.js';
+import { deriveEdges, propagateEvidence } from './engine/graph.js';
+import { analyzeMenu } from './engine/menu.js';
 
-const BAND_ORDER = ['no-evidence', 'weak', 'possible', 'likely', 'confirmed'];
+const BAND_ORDER = ['contrary', 'no-evidence', 'weak', 'possible', 'likely', 'confirmed'];
 
 const els = {
   q: document.getElementById('q'),
@@ -28,7 +30,28 @@ async function init() {
     loadJson('data.usaspending.json'),
   ]);
 
-  const operators = [...(seed.operators || []), ...(usasp.operators || [])];
+  const raw = [...(seed.operators || []), ...(usasp.operators || [])];
+
+  // 1. Menu forensics: turn published menus into evidence items before scoring.
+  const withMenus = raw.map((o) => {
+    const menuEvidence = (o.menus || []).flatMap((m) =>
+      analyzeMenu(m, {
+        state: o.state,
+        month: o.menuContext?.month,
+        verifiedFarms: o.verifiedFarms || [],
+      })
+    );
+    return menuEvidence.length
+      ? { ...o, evidence: [...(o.evidence || []), ...menuEvidence] }
+      : o;
+  });
+
+  // 2. Ownership graph: derive relationships, then let evidence flow across them.
+  // Supply relationships are signed by entities and groups, not by storefronts, so a
+  // filing against one LLC is evidence about every location underneath it.
+  const edges = deriveEdges(withMenus);
+  const operators = propagateEvidence(withMenus, edges);
+
   scored = operators
     .map((o) => ({
       ...scoreOperator(o),
@@ -64,6 +87,8 @@ function render() {
     els.results.replaceChildren(li);
   }
 }
+
+const round3 = (n) => Number(Number(n).toFixed(3));
 
 // Built with createElement throughout. No innerHTML anywhere: every string here
 // originates in a public record or a user submission, so it is untrusted by default.
@@ -111,7 +136,7 @@ function card(r) {
       const item = el('li');
       const head = el('div', 'ev-h');
       head.append(el('strong', null, c.label));
-      head.append(el('span', 'tier', c.tier));
+      head.append(el('span', 'tier', c.propagated ? 'inherited' : c.tier));
       const impact = el('span', `impact ${c.impact >= 0 ? 'pos' : 'neg'}`,
         `${c.impact >= 0 ? '+' : ''}${c.impact} log-odds`);
       head.append(impact);
@@ -119,8 +144,17 @@ function card(r) {
 
       if (c.note) item.append(el('div', 'note', c.note));
 
+      // Inherited evidence must show its provenance. A reader has to be able to see
+      // that this is a claim about a related business, not about this one.
+      if (c.propagated && c.via) {
+        item.append(el('div', 'inherited',
+          `Not observed at this location — inherited from ${c.via.fromName} ` +
+          `via ${c.via.chain.join(' → ')} (${c.via.hops} hop${c.via.hops === 1 ? '' : 's'}, ` +
+          `weight ×${c.via.attenuation})`));
+      }
+
       const detail = el('div', 'note',
-        `LR ${c.rawLr} · recency weight ${c.decay} · identity match ${c.resolution}` +
+        `LR ${c.rawLr} · recency weight ${c.decay} · identity match ${round3(c.resolution)}` +
         (c.dampen < 1 ? ` · correlation damping ×${c.dampen}` : '') +
         (c.observedAt ? ` · observed ${c.observedAt.slice(0, 10)}` : ' · undated'));
       item.append(detail);

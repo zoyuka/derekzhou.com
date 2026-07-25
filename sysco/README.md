@@ -78,13 +78,47 @@ who stopped paying, so it badly under-samples healthy customers.
 name operators directly. A party admission by the distributor; essentially no
 false-positive path.
 
+**Franchise Disclosure Documents.** The highest-leverage source per document. FTC rules
+require Item 8 of an FDD to disclose what a franchisee must buy from the franchisor or
+its designated suppliers, any revenue or rebate the franchisor earns on those sales, and
+the identity of any required purchasing cooperative. Where Item 8 names Sysco, every
+franchisee in the system is contractually pushed toward it — one filing covering hundreds
+of locations. Registration states publish FDDs and Wisconsin's DFI hosts them free and
+searchable. The caveat is that Item 8 often lists several *approved* suppliers rather than
+one *required* one, which is weaker and must be scored as such.
+
+**State and municipal checkbook data.** Far higher volume than federal contract data.
+New York's Open Book, OpenCT, the Illinois Comptroller, Texas and Oklahoma all publish
+vendor-level payments; searching the payee side returns the paying agency, date and
+amount. Same limitation as federal: institutional buyers, not independent restaurants.
+
 ### Tier B
 
-**Menu forensics.** Arrezzio, Block & Barrel, Portico, Butcher's Block, Casa Solana,
-Wholesome Farms, Baker's Source, Fire River Farms, House Recipe, Jade Mountain, White
-Marble Farms and Sysco Simply are Sysco-owned labels not sold through competing
-broadliners. Naming one on a public menu is strong evidence — though operators rarely
-do it, which limits reach more than accuracy.
+**Menu forensics.** A menu is a bill of materials the operator publishes voluntarily.
+Four readings, in descending strength:
+
+- *Sysco private labels.* Arrezzio, Block & Barrel, Portico, Butcher's Block, Casa Solana,
+  Wholesome Farms, Baker's Source, Fire River Farms, House Recipe, Jade Mountain, White
+  Marble Farms and Sysco Simply are Sysco-owned and not sold through competing broadliners.
+  Nearly conclusive, but operators rarely name them.
+- *Convenience-item clusters.* Mozzarella sticks, onion rings, boneless wings, potato
+  skins, crab rangoon. These arrive frozen, breaded and portioned. One proves nothing; a
+  cluster is a strong operational tell — though the distributor could equally be US Foods
+  or PFG, which is why the likelihood ratio stays modest.
+- *Portion specs.* A kitchen breaking down primals does not describe a steak to the ounce.
+  "8 oz center-cut sirloin" is a number off a distributor spec sheet.
+- *Operational impossibility.* 90+ items, or 60+ across several cuisines, requires hundreds
+  of SKUs at stable cost and year-round availability, which farm-direct sourcing cannot
+  deliver. Likewise heirloom tomatoes on a January menu in Minnesota. **This is the main
+  path that reaches the independent restaurants no registry, docket or contract touches** —
+  the coverage gap that documentary sources structurally cannot close.
+
+**Local sourcing, as negative evidence — but only when checkable.** Farm names on the menu
+are matched against USDA's Local Food Directories (farmers market, CSA, food hub, on-farm
+market, all with APIs and bulk CSV) and the USDA Organic INTEGRITY database of certified
+operations. A verified relationship with named producers genuinely lowers the probability.
+An unverifiable "locally sourced" is scored as near-neutral marketing — deliberately, since
+treating it as evidence would let any operator edit their way out of the dataset.
 
 **Photo evidence.** Crowd-submitted images of Sysco cases, invoices or a delivery in
 progress. Valuable because it reaches the independents no registry covers, and weak
@@ -111,10 +145,40 @@ all three cases and *refuses to guess* when a string names both Sysco and a comp
 This filter earns its keep immediately: on a live 5,000-award pull it rejected 7 rows
 that keyword matching would have accepted.
 
+**The relationship graph — the highest-leverage idea in the whole design.** Supply
+contracts are not signed per restaurant. They are signed by an operating entity, a
+management company, or a franchise system, and then apply to every location underneath.
+So a UCC filing naming one LLC is evidence about a dozen storefronts, and an FDD naming
+a designated distributor is evidence about hundreds. Modelling restaurants as independent
+data points throws away most of the available signal.
+
+`engine/graph.js` builds an operator graph from shared legal entities, owners and
+officers, management companies, phone numbers, premises and registered agents, then
+propagates evidence across it with attenuation per edge type and per hop. Three details
+make it defensible rather than a rumour mill:
+
+- *Hub penalty.* Edge weight is divided by the square root of the connecting entity's
+  degree. A registered agent listed on 400 filings — CT Corporation and friends — wires
+  the whole dataset together if you let it, so it is penalised into irrelevance. A person
+  appearing on exactly two filings is not. This is the graph analogue of inverse document
+  frequency.
+- *Max-product paths, not summed paths.* One underlying fact reachable by three routes is
+  still one fact. Summing over paths would double-count it, the same independence error
+  correlation damping fixes for repeated evidence.
+- *Propagated evidence never propagates onward*, and **never counts as documentary**.
+  Inheriting a sibling's sworn bankruptcy schedule is an inference about a different legal
+  person. It can raise the probability; it can never produce a "confirmed" verdict. The UI
+  labels every inherited item with the chain it travelled and the weight it lost.
+
 **Entity resolution on the operator side — the genuinely hard one.** A UCC debtor is
 a legal entity (`JBK Holdings LLC`), not a trade name (`Joe's Diner`). Bridging them
 requires joining state business registries, DBA/assumed-name filings, and health-permit
-or liquor-licence records, which carry legal name, trade name and address together.
+or liquor-licence records, which carry legal name, trade name and address together. NYC's
+Legally Operating Businesses dataset is a worked example: it carries legal `business_name`
+alongside `dba_trade_name`, plus building identifiers and contact phone, which is exactly
+the join this needs — and grouping it by legal entity immediately surfaces operators
+running dozens of locations (along with `ecoATM, LLC` vs `ECOATM LLC`, a reminder that
+normalisation is doing real work).
 This join is probabilistic and it is where a real build would spend most of its effort.
 The engine models this honestly rather than pretending it is solved: every evidence
 item carries a `resolution` score in 0–1, and a filing we are only 40% sure maps to
@@ -169,7 +233,9 @@ The mitigations are structural, not cosmetic:
 engine/entities.js    Sysco entity resolution across OpCos, subsidiaries, competitors, OCR noise
 engine/evidence.js    Evidence registry: likelihood ratios, half-lives, stated basis, false-positive paths
 engine/score.js       Log-odds scoring: priors, decay, resolution scaling, correlation damping, tier cap
-engine/score.test.js  16 tests, including the guardrails above
+engine/graph.js       Operator graph + evidence propagation with hub penalty and hop decay
+engine/menu.js        Menu forensics + local-sourcing verification
+engine/*.test.js      45 tests, including every guardrail above
 pipeline/usaspending.js  Live connector against the public USAspending API (no key)
 index.html app.js app.css  Static UI: search, verdict bands, per-item evidence math, citations
 data.seed.json        Curated corpus; entries flagged "synthetic" are demo fixtures
@@ -179,7 +245,7 @@ data.usaspending.json Real data from a live API pull
 Run it, from this directory:
 
 ```sh
-npm test                                          # 16/16
+npm test                                          # 45/45
 node pipeline/usaspending.js --years 3 --out data.usaspending.json
 npm run serve                                     # then open http://localhost:8080/
 ```
@@ -204,8 +270,14 @@ content reaches the browser before any client-side check can run.
 
 - **Coverage is skewed to institutions and the distressed.** Government contracts
   reach schools and bases; bankruptcy and collection suits reach failing operators.
-  Neither reaches the healthy independent restaurant most users would search for.
-  Closing that gap means UCC bulk ingestion plus crowd-sourcing, not better modelling.
+  Menu forensics and graph propagation are what reach the healthy independent, and both
+  are inference rather than documentation — which is why neither can confirm.
+- **The graph is only as good as its ownership data.** Officer and DBA coverage varies
+  enormously by state, and a missing edge silently costs signal rather than announcing
+  itself.
+- **Menu inference is the weakest link by design.** Every threshold in `menu.js` — three
+  convenience items, 90 menu items, the winter produce list — is a judgement call, and a
+  stale online menu is scored as if current.
 - **UCC coverage is state-by-state**, gated on which states permit secured-party
   search.
 - **The USAspending connector resolves buyers to agency-plus-state**, not to an

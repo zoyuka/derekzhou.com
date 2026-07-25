@@ -1,5 +1,5 @@
 {
-  "note": "Curated evidence corpus. Entries with \"synthetic\": true are illustrative fixtures used to exercise scoring bands in the demo and must never be presented as findings about a real business. All other entries cite a published source.",
+  "note": "Curated evidence corpus. Entries with \"synthetic\": true are illustrative fixtures used to exercise scoring, graph propagation and menu inference in the demo, and must never be presented as findings about a real business. All other entries cite a published source.",
   "operators": [
     {
       "id": "seed:restaurants-unlimited",
@@ -72,22 +72,66 @@
       "segment": "independent",
       "state": "GA",
       "synthetic": true,
+      "legalEntity": "Harbour Hospitality Group LLC",
+      "owners": ["Marcus Delaney"],
+      "phone": "4045550111",
       "evidence": [
         {
           "type": "ucc_filing",
           "observedAt": "2024-02-14T00:00:00Z",
           "sourceLabel": "GA UCC index — secured party search",
           "sourceUrl": "https://search.gsccca.org/UCC_Search/search.asp?searchtype=SecuredParty",
-          "note": "Blanket all-assets filing, Sysco Atlanta as secured party",
+          "note": "Blanket all-assets filing, Sysco Atlanta as secured party, debtor Harbour Hospitality Group LLC",
           "resolution": 0.72
-        },
+        }
+      ],
+      "menus": [
         {
-          "type": "menu_private_label",
           "observedAt": "2026-03-02T00:00:00Z",
           "sourceLabel": "Operator menu PDF",
           "sourceUrl": "https://example.invalid/menu",
-          "note": "Menu names \"Portico\" shrimp",
-          "resolution": 0.9
+          "text": "Grilled Portico shrimp $24.00\n8 oz center-cut sirloin $28.00\nMozzarella sticks $9.00\nOnion rings $8.00\nBoneless wings $12.00"
+        }
+      ]
+    },
+    {
+      "id": "demo:harbour-tavern",
+      "name": "Harbour Tavern (demo fixture)",
+      "segment": "independent",
+      "state": "GA",
+      "synthetic": true,
+      "legalEntity": "Harbour Hospitality Group LLC",
+      "owners": ["Marcus Delaney"],
+      "phone": "4045550111",
+      "evidence": [],
+      "menus": []
+    },
+    {
+      "id": "demo:delaney-pizzeria",
+      "name": "Delaney's Pizzeria (demo fixture)",
+      "segment": "independent",
+      "state": "GA",
+      "synthetic": true,
+      "legalEntity": "MD Pizza Ventures LLC",
+      "owners": ["Marcus Delaney"],
+      "evidence": [],
+      "menus": []
+    },
+    {
+      "id": "demo:route-9-diner",
+      "name": "Route 9 Diner (demo fixture)",
+      "segment": "independent",
+      "state": "MN",
+      "synthetic": true,
+      "menuContext": { "month": 1 },
+      "evidence": [],
+      "menus": [
+        {
+          "observedAt": "2026-01-20T00:00:00Z",
+          "sourceLabel": "Menu scraped from operator website",
+          "sourceUrl": "https://example.invalid/route9",
+          "cuisineCount": 4,
+          "text": "Mozzarella sticks $9.00\nOnion rings $8.00\nPotato skins $10.00\nBoneless wings $12.00\nJalapeno poppers $9.00\nCrab rangoon $8.00\nEgg rolls $7.00\nHeirloom tomato salad $14.00\nFresh berries parfait $9.00\n6 oz sirloin steak $22.00\nChicken parmesan $17.00\nPad thai $16.00\nFajitas $19.00\nGyro platter $15.00\nFish and chips $16.00\nMeatloaf $14.00\nReuben $13.00\nClub sandwich $12.00\nCobb salad $13.00\nCaesar salad $11.00"
         }
       ]
     },
@@ -122,6 +166,7 @@
       "segment": "independent",
       "state": "VT",
       "synthetic": true,
+      "verifiedFarms": ["Stone Ridge Orchard", "Blue Hill Farm"],
       "evidence": [
         {
           "type": "competitor_disclosure",
@@ -130,14 +175,14 @@
           "sourceUrl": "https://example.invalid/sourcing",
           "note": "States Performance Food Group is its primary distributor",
           "resolution": 0.9
-        },
+        }
+      ],
+      "menus": [
         {
-          "type": "local_sourcing_claim",
-          "observedAt": "2026-01-15T00:00:00Z",
+          "observedAt": "2026-05-01T00:00:00Z",
           "sourceLabel": "Operator sourcing page",
           "sourceUrl": "https://example.invalid/sourcing",
-          "note": "Claims farm-direct sourcing within 50 miles",
-          "resolution": 0.9
+          "text": "Our produce comes from Blue Hill Farm and Stone Ridge Orchard. Locally sourced, farm-to-table.\nHand-cut fries $7.00\nHouse-made pasta $19.00\nDry-aged ribeye $38.00\nBaked daily sourdough $5.00"
         }
       ]
     },

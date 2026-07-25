@@ -114,6 +114,119 @@ export const EVIDENCE_TYPES = {
     falsePositives: 'Reused boxes; photo taken elsewhere; deliberate misattribution.',
   },
 
+  franchise_designated_supplier: {
+    tier: TIER.A,
+    lr: 250,
+    halfLifeYears: 3,
+    label: 'Franchise system designates Sysco as a supplier',
+    basis:
+      'FTC rules require Item 8 of a Franchise Disclosure Document to name suppliers a ' +
+      'franchisee must or may buy from, disclose any franchisor revenue from those sales, ' +
+      'and identify required purchasing cooperatives. Where Item 8 names Sysco, every ' +
+      'franchisee in the system is contractually pushed toward it — one document covering ' +
+      'hundreds of locations. Registration states publish FDDs; Wisconsin DFI hosts them free.',
+    falsePositives:
+      'Item 8 often lists several approved suppliers rather than one; "approved" is weaker than "required". ' +
+      'A given franchisee may buy from a different name on the list.',
+  },
+
+  state_vendor_payment: {
+    tier: TIER.A,
+    lr: 300,
+    halfLifeYears: 3,
+    label: 'State or municipal checkbook shows payments to Sysco',
+    basis:
+      'Most states publish every vendor payment (New York Open Book, OpenCT, Illinois ' +
+      'Comptroller, Texas, Oklahoma and others). Searching the payee side returns the paying ' +
+      'agency, date and amount. Authoritative, dated, and far higher volume than federal ' +
+      'contract data — but again institutional buyers, not independent restaurants.',
+    falsePositives: 'Payee strings are messy and may name a reseller or a reimbursement.',
+  },
+
+  menu_broadline_signature: {
+    tier: TIER.B,
+    lr: 6,
+    halfLifeYears: 1.5,
+    label: 'Menu clusters factory-prepped convenience items',
+    basis:
+      'Mozzarella sticks, onion rings, boneless wings, potato skins and similar arrive frozen, ' +
+      'breaded and portioned. A kitchen listing several is buying from a broadline distributor. ' +
+      'The LR is modest because that distributor may equally be US Foods, PFG or Gordon.',
+    falsePositives: 'A scratch kitchen making its own; regional cash-and-carry supply.',
+  },
+
+  menu_portion_spec: {
+    tier: TIER.B,
+    lr: 4,
+    halfLifeYears: 1.5,
+    label: 'Menu quotes exact case-pack portion weights',
+    basis:
+      'A kitchen breaking down primals does not describe a steak to the ounce. That number ' +
+      'comes off a distributor spec sheet for pre-portioned, case-packed protein.',
+    falsePositives: 'Legal portion-disclosure conventions; steakhouse menu convention generally.',
+  },
+
+  menu_breadth: {
+    tier: TIER.B,
+    lr: 4,
+    halfLifeYears: 2,
+    label: 'Menu too broad to sustain without broadline distribution',
+    basis:
+      'Holding 90+ items, or 60+ across several cuisines, requires hundreds of SKUs at ' +
+      'stable cost and year-round availability. Direct and farm-based sourcing does not ' +
+      'deliver that. This is the main signal that reaches independents with no paper trail.',
+    falsePositives: 'Large diners with deep regional supplier relationships; stale online menus.',
+  },
+
+  menu_out_of_season: {
+    tier: TIER.C,
+    lr: 3,
+    halfLifeYears: 1,
+    label: 'Offers produce outside any local growing season',
+    basis:
+      'Heirloom tomatoes or fresh berries on a January menu in a cold-winter state did not ' +
+      'come from a nearby farm. They came through a distribution network.',
+    falsePositives: 'Greenhouse growers; specialist importers; a menu page not updated seasonally.',
+  },
+
+  menu_verified_local_sourcing: {
+    tier: TIER.B,
+    lr: 0.35,
+    halfLifeYears: 1.5,
+    label: 'Named farms confirmed in a public agriculture registry',
+    basis:
+      'Negative evidence, and the only sourcing claim worth weighting. Farm names on the menu ' +
+      'are matched against USDA Local Food Directories (farmers market, CSA, food hub, on-farm ' +
+      'market) and the USDA Organic INTEGRITY database of certified operations. A real, ' +
+      'checkable relationship with named producers genuinely lowers the probability.',
+    falsePositives:
+      'Verified produce sourcing is entirely compatible with dry goods, oil and paper still ' +
+      'arriving on a broadline truck, which is why this only moves the odds and never settles them.',
+  },
+
+  menu_unverified_local_claim: {
+    tier: TIER.C,
+    lr: 0.9,
+    halfLifeYears: 1,
+    label: 'Unverifiable local-sourcing claim',
+    basis:
+      'Deliberately close to neutral. "Locally sourced" with no named producer, or naming ' +
+      'farms that match nothing in any registry, is marketing copy. Treating it as evidence ' +
+      'would let anyone opt out of this dataset by editing their About page.',
+    falsePositives: 'The claim may be true and simply unregistered — many small farms are.',
+  },
+
+  menu_scratch_markers: {
+    tier: TIER.C,
+    lr: 0.6,
+    halfLifeYears: 1.5,
+    label: 'Menu language indicates scratch production',
+    basis:
+      'Hand-cut, whole-animal, dry-aged, house-milled. Real scratch kitchens buy fewer ' +
+      'prepared goods, though they still buy commodities.',
+    falsePositives: 'The single most-copied marketing register in the industry.',
+  },
+
   job_posting: {
     tier: TIER.C,
     lr: 8,

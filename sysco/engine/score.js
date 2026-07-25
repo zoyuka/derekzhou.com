@@ -111,11 +111,17 @@ export function scoreOperator(operator, opts = {}) {
       decay: Number(decay.toFixed(3)),
       resolution,
       dampen: Number(dampen.toFixed(3)),
+      propagated: !!item.propagated,
+      via: item.via,
       // Positive = raises probability, negative = lowers it.
       impact: Number(effectiveLogLr.toFixed(3)),
     });
 
-    if (type.lr > 1) {
+    // Propagated evidence never counts toward evidence quality, whatever its
+    // original tier. A sibling restaurant's bankruptcy schedule is a sworn document
+    // about a different legal person; inheriting it across an ownership edge is an
+    // inference, and inferences must not be able to confirm.
+    if (type.lr > 1 && !item.propagated) {
       if (bestTier === null || tierRank(type.tier) < tierRank(bestTier)) bestTier = type.tier;
     }
   }
@@ -153,11 +159,16 @@ function tierRank(tier) {
 export function applyTierCap(probability, bestTier, contributions) {
   const positives = contributions.filter((c) => c.impact > 0);
 
+  const negatives = contributions.filter((c) => c.impact < 0);
+
   let band;
   if (probability >= 0.9) band = 'confirmed';
   else if (probability >= 0.65) band = 'likely';
   else if (probability >= 0.35) band = 'possible';
   else if (positives.length > 0) band = 'weak';
+  // Having found evidence that points away from Sysco is a different finding from
+  // having found nothing at all, and collapsing the two would misreport both.
+  else if (negatives.length > 0) band = 'contrary';
   else band = 'no-evidence';
 
   if (band === 'confirmed' && bestTier !== TIER.A) {
@@ -172,7 +183,9 @@ export function applyTierCap(probability, bestTier, contributions) {
 
   // A single decayed Tier-A item shouldn't read as freshly confirmed either.
   if (band === 'confirmed') {
-    const freshDocumentary = positives.some((c) => c.tier === TIER.A && c.decay > 0.35);
+    const freshDocumentary = positives.some(
+      (c) => c.tier === TIER.A && !c.propagated && c.decay > 0.35
+    );
     if (!freshDocumentary) {
       return {
         band: 'likely',
@@ -195,6 +208,8 @@ function bandReason(band, n) {
       return 'Some supporting evidence; treat as unconfirmed.';
     case 'weak':
       return 'Only weak or heavily aged signals.';
+    case 'contrary':
+      return 'Evidence found, and it points away from Sysco.';
     default:
       return 'No evidence found. This is not a statement that the restaurant avoids Sysco.';
   }
@@ -205,6 +220,7 @@ export const VERDICT_LABELS = {
   likely: 'Likely customer',
   possible: 'Possible customer',
   weak: 'Weak signal only',
+  contrary: 'Evidence points away',
   'no-evidence': 'No evidence found',
 };
 
@@ -214,6 +230,11 @@ export const VERDICT_LABELS = {
  * protein and specialty houses, so "uses Sysco" never implies "everything is Sysco".
  */
 export function describeVerdict(result) {
+  if (result.verdict === 'contrary') {
+    return `Public evidence about ${result.name} points away from Sysco — a verified sourcing ` +
+      `relationship, another named distributor, or both. It remains entirely possible that ` +
+      `dry goods, oil and paper still arrive on a broadline truck.`;
+  }
   if (result.verdict === 'no-evidence') {
     return `No public evidence links ${result.name} to Sysco. Absence of evidence is not evidence of absence — most Sysco customers leave no public trace.`;
   }
