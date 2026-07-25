@@ -202,3 +202,12 @@ summary { cursor: pointer; font-size: 0.86rem; color: var(--dim); }
 .cov a { color: inherit; }
 .cov .hit { color: var(--accent); }
 .cov .miss { color: var(--dim); opacity: 0.8; }
+
+.trunc {
+  color: var(--warn);
+  font-size: 0.86rem;
+  border-left: 2px solid currentColor;
+  padding-left: 0.6rem;
+  margin: 0.4rem 0;
+  max-width: 70ch;
+}

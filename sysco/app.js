@@ -177,6 +177,10 @@ function renderCoverage(data) {
   els.coverage.append(el('h2', null, 'What was actually searched'));
   els.coverage.append(el('p', 'caveat', data.caveat));
 
+  if (data.coverage.truncated) {
+    els.coverage.append(el('p', 'trunc', data.coverage.truncated.note));
+  }
+
   const searched = data.coverage.searched || [];
   if (searched.length) {
     els.coverage.append(el('h3', null, `Sources queried (${searched.length})`));
@@ -188,6 +192,9 @@ function renderCoverage(data) {
       li.append(label);
       li.append(el('span', s.matches ? 'hit' : 'miss',
         s.error ? ` — ${s.error}` : ` — ${s.matches || 0} match${s.matches === 1 ? '' : 'es'}`));
+      // A caveat that changes how a score should be read belongs next to the score,
+      // not buried in the source list.
+      if (s.note) li.append(el('div', 'trunc', s.note));
       ul.append(li);
     }
     els.coverage.append(ul);

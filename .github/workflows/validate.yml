@@ -71,6 +71,7 @@ jobs:
           # Auth/SSRF guards for the live search API — a regression here turns the
           # menu endpoint into an open proxy.
           node --test "functions/api/lib/*.test.js"
+          node --test "functions/api/search.test.js"
 
       - name: API routes must be wired
         run: |

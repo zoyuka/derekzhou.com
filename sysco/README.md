@@ -251,6 +251,13 @@ metadata, and a dataset with no usable name column is skipped rather than guesse
 US jurisdictions that publish open data. Pasting a menu URL works for any operator on
 earth, because the inference is over the menu itself.
 
+**Two disclosures the live path owes you.** Farm-registry lookup needs an API key and
+so does not run on a live request, which means every local-sourcing claim on a fetched
+menu is scored as *unverified*. That biases live scores **upward, toward Sysco**, for
+exactly the restaurants that genuinely do source locally — so the response says so, and
+says which direction the error runs. Result sets are also capped at 60 operators, and a
+truncated set reports its own truncation rather than presenting as complete.
+
 **The coverage report is not decoration.** This tool's most common answer is "nothing
 found", and that sentence is only interpretable next to a list of what was actually
 consulted. The response always names the datasets queried and how many matched, the

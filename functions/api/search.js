@@ -26,7 +26,18 @@ const OFFLINE_SOURCES = [
   { id: 'fdd', label: 'Franchise Disclosure Documents (Item 8)', why: 'Registration-state portals publish PDFs, not queryable records.' },
   { id: 'checkbook', label: 'State and municipal vendor payments', why: 'Each state runs its own portal with a different interface.' },
   { id: 'courts', label: 'Collection lawsuits', why: 'County-level dockets, no unified public API.' },
+  { id: 'usda-farms', label: 'USDA farm registries (Local Food Directories, Organic INTEGRITY)', why: 'Requires an API key, so local-sourcing claims cannot be verified live. See the note on menu results.' },
 ];
+
+// Local-sourcing claims are only negative evidence when the named farm can be
+// confirmed in a public registry. Live requests have no registry access, so every
+// such claim is scored as unverified — which is the conservative direction for the
+// operator's privacy but biases live scores *upward*, toward Sysco, for exactly the
+// restaurants that genuinely do source locally. Saying so is not optional.
+const FARM_VERIFICATION_NOTE =
+  'Local-sourcing claims on this menu were scored as UNVERIFIED because farm registry ' +
+  'lookup is unavailable live. If this operator does have verifiable farm relationships, ' +
+  'its real probability is lower than shown.';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -82,11 +93,14 @@ export async function onRequestGet(context) {
   let menuReport = null;
   if (menuUrl) {
     menuReport = await analyzeMenuUrl(menuUrl, { state });
+    const sawLocalClaim = (menuReport.evidence || [])
+      .some((e) => e.type === 'menu_unverified_local_claim');
     coverage.searched.push({
       name: 'Menu supplied by you', kind: 'menu',
       matches: menuReport.evidence?.length || 0,
       link: menuReport.ok ? menuUrl : undefined,
       error: menuReport.error,
+      note: sawLocalClaim ? FARM_VERIFICATION_NOTE : undefined,
     });
     if (menuReport.ok && menuReport.evidence.length) {
       // Attach to the best-matching operator, or stand one up if records found none.
@@ -104,7 +118,17 @@ export async function onRequestGet(context) {
     operators = [{ id: `query:${slug(q)}`, name: q, segment: 'independent', state, evidence: [] }];
   }
 
-  operators = dedupe(operators).slice(0, MAX_OPERATORS);
+  const deduped = dedupe(operators);
+  operators = deduped.slice(0, MAX_OPERATORS);
+  // No silent caps. A truncated result set that doesn't say so reads as "this is
+  // everything", which is the same failure as an unexplained empty result.
+  if (deduped.length > MAX_OPERATORS) {
+    coverage.truncated = {
+      shown: MAX_OPERATORS,
+      matched: deduped.length,
+      note: `Showing the first ${MAX_OPERATORS} of ${deduped.length} matching operators. Narrow the search with a city or state.`,
+    };
+  }
 
   const edges = deriveEdges(operators);
   const propagated = propagateEvidence(operators, edges);
