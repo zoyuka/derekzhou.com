@@ -12,6 +12,7 @@
 import { searchOperators } from './lib/socrata.js';
 import { findFilingEvidence } from './lib/edgar.js';
 import { findDocketEvidence } from './lib/courtlistener.js';
+import { findLienEvidence, UCC_SOURCES } from './lib/ucc.js';
 import { guardedFetch, FetchError } from './lib/http.js';
 import { scoreOperator, describeVerdict, VERDICT_LABELS } from '../../sysco/engine/score.js';
 import { deriveEdges, propagateEvidence } from '../../sysco/engine/graph.js';
@@ -23,7 +24,7 @@ const MAX_OPERATORS = 60;
 // Sources that exist and matter, but cannot be hit live from a request. Declared so
 // the coverage report can name them instead of quietly pretending they don't exist.
 const OFFLINE_SOURCES = [
-  { id: 'ucc', label: 'State UCC secured-party filings', why: 'No public API; per-state portals, some requiring paid or bulk access.' },
+  { id: 'ucc-other-states', label: 'UCC filings outside states publishing an open index', why: `Searched live in ${UCC_SOURCES.map((s) => s.state).join(', ')}. Every other state indexes by debtor only, or charges for access, so a Sysco lien elsewhere is invisible here.` },
   { id: 'bankruptcy-schedules', label: 'Bankruptcy Schedule E/F line items', why: 'Dockets are searched live, but reading the actual creditor schedule requires per-document PACER retrieval.' },
   { id: 'fdd', label: 'Franchise Disclosure Documents (Item 8)', why: 'Registration-state portals publish PDFs, not queryable records.' },
   { id: 'checkbook', label: 'State and municipal vendor payments', why: 'Each state runs its own portal with a different interface.' },
@@ -111,6 +112,38 @@ export async function onRequestGet(context) {
     }
   } catch (err) {
     coverage.failed.push({ name: 'SEC EDGAR', reason: String(err?.message || err) });
+  }
+
+  // --- State UCC liens: the only documentary path that reaches ordinary restaurants ---
+  try {
+    const { matches, searched, failed, lapsedCount } = await findLienEvidence(q);
+    coverage.searched.push({
+      name: `State UCC lien index (${UCC_SOURCES.map((s) => s.state).join(', ')}) — Sysco as secured party`,
+      kind: 'ucc',
+      matches: matches.length,
+      link: 'https://data.ct.gov/d/xfev-8smz',
+      note: lapsedCount
+        ? `${lapsedCount} further filing(s) matched but have lapsed, so they are no longer perfected and were not scored.`
+        : undefined,
+    });
+    coverage.failed.push(...failed);
+    for (const m of matches) {
+      const existing = operators.find((o) => matches2(o.name, m.debtorName)
+        || (m.legalEntity && matches2(o.name, m.legalEntity)));
+      if (existing) { existing.evidence.push(m.evidence); continue; }
+      if (!matches2(m.debtorName, q) && !(m.legalEntity && matches2(m.legalEntity, q))) continue;
+      operators.push({
+        id: `ucc:${slug(m.debtorName)}`,
+        name: m.debtorName,
+        segment: 'independent',
+        state: m.state, city: m.city,
+        legalEntity: m.legalEntity,
+        evidence: [m.evidence],
+        sources: [{ name: `${m.state} UCC index`, link: m.evidence.sourceUrl, dataset: 'ucc' }],
+      });
+    }
+  } catch (err) {
+    coverage.failed.push({ name: 'State UCC index', reason: String(err?.message || err) });
   }
 
   // --- Federal bankruptcy dockets, live via CourtListener ---

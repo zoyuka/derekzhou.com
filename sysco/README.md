@@ -57,11 +57,28 @@ statements:
 > statements describing the Collateral as all assets of Customer."
 
 Every credit customer is therefore a candidate public filing naming a Sysco entity as
-secured party. The catch is retrieval direction: most state systems index by *debtor*,
-and you need the reverse. Georgia (GSCCCA), Washington, Colorado and Minnesota expose
-secured-party search; Kentucky sells a bulk feed including full debtor/secured-party
-tables. Coverage is therefore state-by-state, not national — an honest constraint, not
-a solved problem.
+secured party. The catch was always retrieval direction: most state systems index by
+*debtor*, and you need the reverse.
+
+**Several states publish their UCC index as open data with the secured party as a
+queryable column, which turns the reverse lookup into a single request.** Connecticut
+carries both parties in one row (`sec_party_nm_bus`, `debtor_nm_bus`) and is wired up
+and queried live; Colorado splits filing/debtor/collateral across three datasets keyed
+by `fileid`, and Oregon publishes a standalone secured-parties list, so both need a
+second request and are the natural next additions.
+
+This matters more than any other source, because it is the only documentary path that
+reaches an ordinary independent restaurant. A live query returns real operators with
+active Sysco liens — a bakery in Mystic, a bar in New Haven, a diner in Danbury — none
+of which are public companies, bankrupt, or government buyers, and so are invisible to
+every other Tier A source.
+
+Two details the data forces you to get right. `dt_lapse` matters because a UCC-1 lapses
+after five years unless continued: a lapsed filing is no longer perfected and proves
+little, so it is dropped and the count reported. And `cd_flng_type` distinguishes an
+`ORIG FIN STMT` — the routine credit filing — from a `JUDGMENT LIEN`, which means Sysco
+sued over an unpaid account and won. Those are different facts and are scored as
+different evidence types; the second presupposes goods sold and delivered.
 
 **Government contract awards.** Fully public, keyless, national. Verified working
 against the USAspending API in `pipeline/usaspending.js`. Note the relationship runs
@@ -275,6 +292,7 @@ fails is worth recording — otherwise it gets re-proposed forever.
 
 | Path | Verdict |
 | --- | --- |
+| **State UCC open-data indexes** | **The most important source in the project.** CT, CO and OR publish their UCC index as Socrata open data with the secured party queryable, so the reverse lookup — every filing where Sysco is the secured party — is one request. This is the only documentary path that reaches a healthy independent restaurant; everything else reaches public companies, bankrupt operators or government buyers. Debtor records even carry `D/B/A`, handing over the legal-name-to-trade-name join that per-restaurant matching otherwise lacks. |
 | **CourtListener / RECAP** | **Makes bankruptcy evidence live.** Free, no auth. A live query returned *OTB Hospitality d/b/a On the Border*, *VI Land O Lakes* (the Village Inn franchisee already in the curated corpus, found independently) and a hotel group. The direction problem is severe: ~6,900 federal cases mention Sysco and the overwhelming majority are suits *against* it — workplace injury, employment, wages. An injured warehouse worker's lawsuit says nothing about who buys from Sysco, and on a live sample the naive version would have fired on 17 of every 20 results. The discriminator is the court: bankruptcy court IDs end in `b`, district in `d`, appellate `ca1`–`ca11`. In a bankruptcy, Sysco is present because the debtor owes it — including preference clawbacks, where the trustee sues Sysco to recover payments the debtor made, which is itself proof of purchasing. |
 | **SEC EDGAR full-text search** | **The best find of this pass.** Free, no key, and the *only* Tier A source queryable in real time. Public operators name distributors in 10-K risk factors and file distribution agreements as exhibits. A live query surfaced Champps' **Master Distribution Agreement with Sysco Corporation, Exhibit 10.27** — an executed contract on SEC servers. |
 | **Sysco Studio / Menu Services fingerprints** | Sysco sells its customers a menu-design tool that exports print-ready PDFs. The generating application survives in document metadata, and Sysco-hosted asset URLs survive in HTML. Near a signed receipt, because the tool is offered to customers rather than the open market. Cheap to check and far stronger than ingredient inference. |
@@ -371,8 +389,10 @@ content reaches the browser before any client-side check can run.
 - **Menu inference is the weakest link by design.** Every threshold in `menu.js` — three
   convenience items, 90 menu items, the winter produce list — is a judgement call, and a
   stale online menu is scored as if current.
-- **UCC coverage is state-by-state**, gated on which states permit secured-party
-  search.
+- **UCC coverage is three states, not fifty.** CT is queried live; CO and OR are
+  reachable with a second request and not yet wired. Everywhere else indexes by debtor
+  only or charges for access, so a Sysco lien in those states is simply invisible here.
+  The coverage report says so rather than implying national coverage.
 - **Live search reaches identity, not evidence.** Open-data portals establish who an
   operator is and who it is connected to. They do not say anything about Sysco. The
   sources that do are exactly the five that cannot be queried live, so most live

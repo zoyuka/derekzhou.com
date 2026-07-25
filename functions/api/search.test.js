@@ -77,7 +77,11 @@ test('coverage always names the sources that cannot be checked live', async () =
   // 'bankruptcy': dockets are searched live now, but reading the actual Schedule
   // E/F line items still needs per-document PACER retrieval, and claiming
   // otherwise would overstate what a live search covers.
-  for (const id of ['ucc', 'bankruptcy-schedules', 'fdd', 'checkbook', 'courts']) {
+  // 'ucc-other-states' rather than 'ucc': CT's index is searched live now, but every
+  // other state indexes by debtor only or charges for access, so a Sysco lien
+  // elsewhere is invisible — and a coverage report that implied national UCC
+  // coverage would badly overstate what a live search sees.
+  for (const id of ['ucc-other-states', 'bankruptcy-schedules', 'fdd', 'checkbook', 'courts']) {
     assert.ok(ids.includes(id), `missing ${id}`);
   }
 });
