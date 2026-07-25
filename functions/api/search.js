@@ -11,6 +11,7 @@
 
 import { searchOperators } from './lib/socrata.js';
 import { findFilingEvidence } from './lib/edgar.js';
+import { findDocketEvidence } from './lib/courtlistener.js';
 import { guardedFetch, FetchError } from './lib/http.js';
 import { scoreOperator, describeVerdict, VERDICT_LABELS } from '../../sysco/engine/score.js';
 import { deriveEdges, propagateEvidence } from '../../sysco/engine/graph.js';
@@ -23,7 +24,7 @@ const MAX_OPERATORS = 60;
 // the coverage report can name them instead of quietly pretending they don't exist.
 const OFFLINE_SOURCES = [
   { id: 'ucc', label: 'State UCC secured-party filings', why: 'No public API; per-state portals, some requiring paid or bulk access.' },
-  { id: 'bankruptcy', label: 'Bankruptcy creditor schedules', why: 'PACER/RECAP requires credentials and per-docket retrieval.' },
+  { id: 'bankruptcy-schedules', label: 'Bankruptcy Schedule E/F line items', why: 'Dockets are searched live, but reading the actual creditor schedule requires per-document PACER retrieval.' },
   { id: 'fdd', label: 'Franchise Disclosure Documents (Item 8)', why: 'Registration-state portals publish PDFs, not queryable records.' },
   { id: 'checkbook', label: 'State and municipal vendor payments', why: 'Each state runs its own portal with a different interface.' },
   { id: 'courts', label: 'Collection lawsuits', why: 'County-level dockets, no unified public API.' },
@@ -88,10 +89,15 @@ export async function onRequestGet(context) {
         ? `${examined} filings examined, ${discarded} discarded as competitor mentions by a food distributor, ${classified} read in context.`
         : undefined,
     });
+    let offQuery = 0;
     for (const e of evidence) {
-      const existing = operators.find((o) => matches(o.name, e.filerName) || matches(e.filerName, o.name));
-      if (existing) existing.evidence.push(e.evidence);
-      else operators.push({
+      const existing = operators.find((o) => matches2(o.name, e.filerName));
+      if (existing) { existing.evidence.push(e.evidence); continue; }
+      // A source can surface operators nobody asked about. Attaching a verdict to a
+      // business the visitor did not search for is gratuitous, so unrelated filers
+      // are dropped rather than published.
+      if (!matches2(e.filerName, q)) { offQuery++; continue; }
+      operators.push({
         id: `sec:${slug(e.filerName)}`,
         name: e.filerName,
         segment: 'regional-chain',
@@ -99,8 +105,45 @@ export async function onRequestGet(context) {
         sources: [{ name: 'SEC EDGAR', link: e.evidence.sourceUrl, dataset: 'edgar' }],
       });
     }
+    if (offQuery) {
+      const entry = coverage.searched.find((c) => c.kind === 'sec');
+      entry.note = `${entry.note || ''} ${offQuery} further filer(s) named Sysco but did not match your query and were not scored.`.trim();
+    }
   } catch (err) {
     coverage.failed.push({ name: 'SEC EDGAR', reason: String(err?.message || err) });
+  }
+
+  // --- Federal bankruptcy dockets, live via CourtListener ---
+  try {
+    const { matches, examined, rejectedNonBankruptcy } = await findDocketEvidence(q);
+    coverage.searched.push({
+      name: 'CourtListener federal bankruptcy dockets',
+      kind: 'courts',
+      matches: matches.length,
+      link: 'https://www.courtlistener.com/?q=Sysco&type=r',
+      note: rejectedNonBankruptcy
+        ? `${examined} dockets examined; ${rejectedNonBankruptcy} discarded as suits against Sysco (employment and injury claims), which say nothing about who buys from it.`
+        : undefined,
+    });
+    let offQuery = 0;
+    for (const m of matches) {
+      const existing = operators.find((o) => matches2(o.name, m.debtorName));
+      if (existing) { existing.evidence.push(m.evidence); continue; }
+      if (!matches2(m.debtorName, q)) { offQuery++; continue; }
+      operators.push({
+        id: `court:${slug(m.debtorName)}`,
+        name: m.debtorName,
+        segment: 'regional-chain',
+        evidence: [m.evidence],
+        sources: [{ name: 'CourtListener', link: m.evidence.sourceUrl, dataset: 'courtlistener' }],
+      });
+    }
+    if (offQuery) {
+      const entry = coverage.searched.find((c) => c.kind === 'courts');
+      entry.note = `${entry.note || ''} ${offQuery} further debtor(s) had Sysco in their bankruptcy but did not match your query and were not scored.`.trim();
+    }
+  } catch (err) {
+    coverage.failed.push({ name: 'CourtListener', reason: String(err?.message || err) });
   }
 
   // --- Curated corpus: the documentary findings that cannot be fetched live ---
@@ -280,6 +323,12 @@ function dedupe(operators) {
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 const matches = (name, q) => norm(name).includes(norm(q));
+// Either direction: a docket debtor "OTB Hospitality, LLC" and a licence record
+// "OTB Hospitality" should join even though neither string contains the other whole.
+const matches2 = (a, b) => {
+  const x = norm(a), y = norm(b);
+  return x && y && (x.includes(y) || y.includes(x));
+};
 // Word-initial only. A naive \b[a-z] also fires after an apostrophe, turning
 // "Lou Malnati's" into "Lou Malnati'S".
 const titleCase = (s) =>

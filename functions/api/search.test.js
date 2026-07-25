@@ -73,8 +73,11 @@ test('coverage always names the sources that cannot be checked live', async () =
   const { data } = await search({ q: 'Nowhere Cafe' }, stubFetch({ rows: [] }));
   const ids = data.coverage.notQueryable.map((s) => s.id);
   // These carry the strongest evidence in the model. Omitting them would let a
-  // thin result read as exoneration.
-  for (const id of ['ucc', 'bankruptcy', 'fdd', 'checkbook', 'courts']) {
+  // thin result read as exoneration. Note 'bankruptcy-schedules' rather than
+  // 'bankruptcy': dockets are searched live now, but reading the actual Schedule
+  // E/F line items still needs per-document PACER retrieval, and claiming
+  // otherwise would overstate what a live search covers.
+  for (const id of ['ucc', 'bankruptcy-schedules', 'fdd', 'checkbook', 'courts']) {
     assert.ok(ids.includes(id), `missing ${id}`);
   }
 });

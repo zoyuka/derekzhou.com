@@ -130,6 +130,25 @@ export const EVIDENCE_TYPES = {
       'A given franchisee may buy from a different name on the list.',
   },
 
+  bankruptcy_docket: {
+    tier: TIER.A,
+    lr: 120,
+    halfLifeYears: 6,
+    label: 'Sysco appears in this operator\'s bankruptcy',
+    basis:
+      'A full-text hit for Sysco inside a federal bankruptcy docket. Sysco turns up in a ' +
+      'bankruptcy for essentially one reason — the debtor owes it for goods delivered — and ' +
+      'that includes preference-clawback proceedings, where the trustee sues Sysco to recover ' +
+      'payments the debtor made, which is itself proof of purchasing. Queryable live through ' +
+      "CourtListener's free API.",
+    falsePositives:
+      'Scored well below bankruptcy_creditor on purpose. That type means someone read ' +
+      'Schedule E/F and saw a Sysco operating company with a figure beside it; this is a ' +
+      'docket-level match, which is strong but not the same thing and must not be scored ' +
+      'as though it were. Sysco may also appear as a landlord, an equipment lessor, or in ' +
+      'unrelated adversary practice.',
+  },
+
   sec_filing_disclosure: {
     tier: TIER.A,
     lr: 350,

@@ -8,6 +8,13 @@ export class FetchError extends Error {}
 
 const ALLOWED_PROTOCOLS = new Set(['https:']);
 const DEFAULT_TIMEOUT_MS = 8000;
+// Free public APIs (CourtListener, EDGAR, Socrata) return intermittent 5xx and 429
+// under load. One bounded retry converts a transient blip into a result instead of a
+// reported source failure. Deliberately not more: this is a live request path, and a
+// retry storm against a public good is worse than a missing source.
+const RETRY_STATUSES = new Set([429, 502, 503, 504]);
+const MAX_RETRIES = 1;
+const RETRY_DELAY_MS = 400;
 const DEFAULT_MAX_BYTES = 1_500_000;
 const MAX_REDIRECTS = 3;
 
@@ -103,7 +110,14 @@ export async function guardedFetch(rawUrl, opts = {}) {
       current = next;
     }
 
-    if (!response.ok) throw new FetchError(`upstream returned ${response.status}`);
+    if (!response.ok) {
+      if (RETRY_STATUSES.has(response.status) && (opts._attempt || 0) < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+        clearTimeout(timer);
+        return guardedFetch(rawUrl, { ...opts, _attempt: (opts._attempt || 0) + 1 });
+      }
+      throw new FetchError(`upstream returned ${response.status}`);
+    }
 
     const text = await readCapped(response, maxBytes);
     return { text, url: current.toString(), status: response.status };

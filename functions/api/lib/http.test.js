@@ -116,3 +116,39 @@ test('upstream errors surface as FetchError, not raw failures', async () => {
     (e) => e instanceof FetchError && /404/.test(e.message)
   );
 });
+
+test('a transient 5xx is retried once, then succeeds', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls++;
+    if (calls === 1) return { ok: false, status: 503, headers: { get: () => null }, body: bodyOf('') };
+    return { ok: true, status: 200, headers: { get: () => null }, body: bodyOf('RECOVERED') };
+  };
+  const res = await guardedFetch('https://example.com/x', { userSupplied: true, fetchImpl });
+  assert.equal(res.text, 'RECOVERED');
+  assert.equal(calls, 2);
+});
+
+test('retries are bounded — a persistently failing upstream gives up', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls++;
+    return { ok: false, status: 503, headers: { get: () => null }, body: bodyOf('') };
+  };
+  await assert.rejects(
+    () => guardedFetch('https://example.com/x', { userSupplied: true, fetchImpl }),
+    (e) => e instanceof FetchError
+  );
+  // One retry, not a storm against a public API.
+  assert.equal(calls, 2);
+});
+
+test('a 404 is not retried — it is not transient', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls++;
+    return { ok: false, status: 404, headers: { get: () => null }, body: bodyOf('') };
+  };
+  await assert.rejects(() => guardedFetch('https://example.com/x', { userSupplied: true, fetchImpl }));
+  assert.equal(calls, 1);
+});
