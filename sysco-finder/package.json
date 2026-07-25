@@ -1,0 +1,12 @@
+{
+  "name": "sysco-finder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-based inference engine for identifying foodservice operators that buy from Sysco.",
+  "scripts": {
+    "test": "node --test \"engine/*.test.js\"",
+    "ingest:usaspending": "node pipeline/usaspending.js",
+    "serve": "python3 -m http.server 8080"
+  }
+}

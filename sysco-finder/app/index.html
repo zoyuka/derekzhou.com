@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sysco Trace — evidence-based supplier lookup</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="head">
+    <h1>Sysco Trace</h1>
+    <p class="sub">Which foodservice operators can be shown, from public records, to buy from Sysco — and how strongly.</p>
+  </header>
+
+  <div class="banner" role="note">
+    <strong>This is not a complete list, and it cannot be.</strong>
+    Sysco serves roughly 700,000 customer locations and treats its customer list as a trade
+    secret. No public directory exists. This tool infers the relationship from public
+    documents and scores its own confidence. <em>Absence of evidence here is not evidence
+    that a restaurant avoids Sysco</em> — most customers leave no public trace at all.
+  </div>
+
+  <section class="controls">
+    <label class="field">
+      <span>Search operator</span>
+      <input type="search" id="q" placeholder="e.g. Restaurants Unlimited, Army, Harbour" autocomplete="off">
+    </label>
+    <label class="field">
+      <span>Minimum verdict</span>
+      <select id="minband">
+        <option value="all">Show everything</option>
+        <option value="weak">Weak signal and above</option>
+        <option value="possible">Possible and above</option>
+        <option value="likely">Likely and above</option>
+        <option value="confirmed">Confirmed only</option>
+      </select>
+    </label>
+    <label class="field checkline">
+      <input type="checkbox" id="hidesynth">
+      <span>Hide demo fixtures</span>
+    </label>
+  </section>
+
+  <p class="count" id="count" aria-live="polite"></p>
+  <ul class="results" id="results"></ul>
+
+  <section class="method">
+    <h2>How a verdict is reached</h2>
+    <p>
+      Each operator starts at a base rate for its segment, not at zero and not at fifty-fifty.
+      Every piece of evidence multiplies the odds by a likelihood ratio, decays by its own
+      half-life, and is scaled by how confident we are that the record actually refers to this
+      operator. The result is capped by evidence quality: <strong>no quantity of circumstantial
+      signals can produce a “confirmed” verdict</strong> — only a document can do that.
+    </p>
+    <p>
+      A verdict of “confirmed” means the operator bought from Sysco as <em>one of</em> its
+      suppliers. It never means everything on the menu is Sysco product. Operators almost
+      always run a primary broadliner alongside produce, protein and specialty houses.
+    </p>
+    <p class="dispute">
+      Think an entry is wrong? Every claim is traceable to a cited source. Corrections and
+      removal requests are honoured on the strength of the record, not the volume of the complaint.
+    </p>
+  </section>
+
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
