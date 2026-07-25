@@ -164,15 +164,15 @@ h2 {
   list-style: none;
 }
 
-.experience li {
+.experience > li {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
-  padding: 0.6rem 0;
+  padding: 0.9rem 0;
 }
 
-.experience li + li {
+.experience > li + li {
   border-top: 1px solid color-mix(in srgb, var(--color-dimmed) 20%, transparent);
 }
 
@@ -191,6 +191,30 @@ h2 {
   font-size: 0.85rem;
   color: var(--color-dimmed);
   white-space: nowrap;
+}
+
+.exp-work {
+  width: 100%;
+  list-style: none;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-dimmed);
+}
+
+.exp-clients {
+  width: 100%;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-dimmed);
+}
+
+.exp-clients-label {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.72rem;
+  margin-right: 0.15rem;
 }
 
 /* ------------------------------------------------
@@ -231,13 +255,21 @@ footer a:hover {
     letter-spacing: -0.02em;
   }
 
-  .experience li {
+  .experience > li {
     flex-direction: column;
     gap: 0.1rem;
   }
 
   .exp-date {
     margin-left: 0;
+  }
+
+  .exp-work {
+    margin-top: 0.6rem;
+  }
+
+  .exp-clients {
+    margin-top: 0.85rem;
   }
 }
 
@@ -260,7 +292,11 @@ footer a:hover {
     font-size: 2rem;
   }
 
-  .dimmed {
+  .dimmed,
+  .exp-place,
+  .exp-date,
+  .exp-work,
+  .exp-clients {
     color: #555;
   }
 }
