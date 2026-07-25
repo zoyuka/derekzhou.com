@@ -190,10 +190,15 @@ findings about a real business.
 
 ## Access
 
-This app lives under `/private/`, which is gated at the Cloudflare edge by
-`functions/private/_middleware.js`. It is not linked from derekzhou.com and is served
-only to a verified Access identity on the allowlist. See `../SETUP.md` — the gate
-denies everything, including you, until it is configured.
+Served publicly at `/sysco/`, but not linked from the home page and excluded from
+search results by `X-Robots-Tag` in `_headers` plus a `noindex` meta tag. Anyone with
+the URL can read it.
+
+It was briefly built behind a Cloudflare Access gate — edge-verified JWT, email
+allowlist, fail-closed — before being made public deliberately. That middleware and
+its 16 tests are recoverable from git history (`git show a0c8f77`) if this ever needs
+locking down again. Note that a client-side password check is not a substitute: static
+content reaches the browser before any client-side check can run.
 
 ## 7. Honest limits
 

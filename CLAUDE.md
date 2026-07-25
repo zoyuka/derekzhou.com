@@ -14,24 +14,21 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security headers
 /\_redirects             HTTPS enforcement
-/\_routes.json           Scopes Pages Functions to /private/* only
 /.github/workflows/validate.yml  CI checks
 
-Private area (not part of the public site, not linked from it):
+Side project, publicly reachable but not linked from the home page:
 
-/private/SETUP.md       How to configure the Access gate. Read before deploying.
-/private/sysco/         Sysco Trace app (see its README)
-/functions/private/\_middleware.js  Access JWT verification for all of /private/\*
+/sysco/                 Sysco Trace app (see sysco/README.md)
 
-Anything under /private/ is served only to a verified Cloudflare Access identity on
-the ACCESS\_ALLOWED\_EMAILS allowlist. The middleware fails closed: if the
-ACCESS\_TEAM\_DOMAIN / ACCESS\_AUD / ACCESS\_ALLOWED\_EMAILS environment variables
-are absent, every request under /private/ gets a 404. Never weaken this to "allow
-when unconfigured", and never add a client-side password gate — static content
+Reachable by anyone with the URL. Kept out of search results via X-Robots-Tag in
+\_headers plus a noindex meta tag; delete both to make it indexable. It needs
+connect-src 'self' in its CSP block because the site-wide policy sets
+connect-src 'none', which would block it fetching its own JSON.
+
+The whole site stays pure static HTML/CSS/JS with no build step. If this page ever
+needs real access control, it must be enforced at the edge (Cloudflare Access, or a
+Pages Function) — never with a client-side password check, because static content
 reaches the browser before any client-side check can run.
-
-The public site stays pure static HTML/CSS/JS. Functions exist only to guard
-/private/\*, which is what \_routes.json enforces.
 
 ## Content
 
