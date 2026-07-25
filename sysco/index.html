@@ -24,30 +24,35 @@
     that a restaurant avoids Sysco</em> — most customers leave no public trace at all.
   </div>
 
-  <section class="controls">
-    <label class="field">
-      <span>Search operator</span>
-      <input type="search" id="q" placeholder="e.g. Restaurants Unlimited, Army, Harbour" autocomplete="off">
+  <form class="controls" id="searchform">
+    <label class="field wide">
+      <span>Restaurant or food provider</span>
+      <input type="search" id="q" name="q" placeholder="Any operator name — e.g. Lou Malnati's" autocomplete="off" required minlength="3">
     </label>
     <label class="field">
-      <span>Minimum verdict</span>
-      <select id="minband">
-        <option value="all">Show everything</option>
-        <option value="no-evidence">Exclude contrary evidence</option>
-        <option value="weak">Weak signal and above</option>
-        <option value="possible">Possible and above</option>
-        <option value="likely">Likely and above</option>
-        <option value="confirmed">Confirmed only</option>
-      </select>
+      <span>City or state <em>(optional)</em></span>
+      <input type="search" id="where" name="where" placeholder="Chicago" autocomplete="off">
     </label>
-    <label class="field checkline">
-      <input type="checkbox" id="hidesynth">
-      <span>Hide demo fixtures</span>
+    <label class="field narrow">
+      <span>State code</span>
+      <input type="search" id="state" name="state" placeholder="IL" maxlength="2" autocomplete="off">
     </label>
-  </section>
+    <label class="field wide">
+      <span>Menu or website URL <em>(optional — works anywhere)</em></span>
+      <input type="url" id="menu" name="menu" placeholder="https://…" autocomplete="off">
+    </label>
+    <button type="submit" id="go">Search</button>
+  </form>
+
+  <p class="hint">
+    Public-records lookup covers US jurisdictions publishing open data. The menu field
+    works for <strong>any operator in the world</strong> — paste a menu page and it is read
+    for supply-chain signals directly.
+  </p>
 
   <p class="count" id="count" aria-live="polite"></p>
   <ul class="results" id="results"></ul>
+  <section class="coverage" id="coverage" hidden></section>
 
   <section class="method">
     <h2>How a verdict is reached</h2>

@@ -14,18 +14,26 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security headers
 /\_redirects             HTTPS enforcement
+/\_routes.json           Scopes Pages Functions to /api/* only
 /.github/workflows/validate.yml  CI checks
 
 Side project, publicly reachable but not linked from the home page:
 
 /sysco/                 Sysco Trace app (see sysco/README.md)
+/functions/api/         Live search endpoint backing it
 
 Reachable by anyone with the URL. Kept out of search results via X-Robots-Tag in
 \_headers plus a noindex meta tag; delete both to make it indexable. It needs
 connect-src 'self' in its CSP block because the site-wide policy sets
 connect-src 'none', which would block it fetching its own JSON.
 
-The whole site stays pure static HTML/CSS/JS with no build step. If this page ever
+The home page stays pure static HTML/CSS/JS with no build step. Functions exist only
+to back /sysco/, which \_routes.json enforces by scoping them to /api/\*.
+
+The /api/search menu parameter fetches a URL supplied by the visitor. Every guard in
+functions/api/lib/http.js is load-bearing — https only, no private or link-local hosts,
+redirects re-validated per hop, byte ceiling while streaming. Without them the endpoint
+is an SSRF pivot and an open proxy. Never relax them, and never return the fetched body. If this page ever
 needs real access control, it must be enforced at the edge (Cloudflare Access, or a
 Pages Function) — never with a client-side password check, because static content
 reaches the browser before any client-side check can run.

@@ -227,7 +227,54 @@ The mitigations are structural, not cosmetic:
 - Crowd-sourced photo submissions attract §230 protection; the app's own inferences
   do not. That asymmetry is a reason to keep first-party claims tied to documents.
 
-## 6. What's in this prototype
+## 6. Live search: making it work for anyone, anywhere
+
+The corpus-only version answered questions about 36 pre-computed operators. Searching
+an arbitrary restaurant needs live fan-out, which needs a server: almost none of these
+sources are reachable from the browser under this page's CSP, and the ones that are
+still need schema mapping and escaping in one place.
+
+`functions/api/search.js` is that server. Given a name — and optionally a locality and
+a menu URL — it queries every source that can be asked about a name it has never seen,
+resolves the results into operators, derives the ownership graph between them,
+propagates evidence and scores everything.
+
+**Discovery instead of hardcoding.** Socrata runs a cross-portal catalogue covering
+every government open-data portal on the platform, so the relevant food-establishment
+and business-licence datasets are found at query time rather than wired up by hand.
+That is what makes the tool work in a jurisdiction nobody anticipated. Schemas are
+wildly inconsistent between them — `dba`, `dba_name`, `facility_name`, `premise_name`
+all mean the same thing — so columns are mapped by heuristic from the catalogue
+metadata, and a dataset with no usable name column is skipped rather than guessed at.
+
+**The menu field is the genuinely universal path.** Public-records lookup only reaches
+US jurisdictions that publish open data. Pasting a menu URL works for any operator on
+earth, because the inference is over the menu itself.
+
+**The coverage report is not decoration.** This tool's most common answer is "nothing
+found", and that sentence is only interpretable next to a list of what was actually
+consulted. The response always names the datasets queried and how many matched, the
+sources that failed and why, and the five source classes that carry the *strongest*
+evidence in the whole model and cannot be queried live at all — UCC filings, bankruptcy
+schedules, FDD Item 8, checkbook data and court dockets. A result is a floor on what
+exists, never a ceiling. Without that list, a thin result reads as exoneration.
+
+### Security of the live endpoint
+
+The menu analyser fetches a URL supplied by whoever is using the page, which makes it
+both an SSRF surface and, unbounded, an open proxy running on someone else's domain.
+`functions/api/lib/http.js` enforces https only; no credentials in the URL; no
+non-standard ports; no loopback, private, link-local or `.internal` hosts — which
+covers cloud metadata endpoints; manual redirect following so **every hop is
+re-validated** rather than trusting the first URL; a redirect cap; a timeout; and a
+byte ceiling enforced while streaming, since `Content-Length` can lie. Only derived
+signals are ever returned, never the fetched body. All of it is tested, including the
+redirect-to-metadata-endpoint case.
+
+SoQL string literals are escaped by doubling quotes, and the test asserts the literal
+stays balanced rather than merely checking the escape appears.
+
+## 7. What's in this prototype
 
 ```
 engine/entities.js    Sysco entity resolution across OpCos, subsidiaries, competitors, OCR noise
@@ -237,6 +284,11 @@ engine/graph.js       Operator graph + evidence propagation with hub penalty and
 engine/menu.js        Menu forensics + local-sourcing verification
 engine/*.test.js      45 tests, including every guardrail above
 pipeline/usaspending.js  Live connector against the public USAspending API (no key)
+
+../functions/api/search.js      Live search: fan-out, graph, scoring, coverage report
+../functions/api/lib/socrata.js Cross-portal discovery + heuristic schema mapping
+../functions/api/lib/http.js    SSRF-guarded fetch (https-only, redirect re-validation, size cap)
+../functions/api/lib/*.test.js  20 tests covering the guards and schema inference
 index.html app.js app.css  Static UI: search, verdict bands, per-item evidence math, citations
 data.seed.json        Curated corpus; entries flagged "synthetic" are demo fixtures
 data.usaspending.json Real data from a live API pull
@@ -266,7 +318,7 @@ its 16 tests are recoverable from git history (`git show a0c8f77`) if this ever 
 locking down again. Note that a client-side password check is not a substitute: static
 content reaches the browser before any client-side check can run.
 
-## 7. Honest limits
+## 8. Honest limits
 
 - **Coverage is skewed to institutions and the distressed.** Government contracts
   reach schools and bases; bankruptcy and collection suits reach failing operators.
@@ -280,6 +332,10 @@ content reaches the browser before any client-side check can run.
   stale online menu is scored as if current.
 - **UCC coverage is state-by-state**, gated on which states permit secured-party
   search.
+- **Live search reaches identity, not evidence.** Open-data portals establish who an
+  operator is and who it is connected to. They do not say anything about Sysco. The
+  sources that do are exactly the five that cannot be queried live, so most live
+  searches will correctly return the prior and a list of what was checked.
 - **The USAspending connector resolves buyers to agency-plus-state**, not to an
   individual dining facility; the data does not expose finer granularity.
 - **The likelihood ratios are unvalidated.** They can be sanity-checked against

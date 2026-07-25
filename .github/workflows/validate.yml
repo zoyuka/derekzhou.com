@@ -66,7 +66,19 @@ jobs:
           node-version: '22'
 
       - name: Run tests
-        run: node --test "sysco/engine/*.test.js"
+        run: |
+          node --test "sysco/engine/*.test.js"
+          # Auth/SSRF guards for the live search API — a regression here turns the
+          # menu endpoint into an open proxy.
+          node --test "functions/api/lib/*.test.js"
+
+      - name: API routes must be wired
+        run: |
+          if [ -d functions/api ] && ! grep -q '"/api/\*"' _routes.json; then
+            echo "::error::functions/api exists but _routes.json does not route /api/*"
+            exit 1
+          fi
+          echo "API routing OK"
 
       - name: Validate HTML
         run: |
