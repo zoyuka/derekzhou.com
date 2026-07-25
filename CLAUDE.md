@@ -43,16 +43,17 @@ value, business goals, and technical integrity."
 Experience:
 
 * Product Team Lead @ Accenture Song, 2022 – Now
-  * Clients: Exxon Mobil, Norfolk Southern, AT&T, Allstate, Cisco, Accenture
-    Advanced AI Center of Excellence
 * Product Intern @ Sabre, 2020
 
-No per-role project lists. Job title, company, and dates only, plus the
-client line under the Accenture Song role.
+Job title, company, and dates only. No per-role project or client lists.
 
 Links:
 
 * Email: hello@derekzhou.com (obfuscated in HTML, assembled in JS)
+* LinkedIn: https://www.linkedin.com/in/derek-z (plain href, rel="me",
+  also listed in the JSON-LD Person sameAs)
+
+Both live in the footer, separated by footer a + a margin.
 
 ## Design
 
