@@ -1,0 +1,153 @@
+{
+  "note": "Curated evidence corpus. Entries with \"synthetic\": true are illustrative fixtures used to exercise scoring bands in the demo and must never be presented as findings about a real business. All other entries cite a published source.",
+  "operators": [
+    {
+      "id": "seed:restaurants-unlimited",
+      "name": "Restaurants Unlimited, Inc.",
+      "segment": "regional-chain",
+      "state": "WA",
+      "evidence": [
+        {
+          "type": "bankruptcy_creditor",
+          "observedAt": "2019-07-06T00:00:00Z",
+          "sourceLabel": "Ch. 11 petition, D. Del. — top unsecured creditors",
+          "sourceUrl": "https://www.fsrmagazine.com/finance/progressive-wage-laws-send-restaurants-unlimited-into-bankruptcy",
+          "note": "Sysco Food Service Portland ($707,000) and Sysco Seattle ($606,000) listed as trade creditors",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "seed:damons-international",
+      "name": "Damon's International, Inc.",
+      "segment": "regional-chain",
+      "state": "OH",
+      "evidence": [
+        {
+          "type": "bankruptcy_creditor",
+          "observedAt": "2010-01-01T00:00:00Z",
+          "sourceLabel": "Ch. 11 filing — largest unsecured creditors",
+          "sourceUrl": "https://www.restaurantbusinessonline.com/damons-files-chapter-11-bankruptcy-protection-sysco-usf-among-top-creditors",
+          "note": "Sysco Baltimore, a division of Sysco Corp., owed more than $500,000",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "seed:vi-land-o-lakes",
+      "name": "VI Land O Lakes LLC (Village Inn franchisee)",
+      "segment": "regional-chain",
+      "state": "FL",
+      "evidence": [
+        {
+          "type": "bankruptcy_creditor",
+          "observedAt": "2025-06-10T00:00:00Z",
+          "sourceLabel": "Ch. 11 petition, M.D. Fla.",
+          "sourceUrl": "https://www.thestreet.com/restaurants/village-inn-restaurant-franchisee-files-chapter-11-bankruptcy",
+          "note": "Sysco Food Service owed $35,000 among largest unsecured creditors",
+          "resolution": 0.95
+        }
+      ]
+    },
+    {
+      "id": "seed:smoking-monkey-pizza",
+      "name": "Smoking Monkey Pizza",
+      "segment": "regional-chain",
+      "state": "WA",
+      "evidence": [
+        {
+          "type": "bankruptcy_creditor",
+          "observedAt": "2026-05-01T00:00:00Z",
+          "sourceLabel": "Ch. 11 filing, W.D. Wash.",
+          "sourceUrl": "https://www.thestreet.com/restaurants/smoking-monkey-pizza-restaurant-chain-files-chapter-11-bankruptcy",
+          "note": "Sysco listed among largest unsecured creditors, owed over $42,000",
+          "resolution": 0.95
+        }
+      ]
+    },
+
+    {
+      "id": "demo:harbour-grill",
+      "name": "The Harbour Grill (demo fixture)",
+      "segment": "independent",
+      "state": "GA",
+      "synthetic": true,
+      "evidence": [
+        {
+          "type": "ucc_filing",
+          "observedAt": "2024-02-14T00:00:00Z",
+          "sourceLabel": "GA UCC index — secured party search",
+          "sourceUrl": "https://search.gsccca.org/UCC_Search/search.asp?searchtype=SecuredParty",
+          "note": "Blanket all-assets filing, Sysco Atlanta as secured party",
+          "resolution": 0.72
+        },
+        {
+          "type": "menu_private_label",
+          "observedAt": "2026-03-02T00:00:00Z",
+          "sourceLabel": "Operator menu PDF",
+          "sourceUrl": "https://example.invalid/menu",
+          "note": "Menu names \"Portico\" shrimp",
+          "resolution": 0.9
+        }
+      ]
+    },
+    {
+      "id": "demo:cedar-fork",
+      "name": "Cedar & Fork (demo fixture)",
+      "segment": "independent",
+      "state": "OR",
+      "synthetic": true,
+      "evidence": [
+        {
+          "type": "job_posting",
+          "observedAt": "2026-05-20T00:00:00Z",
+          "sourceLabel": "Line cook posting",
+          "sourceUrl": "https://example.invalid/job",
+          "note": "Asks for familiarity with Sysco ordering",
+          "resolution": 0.8
+        },
+        {
+          "type": "photo_evidence",
+          "observedAt": "2026-06-11T00:00:00Z",
+          "sourceLabel": "User submission (moderated)",
+          "sourceUrl": "https://example.invalid/photo",
+          "note": "Sysco cases visible at back door during delivery",
+          "resolution": 0.7
+        }
+      ]
+    },
+    {
+      "id": "demo:blue-heron",
+      "name": "Blue Heron Farmhouse (demo fixture)",
+      "segment": "independent",
+      "state": "VT",
+      "synthetic": true,
+      "evidence": [
+        {
+          "type": "competitor_disclosure",
+          "observedAt": "2026-01-15T00:00:00Z",
+          "sourceLabel": "Operator sourcing page",
+          "sourceUrl": "https://example.invalid/sourcing",
+          "note": "States Performance Food Group is its primary distributor",
+          "resolution": 0.9
+        },
+        {
+          "type": "local_sourcing_claim",
+          "observedAt": "2026-01-15T00:00:00Z",
+          "sourceLabel": "Operator sourcing page",
+          "sourceUrl": "https://example.invalid/sourcing",
+          "note": "Claims farm-direct sourcing within 50 miles",
+          "resolution": 0.9
+        }
+      ]
+    },
+    {
+      "id": "demo:no-trace-diner",
+      "name": "Eastside Diner (demo fixture)",
+      "segment": "independent",
+      "state": "TX",
+      "synthetic": true,
+      "evidence": []
+    }
+  ]
+}

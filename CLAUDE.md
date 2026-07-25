@@ -16,6 +16,20 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /\_redirects             HTTPS enforcement
 /.github/workflows/validate.yml  CI checks
 
+Side project, publicly reachable but not linked from the home page:
+
+/sysco/                 Sysco Trace app (see sysco/README.md)
+
+Reachable by anyone with the URL. Kept out of search results via X-Robots-Tag in
+\_headers plus a noindex meta tag; delete both to make it indexable. It needs
+connect-src 'self' in its CSP block because the site-wide policy sets
+connect-src 'none', which would block it fetching its own JSON.
+
+The whole site stays pure static HTML/CSS/JS with no build step. If this page ever
+needs real access control, it must be enforced at the edge (Cloudflare Access, or a
+Pages Function) — never with a client-side password check, because static content
+reaches the browser before any client-side check can run.
+
 ## Content
 
 Name: Derek Zhou

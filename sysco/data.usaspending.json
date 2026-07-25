@@ -1,0 +1,1963 @@
+{
+  "operators": [
+    {
+      "id": "usasp:department-of-the-army:FL",
+      "name": "Department of the Army (FL)",
+      "segment": "government",
+      "state": "FL",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-03-24T00:00:00Z",
+          "sourceLabel": "USAspending award W912P825P0021 — Sysco",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912P825P0021_9700_-NONE-_-NONE-",
+          "note": "$13,091.47 obligated to SYSCO CORP",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:MN",
+      "name": "Department of the Army (MN)",
+      "segment": "government",
+      "state": "MN",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM26FA018 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM26FA018_9700_W912LM22D0002_9700",
+          "note": "$190,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM26FA011 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM26FA011_9700_W912LM22D0002_9700",
+          "note": "$138,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-01-31T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM26FA009 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM26FA009_9700_W912LM22D0002_9700",
+          "note": "$217,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-01-30T00:00:00Z",
+          "sourceLabel": "USAspending award W50S7F26FA004 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S7F26FA004_9700_W912LM22D0002_9700",
+          "note": "$18,900 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-01-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM26FA008 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM26FA008_9700_W912LM22D0002_9700",
+          "note": "$186,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-11-21T00:00:00Z",
+          "sourceLabel": "USAspending award W50S7F26FA001 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S7F26FA001_9700_W912LM22D0002_9700",
+          "note": "$12,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-11-18T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM26FA002 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM26FA002_9700_W912LM22D0002_9700",
+          "note": "$200,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-09-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM25FA052 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM25FA052_9700_W912LM22D0002_9700",
+          "note": "$185,000 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-08-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM25FA042 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM25FA042_9700_W912LM22D0002_9700",
+          "note": "$151,445.82 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-07-25T00:00:00Z",
+          "sourceLabel": "USAspending award W50S7F25FA019 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S7F25FA019_9700_W912LM22D0002_9700",
+          "note": "$15,350 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-07-25T00:00:00Z",
+          "sourceLabel": "USAspending award W50S7E25FA011 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S7E25FA011_9700_W912LM22D0002_9700",
+          "note": "$71,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-07-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912LM25FA039 — Sysco Western Minnesota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912LM25FA039_9700_W912LM22D0002_9700",
+          "note": "$225,500 obligated to SYSCO WESTERN MINNESOTA, INC.",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 43
+    },
+    {
+      "id": "usasp:department-of-the-army:IA",
+      "name": "Department of the Army (IA)",
+      "segment": "government",
+      "state": "IA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-02-22T00:00:00Z",
+          "sourceLabel": "USAspending award W912JF24P0017 — Sysco Iowa",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912JF24P0017_9700_-NONE-_-NONE-",
+          "note": "$0 obligated to SYSCO IOWA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2023-09-05T00:00:00Z",
+          "sourceLabel": "USAspending award W912K623P0023 — Sysco Iowa",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912K623P0023_9700_-NONE-_-NONE-",
+          "note": "$26,445.43 obligated to SYSCO IOWA, INC.",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:MI",
+      "name": "Department of the Army (MI)",
+      "segment": "government",
+      "state": "MI",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-05-01T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8526FA014 — Sysco Detroit",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8526FA014_9700_W50S8522A0004_9700",
+          "note": "$25,000 obligated to SYSCO DETROIT LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-10-27T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8426FA001 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8426FA001_9700_W50S8422A0001_9700",
+          "note": "$16,700 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-07-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912JB25FA054 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912JB25FA054_9700_W912JB23A0001_9700",
+          "note": "$30,000 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-05-15T00:00:00Z",
+          "sourceLabel": "USAspending award W912JB25FA037 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912JB25FA037_9700_W912JB23A0001_9700",
+          "note": "$100,000 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-10-02T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8425FA001 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8425FA001_9700_W50S8422A0001_9700",
+          "note": "$18,000 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-10-01T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8525FA005 — Sysco Detroit",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8525FA005_9700_W50S8522A0004_9700",
+          "note": "$47,400 obligated to SYSCO DETROIT LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-08-04T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8624F2435 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8624F2435_9700_W50S8623A0002_9700",
+          "note": "$11,279.17 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-07-31T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8624F2434 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8624F2434_9700_W50S8623A0002_9700",
+          "note": "$10,680.87 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-07-01T00:00:00Z",
+          "sourceLabel": "USAspending award W912JB24F0042 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912JB24F0042_9700_W912JB23A0001_9700",
+          "note": "$50,000 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-06-28T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8624F2421 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8624F2421_9700_W50S8623A0002_9700",
+          "note": "$12,548.94 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-06-25T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8624F2419 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8624F2419_9700_W50S8623A0002_9700",
+          "note": "$10,327.57 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-06-21T00:00:00Z",
+          "sourceLabel": "USAspending award W50S8624F2420 — Sysco Grand Rapids",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S8624F2420_9700_W50S8623A0002_9700",
+          "note": "$11,118.16 obligated to SYSCO GRAND RAPIDS, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 16
+    },
+    {
+      "id": "usasp:department-of-the-army:ID",
+      "name": "Department of the Army (ID)",
+      "segment": "government",
+      "state": "ID",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-04-20T00:00:00Z",
+          "sourceLabel": "USAspending award W912J724P0012 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912J724P0012_9700_-NONE-_-NONE-",
+          "note": "$30,000 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:MS",
+      "name": "Department of the Army (MS)",
+      "segment": "government",
+      "state": "MS",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-12-23T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE26FA014 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE26FA014_9700_W912EE22A0002_9700",
+          "note": "$240,000 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2025-10-20T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE26FA004 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE26FA004_9700_W912EE22A0002_9700",
+          "note": "$100,000 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-08-12T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE24F0137 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE24F0137_9700_W912EE22A0002_9700",
+          "note": "$196,493.55 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-04-15T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE24F0065 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE24F0065_9700_W912EE22A0002_9700",
+          "note": "$240,000 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2023-11-14T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE24F0010 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE24F0010_9700_W912EE22A0002_9700",
+          "note": "$239,813.31 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2022-12-16T00:00:00Z",
+          "sourceLabel": "USAspending award W912EE23F0016 — Sysco Jackson",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W912EE23F0016_9700_W912EE22A0002_9700",
+          "note": "$239,802.32 obligated to SYSCO JACKSON, LLC",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:GA",
+      "name": "Department of the Army (GA)",
+      "segment": "government",
+      "state": "GA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-05-03T00:00:00Z",
+          "sourceLabel": "USAspending award W9127P24C0003 — Sysco Jacksonville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W9127P24C0003_9700_-NONE-_-NONE-",
+          "note": "$18,948.07 obligated to SYSCO JACKSONVILLE, INC.",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:ND",
+      "name": "Department of the Army (ND)",
+      "segment": "government",
+      "state": "ND",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-07-25T00:00:00Z",
+          "sourceLabel": "USAspending award W901UZ24P0022 — Sysco North Dakota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W901UZ24P0022_9700_-NONE-_-NONE-",
+          "note": "$3,300.36 obligated to SYSCO NORTH DAKOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-04-30T00:00:00Z",
+          "sourceLabel": "USAspending award W901UZ24P0013 — Sysco North Dakota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W901UZ24P0013_9700_-NONE-_-NONE-",
+          "note": "$2,537.63 obligated to SYSCO NORTH DAKOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award W901UZ24P0006 — Sysco North Dakota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W901UZ24P0006_9700_-NONE-_-NONE-",
+          "note": "$1,201.2 obligated to SYSCO NORTH DAKOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2023-09-07T00:00:00Z",
+          "sourceLabel": "USAspending award W901UZ23P0031 — Sysco North Dakota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W901UZ23P0031_9700_-NONE-_-NONE-",
+          "note": "$803.69 obligated to SYSCO NORTH DAKOTA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2023-08-08T00:00:00Z",
+          "sourceLabel": "USAspending award W901UZ23P0028 — Sysco North Dakota",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W901UZ23P0028_9700_-NONE-_-NONE-",
+          "note": "$430.02 obligated to SYSCO NORTH DAKOTA, INC.",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:department-of-the-army:CA",
+      "name": "Department of the Army (CA)",
+      "segment": "government",
+      "state": "CA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2023-10-27T00:00:00Z",
+          "sourceLabel": "USAspending award W50S7424P0003 — Sysco Riverside",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_W50S7424P0003_9700_-NONE-_-NONE-",
+          "note": "$0 obligated to SYSCO RIVERSIDE INC",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:defense-logistics-agency:NY",
+      "name": "Defense Logistics Agency (NY)",
+      "segment": "government",
+      "state": "NY",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZQX — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZQX_9700_SPE30021D3318_9700",
+          "note": "$131.64 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYQ8 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYQ8_9700_SPE30021D3318_9700",
+          "note": "$6,013.87 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYQ6 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYQ6_9700_SPE30021D3318_9700",
+          "note": "$3,875.73 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYQ4 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYQ4_9700_SPE30021D3318_9700",
+          "note": "$3,125.44 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXV6 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXV6_9700_SPE30021D3318_9700",
+          "note": "$341.28 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXV5 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXV5_9700_SPE30021D3318_9700",
+          "note": "$40,149.79 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXPE — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXPE_9700_SPE30021D3318_9700",
+          "note": "$12,060.54 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXPA — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXPA_9700_SPE30021D3318_9700",
+          "note": "$13,764.13 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXP9 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXP9_9700_SPE30021D3318_9700",
+          "note": "$12,048.15 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX11 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX11_9700_SPE30021D3318_9700",
+          "note": "$462.63 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX10 — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX10_9700_SPE30021D3318_9700",
+          "note": "$145.66 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX0Z — Sysco Syracuse",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX0Z_9700_SPE30021D3318_9700",
+          "note": "$1,053.8 obligated to SYSCO SYRACUSE, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 200
+    },
+    {
+      "id": "usasp:defense-logistics-agency:VA",
+      "name": "Defense Logistics Agency (VA)",
+      "segment": "government",
+      "state": "VA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZXC — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZXC_9700_SPE30025D3021_9700",
+          "note": "$18,498.92 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZMY — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZMY_9700_SPE30025D3021_9700",
+          "note": "$17,669.26 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ4W — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ4W_9700_SPE30025D3021_9700",
+          "note": "$1,412.16 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ4S — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ4S_9700_SPE30025D3021_9700",
+          "note": "$394.12 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ0E — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ0E_9700_SPE30025D3021_9700",
+          "note": "$1,730.21 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ0C — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ0C_9700_SPE30025DA090_9700",
+          "note": "$226.92 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYZ8 — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYZ8_9700_SPE30025D3021_9700",
+          "note": "$18,120.57 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYPH — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYPH_9700_SPE30025D3021_9700",
+          "note": "$4,497.35 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYPG — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYPG_9700_SPE30025DA090_9700",
+          "note": "$483.12 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYML — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYML_9700_SPE30025D3021_9700",
+          "note": "$13,006.47 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYMJ — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYMJ_9700_SPE30025DA090_9700",
+          "note": "$1,239.71 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY90 — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY90_9700_SPE30025DA090_9700",
+          "note": "$285.38 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 720
+    },
+    {
+      "id": "usasp:defense-logistics-agency:PA",
+      "name": "Defense Logistics Agency (PA)",
+      "segment": "government",
+      "state": "PA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2024-09-24T00:00:00Z",
+          "sourceLabel": "USAspending award SPE3SE24F1633 — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE3SE24F1633_9700_SPE30020D3286_9700",
+          "note": "$152,000 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2022-03-02T00:00:00Z",
+          "sourceLabel": "USAspending award SPE3SE22F1159 — Sysco Hampton Roads",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE3SE22F1159_9700_SPE30020D3286_9700",
+          "note": "$152,000 obligated to SYSCO HAMPTON ROADS, INC",
+          "resolution": 0.98
+        }
+      ]
+    },
+    {
+      "id": "usasp:defense-logistics-agency:AL",
+      "name": "Defense Logistics Agency (AL)",
+      "segment": "government",
+      "state": "AL",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZPA2 — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZPA2_9700_SPE30025D3020_9700",
+          "note": "$3,972.74 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP8P — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP8P_9700_SPE30025D3020_9700",
+          "note": "$837.45 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP7N — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP7N_9700_SPE30025D3020_9700",
+          "note": "$5,729.28 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP72 — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP72_9700_SPE30025D3020_9700",
+          "note": "$5,985.78 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP6X — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP6X_9700_SPE30025D3020_9700",
+          "note": "$14,909.01 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP3X — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP3X_9700_SPE30025D3020_9700",
+          "note": "$3,504 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP3K — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP3K_9700_SPE30025D3020_9700",
+          "note": "$16,991.73 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNYE — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNYE_9700_SPE30025D3020_9700",
+          "note": "$5,937.73 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNMV — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNMV_9700_SPE30025D3020_9700",
+          "note": "$5,210.46 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNMR — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNMR_9700_SPE30025D3020_9700",
+          "note": "$8,177.46 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNLQ — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNLQ_9700_SPE30025D3020_9700",
+          "note": "$7,658.12 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNLP — Sysco Central Alabama",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNLP_9700_SPE30025D3020_9700",
+          "note": "$34,302.21 obligated to SYSCO CENTRAL ALABAMA INC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 596
+    },
+    {
+      "id": "usasp:defense-logistics-agency:NC",
+      "name": "Defense Logistics Agency (NC)",
+      "segment": "government",
+      "state": "NC",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZZX — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZZX_9700_SPE30025D3010_9700",
+          "note": "$3,583.82 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVG — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVG_9700_SPE30025DA080_9700",
+          "note": "$979.16 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVF — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVF_9700_SPE30025DA080_9700",
+          "note": "$621 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVE — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVE_9700_SPE30025DA080_9700",
+          "note": "$6,965.2 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVD — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVD_9700_SPE30025DA080_9700",
+          "note": "$3,585.39 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVC — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVC_9700_SPE30025DA080_9700",
+          "note": "$677.32 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVB — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVB_9700_SPE30025DA080_9700",
+          "note": "$5,104.22 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZVA — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZVA_9700_SPE30025DA080_9700",
+          "note": "$1,312.35 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZV9 — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZV9_9700_SPE30025DA080_9700",
+          "note": "$452.11 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZV8 — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZV8_9700_SPE30025DA080_9700",
+          "note": "$431.65 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZV5 — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZV5_9700_SPE30025DA080_9700",
+          "note": "$4,886.94 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZV4 — Sysco Raleigh",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZV4_9700_SPE30025DA080_9700",
+          "note": "$862.73 obligated to SYSCO RALEIGH, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 1489
+    },
+    {
+      "id": "usasp:defense-logistics-agency:AR",
+      "name": "Defense Logistics Agency (AR)",
+      "segment": "government",
+      "state": "AR",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZZK — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZZK_9700_SPE30024D3007_9700",
+          "note": "$112.98 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZDH — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZDH_9700_SPE30024D3007_9700",
+          "note": "$4,232.99 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ3Y — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ3Y_9700_SPE30024D3007_9700",
+          "note": "$236.56 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY8A — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY8A_9700_SPE30024D3007_9700",
+          "note": "$3,183.02 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX86 — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX86_9700_SPE30024D3007_9700",
+          "note": "$5,297.09 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZV8J — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZV8J_9700_SPE30024D3007_9700",
+          "note": "$6,759.44 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZUSF — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZUSF_9700_SPE30024D3007_9700",
+          "note": "$253.28 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-04T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZTTC — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZTTC_9700_SPE30024D3007_9700",
+          "note": "$1,015.38 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-03T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZTR8 — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZTR8_9700_SPE30024D3007_9700",
+          "note": "$2,823.76 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-02T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZSP8 — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZSP8_9700_SPE30024D3007_9700",
+          "note": "$211.54 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-01T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZS1K — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZS1K_9700_SPE30024D3007_9700",
+          "note": "$3,463.43 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-01T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZRW6 — Sysco Usa Ii",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZRW6_9700_SPE30024D3007_9700",
+          "note": "$96.33 obligated to SYSCO USA II, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 68
+    },
+    {
+      "id": "usasp:defense-logistics-agency:FL",
+      "name": "Defense Logistics Agency (FL)",
+      "segment": "government",
+      "state": "FL",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZYU — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZYU_9700_SPE30023D3362_9700",
+          "note": "$8,162.49 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZUB — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZUB_9700_SPE30023D3362_9700",
+          "note": "$3,503.15 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ4G — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ4G_9700_SPE30023D3362_9700",
+          "note": "$4,567.43 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ3F — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ3F_9700_SPE30023D3362_9700",
+          "note": "$98.86 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ0H — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ0H_9700_SPE30023D3362_9700",
+          "note": "$68,304.19 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY3D — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY3D_9700_SPE30023D3362_9700",
+          "note": "$2,894.19 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY1E — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY1E_9700_SPE30023D3362_9700",
+          "note": "$20,845.71 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX88 — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX88_9700_SPE30023D3362_9700",
+          "note": "$1,905.48 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX3X — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX3X_9700_SPE30023D3362_9700",
+          "note": "$6,643.88 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZWSG — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZWSG_9700_SPE30023D3362_9700",
+          "note": "$4,193.14 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZW71 — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZW71_9700_SPE30023D3362_9700",
+          "note": "$5,009.05 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZVB9 — Sysco Central Florida",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZVB9_9700_SPE30023D3362_9700",
+          "note": "$7,814.86 obligated to SYSCO CENTRAL FLORIDA, INC.",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 181
+    },
+    {
+      "id": "usasp:defense-logistics-agency:WA",
+      "name": "Defense Logistics Agency (WA)",
+      "segment": "government",
+      "state": "WA",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZXY — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZXY_9700_SPE30025D3018_9700",
+          "note": "$699.88 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZXJ — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZXJ_9700_SPE30025D3018_9700",
+          "note": "$2,883.33 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZEG — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZEG_9700_SPE30025D3018_9700",
+          "note": "$836.02 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ4F — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ4F_9700_SPE30025D3018_9700",
+          "note": "$674.62 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ20 — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ20_9700_SPE30025D3018_9700",
+          "note": "$13,544.96 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ1Z — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ1Z_9700_SPE30025D3018_9700",
+          "note": "$4,822.55 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ1Y — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ1Y_9700_SPE30025D3018_9700",
+          "note": "$19,095.93 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ1X — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ1X_9700_SPE30025D3018_9700",
+          "note": "$51.9 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ1W — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ1W_9700_SPE30025D3018_9700",
+          "note": "$2,263.48 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-12T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYBX — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYBX_9700_SPE30025D3018_9700",
+          "note": "$4,756.17 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY7U — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY7U_9700_SPE30025D3018_9700",
+          "note": "$259.34 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY3J — Sysco Seattle",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY3J_9700_SPE30025D3018_9700",
+          "note": "$1,880.65 obligated to SYSCO SEATTLE, INC.",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 486
+    },
+    {
+      "id": "usasp:defense-logistics-agency:ID",
+      "name": "Defense Logistics Agency (ID)",
+      "segment": "government",
+      "state": "ID",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZXD — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZXD_9700_SPE30024D3004_9700",
+          "note": "$4,821.54 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZX4 — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZX4_9700_SPE30024D3006_9700",
+          "note": "$1,143.03 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZDP — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZDP_9700_SPE30024D3006_9700",
+          "note": "$3,489.71 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZDM — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZDM_9700_SPE30024D3006_9700",
+          "note": "$163.52 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZDL — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZDL_9700_SPE30024D3006_9700",
+          "note": "$55.89 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZAW — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZAW_9700_SPE30024D3006_9700",
+          "note": "$2,323.01 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY6G — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY6G_9700_SPE30024D3004_9700",
+          "note": "$4,596.28 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY2R — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY2R_9700_SPE30024D3006_9700",
+          "note": "$73.64 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY00 — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY00_9700_SPE30024D3006_9700",
+          "note": "$5,544.18 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXZ9 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXZ9_9700_SPE30024D3004_9700",
+          "note": "$2,131.6 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXV4 — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXV4_9700_SPE30024D3006_9700",
+          "note": "$145.52 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX9U — Sysco Spokane",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX9U_9700_SPE30024D3006_9700",
+          "note": "$3,528.5 obligated to SYSCO SPOKANE INC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 254
+    },
+    {
+      "id": "usasp:defense-logistics-agency:WI",
+      "name": "Defense Logistics Agency (WI)",
+      "segment": "government",
+      "state": "WI",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZX8 — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZX8_9700_SPE30023D3354_9700",
+          "note": "$285.96 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZEC — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZEC_9700_SPE30023D3354_9700",
+          "note": "$2,859.41 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ74 — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ74_9700_SPE30023D3354_9700",
+          "note": "$1,810.88 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ6Z — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ6Z_9700_SPE30023D3354_9700",
+          "note": "$9,565.32 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYPC — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYPC_9700_SPE30023D3354_9700",
+          "note": "$11,577.81 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXUH — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXUH_9700_SPE30023D3354_9700",
+          "note": "$476.6 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX3C — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX3C_9700_SPE30023D3354_9700",
+          "note": "$9,137.67 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX3B — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX3B_9700_SPE30023D3354_9700",
+          "note": "$2,787.41 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZW6Z — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZW6Z_9700_SPE30023D3354_9700",
+          "note": "$23,524.29 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZVCD — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZVCD_9700_SPE30023D3354_9700",
+          "note": "$341.7 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZV9Y — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZV9Y_9700_SPE30023D3354_9700",
+          "note": "$1,876.5 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZV98 — Sysco Baraboo",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZV98_9700_SPE30023D3354_9700",
+          "note": "$238.3 obligated to SYSCO BARABOO, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 120
+    },
+    {
+      "id": "usasp:defense-logistics-agency:MT",
+      "name": "Defense Logistics Agency (MT)",
+      "segment": "government",
+      "state": "MT",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZUC — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZUC_9700_SPE30025D3019_9700",
+          "note": "$416.16 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZRX — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZRX_9700_SPE30025D3019_9700",
+          "note": "$46.56 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZAJ — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZAJ_9700_SPE30025D3019_9700",
+          "note": "$2,030.7 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYXF — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYXF_9700_SPE30025D3019_9700",
+          "note": "$2,589.59 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXZ8 — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXZ8_9700_SPE30025D3019_9700",
+          "note": "$1,431.34 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXW9 — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXW9_9700_SPE30025D3019_9700",
+          "note": "$50.89 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXW7 — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXW7_9700_SPE30025D3019_9700",
+          "note": "$3,198.69 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZWBP — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZWBP_9700_SPE30025D3019_9700",
+          "note": "$434.9 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZW66 — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZW66_9700_SPE30025D3019_9700",
+          "note": "$3,054.88 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZVCY — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZVCY_9700_SPE30025D3019_9700",
+          "note": "$536.31 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZUJM — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZUJM_9700_SPE30025D3019_9700",
+          "note": "$28.76 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZUAH — Sysco Montana",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZUAH_9700_SPE30025D3019_9700",
+          "note": "$1,166.39 obligated to SYSCO MONTANA, INC.",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 128
+    },
+    {
+      "id": "usasp:defense-logistics-agency:ME",
+      "name": "Defense Logistics Agency (ME)",
+      "segment": "government",
+      "state": "ME",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZSL — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZSL_9700_SPE30024D3003_9700",
+          "note": "$18,202.24 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX55 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX55_9700_SPE30024D3003_9700",
+          "note": "$16,742.4 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZV43 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZV43_9700_SPE30024D3003_9700",
+          "note": "$1,204.99 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZU3L — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZU3L_9700_SPE30024D3003_9700",
+          "note": "$2,302 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZU27 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZU27_9700_SPE30024D3003_9700",
+          "note": "$1,407.83 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-02T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZSYR — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZSYR_9700_SPE30024D3003_9700",
+          "note": "$22,447.08 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-30T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZQBH — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZQBH_9700_SPE30024D3003_9700",
+          "note": "$12,375.11 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP5M — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP5M_9700_SPE30024D3003_9700",
+          "note": "$1,226.43 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNN1 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNN1_9700_SPE30024D3003_9700",
+          "note": "$954.99 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZNL7 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZNL7_9700_SPE30024D3003_9700",
+          "note": "$5,493.87 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-24T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZL6Z — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZL6Z_9700_SPE30024D3003_9700",
+          "note": "$1,355.01 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-23T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZKK7 — Sysco Northern New England",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZKK7_9700_SPE30024D3003_9700",
+          "note": "$719.97 obligated to SYSCO NORTHERN NEW ENGLAND, INC.",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 59
+    },
+    {
+      "id": "usasp:defense-logistics-agency:KY",
+      "name": "Defense Logistics Agency (KY)",
+      "segment": "government",
+      "state": "KY",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZRE — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZRE_9700_SPE30022D3343_9700",
+          "note": "$222.42 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ8X — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ8X_9700_SPE30022D3343_9700",
+          "note": "$5,932.52 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYXG — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYXG_9700_SPE30022D3343_9700",
+          "note": "$13,351.85 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY2V — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY2V_9700_SPE30022D3343_9700",
+          "note": "$7,807.38 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXL9 — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXL9_9700_SPE30022D3343_9700",
+          "note": "$2,907.48 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXDR — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXDR_9700_SPE30022D3343_9700",
+          "note": "$6,025.26 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXDH — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXDH_9700_SPE30022D3343_9700",
+          "note": "$16,351 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX92 — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX92_9700_SPE30022D3343_9700",
+          "note": "$23,942.55 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX8L — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX8L_9700_SPE30022D3343_9700",
+          "note": "$12,389.21 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX4K — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX4K_9700_SPE30022D3343_9700",
+          "note": "$18,726.61 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX49 — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX49_9700_SPE30022D3343_9700",
+          "note": "$219.68 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-09T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZX48 — Sysco Louisville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZX48_9700_SPE30022D3343_9700",
+          "note": "$7,119.5 obligated to SYSCO LOUISVILLE INC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 227
+    },
+    {
+      "id": "usasp:defense-logistics-agency:TN",
+      "name": "Defense Logistics Agency (TN)",
+      "segment": "government",
+      "state": "TN",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZQ4 — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZQ4_9700_SPE30022D3340_9700",
+          "note": "$17,237.69 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZQ0 — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZQ0_9700_SPE30022D3340_9700",
+          "note": "$2,343.6 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZPY — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZPY_9700_SPE30022D3340_9700",
+          "note": "$6,228.17 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZPV — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZPV_9700_SPE30022D3340_9700",
+          "note": "$1,574.37 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZPS — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZPS_9700_SPE30022D3340_9700",
+          "note": "$557.4 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZPM — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZPM_9700_SPE30022D3340_9700",
+          "note": "$3,534.55 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-14T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZPL — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZPL_9700_SPE30022D3340_9700",
+          "note": "$2,484.41 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZYZK — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZYZK_9700_SPE30022D3340_9700",
+          "note": "$7,749.89 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY4Y — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY4Y_9700_SPE30022D3340_9700",
+          "note": "$4,599.73 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXMB — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXMB_9700_SPE30022D3340_9700",
+          "note": "$669.11 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXM9 — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXM9_9700_SPE30022D3340_9700",
+          "note": "$4,524.92 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZXM7 — Sysco Nashville",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZXM7_9700_SPE30022D3340_9700",
+          "note": "$1,992.68 obligated to SYSCO NASHVILLE, LLC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 304
+    },
+    {
+      "id": "usasp:defense-logistics-agency:UT",
+      "name": "Defense Logistics Agency (UT)",
+      "segment": "government",
+      "state": "UT",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-13T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZZ49 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZZ49_9700_SPE30022D3342_9700",
+          "note": "$12,133.19 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-10T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZY2N — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZY2N_9700_SPE30022D3342_9700",
+          "note": "$11,532.88 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZW3Y — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZW3Y_9700_SPE30022D3342_9700",
+          "note": "$14,022.05 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-07T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZV2D — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZV2D_9700_SPE30022D3342_9700",
+          "note": "$80.1 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-06T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZUBH — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZUBH_9700_SPE30022D3342_9700",
+          "note": "$9,473.78 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-03T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZTJ2 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZTJ2_9700_SPE30022D3342_9700",
+          "note": "$10,941 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-02T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZSKM — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZSKM_9700_SPE30022D3342_9700",
+          "note": "$2,869.54 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-04-01T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZRYY — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZRYY_9700_SPE30022D3342_9700",
+          "note": "$10,459.21 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-30T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZPY9 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZPY9_9700_SPE30022D3342_9700",
+          "note": "$7,058.98 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-27T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZP9Y — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZP9Y_9700_SPE30022D3342_9700",
+          "note": "$7,664.48 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-25T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZMD6 — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZMD6_9700_SPE30022D3342_9700",
+          "note": "$11,595.46 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-24T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZLJB — Sysco Usa I",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZLJB_9700_SPE30022D3342_9700",
+          "note": "$9,559 obligated to SYSCO USA I, INC",
+          "resolution": 0.98
+        }
+      ],
+      "totalAwardsFound": 77
+    },
+    {
+      "id": "usasp:defense-logistics-agency:OR",
+      "name": "Defense Logistics Agency (OR)",
+      "segment": "government",
+      "state": "OR",
+      "evidence": [
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-08T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZ9S7 — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZ9S7_9700_SPE30024D3005_9700",
+          "note": "$7,591 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-03T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZ6U8 — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZ6U8_9700_SPE30024D3005_9700",
+          "note": "$366.38 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-03-03T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FZ6U7 — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FZ6U7_9700_SPE30024D3005_9700",
+          "note": "$309.4 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-02-18T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FYYPY — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FYYPY_9700_SPE30024D3005_9700",
+          "note": "$25,091.59 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-01-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FYHWF — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FYHWF_9700_SPE30024D3005_9700",
+          "note": "$364.11 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        },
+        {
+          "type": "gov_contract",
+          "observedAt": "2026-01-26T00:00:00Z",
+          "sourceLabel": "USAspending award SPE30026FYHW2 — Sysco Portland",
+          "sourceUrl": "https://www.usaspending.gov/award/CONT_AWD_SPE30026FYHW2_9700_SPE30024D3005_9700",
+          "note": "$288.93 obligated to SYSCO PORTLAND, INC.",
+          "resolution": 0.98
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "scanned": 5000,
+    "rejected": 7,
+    "truncated": 4776,
+    "pages": 51,
+    "window": "2023-07-25..2026-07-25"
+  }
+}
