@@ -28,8 +28,14 @@ value, business goals, and technical integrity."
 
 Experience:
 
-* Senior Analyst, Digital Products @ Accenture Song, 2025 – Now
-* Analyst, Digital Products @ Accenture Song, 2022 – 2025
+* Product Team Lead @ Accenture Song, 2022 – Now
+  * Work: Agentic Design System, Agentic Laboratory Scheduling, Enterprise
+    Channel AI Strategy, HR Portal / AI Chat, GenAI Newsletter Orchestrator,
+    Employee Portal, B2B Commerce Portal
+  * Clients: Exxon Mobil, Norfolk Southern, AT&T, Allstate, Cisco, Accenture
+    Advanced AI Center of Excellence
+* Product Intern @ Sabre, 2020
+  * Work: Travel Supplier GTM
 
 Links:
 
