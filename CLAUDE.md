@@ -29,13 +29,12 @@ value, business goals, and technical integrity."
 Experience:
 
 * Product Team Lead @ Accenture Song, 2022 – Now
-  * Work: Agentic Design System, Agentic Laboratory Scheduling, Enterprise
-    Channel AI Strategy, HR Portal / AI Chat, GenAI Newsletter Orchestrator,
-    Employee Portal, B2B Commerce Portal
   * Clients: Exxon Mobil, Norfolk Southern, AT&T, Allstate, Cisco, Accenture
     Advanced AI Center of Excellence
 * Product Intern @ Sabre, 2020
-  * Work: Travel Supplier GTM
+
+No per-role project lists. Job title, company, and dates only, plus the
+client line under the Accenture Song role.
 
 Links:
 
