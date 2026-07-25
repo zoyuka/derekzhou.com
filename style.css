@@ -169,7 +169,7 @@ h2 {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
-  padding: 0.9rem 0;
+  padding: 0.6rem 0;
 }
 
 .experience > li + li {
@@ -193,21 +193,6 @@ h2 {
   white-space: nowrap;
 }
 
-.exp-clients {
-  width: 100%;
-  margin-top: 0.35rem;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: var(--color-dimmed);
-}
-
-.exp-clients-label {
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-size: 0.72rem;
-  margin-right: 0.15rem;
-}
-
 /* ------------------------------------------------
    Footer / links
    ------------------------------------------------ */
@@ -228,6 +213,10 @@ footer a {
 
 footer a:hover {
   color: var(--color-dimmed);
+}
+
+footer a + a {
+  margin-left: 1.5rem;
 }
 
 .noscript-email {
@@ -254,10 +243,6 @@ footer a:hover {
   .exp-date {
     margin-left: 0;
   }
-
-  .exp-clients {
-    margin-top: 0.7rem;
-  }
 }
 
 /* ------------------------------------------------
@@ -281,8 +266,7 @@ footer a:hover {
 
   .dimmed,
   .exp-place,
-  .exp-date,
-  .exp-clients {
+  .exp-date {
     color: #555;
   }
 }
