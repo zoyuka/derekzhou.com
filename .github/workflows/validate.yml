@@ -98,8 +98,10 @@ jobs:
           fi
 
           # Check for unclosed tags (basic)
+          # The open pattern requires a delimiter after the tag name so that
+          # <head> is not also matched by <header>, <main> by <mainbar>, etc.
           for tag in html head body main; do
-            opens=$(grep -oi "<$tag" "$file" | wc -l)
+            opens=$(grep -oiE "<$tag([[:space:]>]|$)" "$file" | wc -l)
             closes=$(grep -oi "</$tag>" "$file" | wc -l)
             if [ "$opens" -ne "$closes" ]; then
               echo "::error::Mismatched <$tag> tags (open=$opens, close=$closes)"
