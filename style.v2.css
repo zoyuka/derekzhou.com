@@ -1,37 +1,104 @@
 /* ------------------------------------------------
-   @font-face — self-hosted WOFF2
+   @font-face — self-hosted WOFF2, ASCII subsets
+   (regenerate with ./subset-fonts.sh; bump .subN
+   filenames on change — assets are immutable-cached)
    ------------------------------------------------ */
 
 @font-face {
   font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Regular.woff2') format('woff2');
+  src: url('/assets/fonts/Newsreader-Regular.sub1.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
   font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Bold.woff2') format('woff2');
+  src: url('/assets/fonts/Newsreader-Bold.sub1.woff2') format('woff2');
   font-weight: 500 700;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Regular.woff2') format('woff2');
+  src: url('/assets/fonts/DMSans-Regular.sub1.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Medium.woff2') format('woff2');
+  src: url('/assets/fonts/DMSans-Medium.sub1.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
+}
+
+/* Metric-matched fallbacks: if the webfont misses first paint,
+   these render the system face at the webfont's exact metrics,
+   so the swap (or the absence of one) shifts nothing. Values
+   computed from the font tables — see CLAUDE.md. */
+
+@font-face {
+  font-family: 'Newsreader Fallback';
+  src: local('Georgia');
+  font-weight: 400;
+  size-adjust: 96.88%;
+  ascent-override: 75.87%;
+  descent-override: 27.35%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Newsreader Fallback';
+  src: local('Georgia Bold'), local('Georgia');
+  font-weight: 500 700;
+  size-adjust: 99.42%;
+  ascent-override: 73.93%;
+  descent-override: 26.66%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  font-weight: 400;
+  size-adjust: 113.91%;
+  ascent-override: 87.09%;
+  descent-override: 27.21%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  font-weight: 500;
+  size-adjust: 116.50%;
+  ascent-override: 85.15%;
+  descent-override: 26.61%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback Android';
+  src: local('Roboto');
+  font-weight: 400;
+  size-adjust: 112.12%;
+  ascent-override: 88.48%;
+  descent-override: 27.65%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback Android';
+  src: local('Roboto Medium'), local('Roboto');
+  font-weight: 500;
+  size-adjust: 114.66%;
+  ascent-override: 86.52%;
+  descent-override: 27.04%;
+  line-gap-override: 0%;
 }
 
 /* ------------------------------------------------
@@ -41,12 +108,12 @@
 :root {
   color-scheme: light dark;
 
-  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
+  --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
   --color-bg: #fafaf8;
   --color-text: #111110;
-  --color-dimmed: #74746b;
+  --color-dimmed: #6d6d64;
   --color-focus: #3b5998;
   --color-selection-bg: #111110;
   --color-selection-text: #fafaf8;
@@ -73,13 +140,10 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 100%;
-}
-
 body {
   font-family: var(--font-sans);
   font-size: 1rem;
+  font-synthesis: none;
   background: var(--color-bg);
   color: var(--color-text);
   cursor: crosshair;
@@ -100,6 +164,53 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+/* ------------------------------------------------
+   Quincunx canvases — behind everything, inert
+   ------------------------------------------------ */
+
+#pk-static, #pk-live {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.pk-ready #pk-static, .pk-ready #pk-live {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pk-static, #pk-live {
+    transition: none;
+  }
+}
+
+/* On wide viewports the board is staged right of the text column;
+   a mask fades its left edge well clear of the type. */
+@media (min-width: 1280px) and (min-height: 620px) {
+  #pk-static, #pk-live {
+    -webkit-mask-image: linear-gradient(to right, transparent calc(50% + 300px), #000 calc(50% + 364px));
+    mask-image: linear-gradient(to right, transparent calc(50% + 300px), #000 calc(50% + 364px));
+  }
+}
+
+/* Narrow viewports get a static sediment horizon at the bottom;
+   reserve room so it never sits under the footer. */
+@media (max-width: 1279.98px), (max-height: 619.98px) {
+  body {
+    padding-bottom: 120px;
+  }
+}
+
+main, footer {
+  position: relative;
+  z-index: 1;
 }
 
 /* ------------------------------------------------
@@ -219,6 +330,35 @@ footer a + a {
   margin-left: 1.5rem;
 }
 
+/* Occupies its footer slot from first paint (visibility, not display)
+   so revealing it can never shift layout; pachinko.js adds .pk-show
+   only when the animation actually runs. */
+.pk-pause {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-dimmed);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 1.5rem;
+  cursor: crosshair;
+  transition: color 0.2s;
+  visibility: hidden;
+}
+
+.pk-pause.pk-show {
+  visibility: visible;
+}
+
+.pk-pause:hover {
+  color: var(--color-text);
+}
+
+.back-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .noscript-email {
   font-family: var(--font-sans);
   font-size: 0.9rem;
@@ -250,7 +390,10 @@ footer a + a {
    ------------------------------------------------ */
 
 @media print {
-  footer {
+  footer,
+  #pk-static,
+  #pk-live,
+  .pk-pause {
     display: none;
   }
 
@@ -258,15 +401,14 @@ footer a + a {
     cursor: default;
     color: #000;
     background: #fff;
+    padding-bottom: 0;
   }
 
   h1 {
     font-size: 2rem;
   }
 
-  .dimmed,
-  .exp-place,
-  .exp-date {
+  .dimmed {
     color: #555;
   }
 }

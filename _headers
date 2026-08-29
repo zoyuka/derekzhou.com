@@ -1,17 +1,45 @@
+# CSP note: Cloudflare Pages COMBINES headers from every matching rule —
+# it does not override. Two rules both setting Content-Security-Policy
+# means the browser receives both and enforces the intersection (this
+# silently broke /sysco/ fetches when /* carried connect-src 'none').
+# So CSP lives only on the HTML document paths, scoped with no overlap.
+# CSP on non-HTML responses is inert anyway.
+
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Early Hints: Link headers on the root document let Cloudflare send 103s
+# for the render-critical assets. crossorigin on the font links is mandatory
+# or the browser double-fetches them.
+/
+  Cache-Control: max-age=0, must-revalidate
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+  Link: </style.v2.css>; rel=preload; as=style
+  Link: </assets/fonts/Newsreader-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/Newsreader-Bold.sub1.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/DMSans-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/DMSans-Medium.sub1.woff2>; rel=preload; as=font; crossorigin
 
 /index.html
   Cache-Control: max-age=0, must-revalidate
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
 
-/style.css
+/404.html
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+
+# Immutable assets: changed bytes require a renamed file (style.v3.css,
+# pachinko.v2.js, .sub2 fonts) or returning visitors keep stale copies.
+/style.v2.css
   Cache-Control: public, max-age=31536000, immutable
 
 /site.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/pachinko.js
   Cache-Control: public, max-age=31536000, immutable
 
 /assets/*
@@ -19,11 +47,14 @@
 
 # Sysco Trace. Publicly reachable but not advertised: X-Robots-Tag keeps it out of
 # search results while leaving the URL usable by anyone who has it.
-# connect-src 'self' is required — the site-wide policy sets it to 'none', which
-# would block the app from fetching its own JSON data files.
+# Its CSP needs connect-src 'self' so the app can fetch its own JSON and /api/*.
 /sysco/*
   X-Robots-Tag: noindex, nofollow
+
+/sysco/
+  Cache-Control: max-age=0, must-revalidate
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
 
 /sysco/index.html
   Cache-Control: max-age=0, must-revalidate
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'

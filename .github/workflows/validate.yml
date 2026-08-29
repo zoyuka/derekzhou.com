@@ -16,13 +16,20 @@ jobs:
         run: |
           files=(
             index.html
-            style.css
+            style.v2.css
             site.js
+            pachinko.js
             robots.txt
             _headers
             _redirects
             404.html
             assets/favicon.png
+            assets/favicon.svg
+            assets/apple-touch-icon.png
+            assets/fonts/Newsreader-Regular.sub1.woff2
+            assets/fonts/Newsreader-Bold.sub1.woff2
+            assets/fonts/DMSans-Regular.sub1.woff2
+            assets/fonts/DMSans-Medium.sub1.woff2
             .well-known/security.txt
           )
           missing=0
@@ -80,6 +87,18 @@ jobs:
             exit 1
           fi
           echo "API routing OK"
+
+      - name: No inline code on CSP'd pages
+        run: |
+          # The site-wide CSP has no unsafe-inline; inline styles, style
+          # blocks, and inline event handlers silently do nothing. Fail
+          # fast instead. (JSON-LD script blocks are exempt from
+          # script-src and allowed.)
+          if grep -niE 'style[[:space:]]*=[[:space:]]*"|<style|[[:space:]]on[a-z]+[[:space:]]*=[[:space:]]*"' index.html 404.html; then
+            echo "::error::Inline style/handler found — blocked by CSP"
+            exit 1
+          fi
+          echo "No inline code"
 
       - name: Validate HTML
         run: |
