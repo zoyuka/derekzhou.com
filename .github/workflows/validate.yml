@@ -94,7 +94,7 @@ jobs:
           # blocks, and inline event handlers silently do nothing. Fail
           # fast instead. (JSON-LD script blocks are exempt from
           # script-src and allowed.)
-          if grep -nE 'style="|<style|on(click|load|error|mouse)[a-z]*=' index.html 404.html; then
+          if grep -niE 'style[[:space:]]*=[[:space:]]*"|<style|[[:space:]]on[a-z]+[[:space:]]*=[[:space:]]*"' index.html 404.html; then
             echo "::error::Inline style/handler found — blocked by CSP"
             exit 1
           fi

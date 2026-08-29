@@ -97,7 +97,10 @@ The calm envelope (constants at the top of pachinko.js — any change must keep
 all of these true):
 
 * Motion only at ≥1280x620 viewports; narrower/shorter viewports get a static
-  sediment horizon band at the bottom (no rAF ever runs there).
+  sediment horizon band anchored to the END of the document (the static canvas
+  switches to position:absolute at document height there), inside the space
+  body padding-bottom reserves — never under text, even mid-scroll. No rAF
+  ever runs there.
 * prefers-reduced-motion: the converged edition renders once, stilled; the
   listener reacts to live changes in both directions.
 * ≤8 ambient balls (12 during click bursts), ≥500 ms between drops, descent
@@ -108,8 +111,10 @@ all of these true):
   never starts in band/still modes. Frame-time self-benchmark steps down
   (no trails, 6 balls, DPR 1.5) once if the median of the first 120 frames
   exceeds 12 ms.
-* Footer "Pause motion" button (WCAG 2.2.2) — aria-pressed, persisted in
-  localStorage inside try/catch. Ships wherever the loop ships. Non-negotiable.
+* Footer "Pause motion" button (WCAG 2.2.2) — its label names the action it
+  performs and swaps on toggle (no aria-pressed: label swap plus pressed state
+  read contradictorily in screen readers); persisted in localStorage inside
+  try/catch. Ships wherever the loop ships. Non-negotiable.
 * Both canvases: aria-hidden, pointer-events: none. Click-to-drop listens on
   document, only right of the text column, never on links/buttons.
 * No Math.random and no Date.now in the render path — time comes from the rAF
@@ -164,6 +169,11 @@ External JS and CSS files (enables strict CSP with no unsafe-inline —
 CI greps index.html and 404.html for inline style/handlers).
 \_headers file: script-src 'self'; style-src 'self'; connect-src 'none';
 frame-ancestors 'none'; form-action 'none'; HSTS.
+CSP rules are scoped per HTML path with NO overlapping rules: Cloudflare
+Pages COMBINES same-named headers from every matching rule (it does not
+override), and a doubled CSP means browsers enforce the intersection —
+this is exactly how /sysco/ fetches were once silently broken. Never put
+Content-Security-Policy on /*.
 robots.txt blocks: GPTBot, ClaudeBot, CCBot, Google-Extended, ChatGPT-User,
 Bytespider, anthropic-ai, cohere-ai, FacebookBot.
 

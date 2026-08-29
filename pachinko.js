@@ -177,6 +177,12 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  /* Old Safari (<=13) exposes only addListener on MediaQueryList. */
+  function listenMq(mq, fn) {
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
   function layout() {
     vw = window.innerWidth;
     vh = window.innerHeight;
@@ -186,13 +192,27 @@
     cdfP = -1;
 
     if (mode === 'band') {
+      /* The horizon band belongs to the END of the document — where the
+         CSS padding-bottom reserves clear space — not to the viewport.
+         Anchor the static canvas to the document so the band can never
+         sit under text on a scrollable page. */
+      var docH = Math.max(vh, document.documentElement.scrollHeight);
+      staticC.style.position = 'absolute';
+      staticC.style.height = docH + 'px';
+      liveC.style.display = 'none';        // unused in band mode
+      staticC.width = Math.round(vw * dpr);
+      staticC.height = Math.round(docH * dpr);
+      sx.setTransform(dpr, 0, 0, dpr, 0, 0);
       var fit = ((vw - 32) / PITCH - 1) | 0;
       N_ROWS = fit >= 12 ? 12 : fit >= 10 ? 10 : 8;
       stage.cx = vw / 2;
-      stage.base = vh - 16;
+      stage.base = docH - 16;
       colCap = BAND_H - 30;
       return;
     }
+    staticC.style.position = '';
+    staticC.style.height = '';
+    liveC.style.display = '';
     if (mode === 'none') return;
 
     var colRight = vw / 2 + 300;             // 600px column, centered
@@ -275,13 +295,34 @@
     sx.restore();
   }
 
+  /* Full sediment repaint, batched into one path (one fill call).
+     Per-bin draw cap: beyond ~400 grains a column is visually saturated
+     under gamma compression; drawing more is pure cost. The first 400
+     per bin have stable substreams, so repaints are pixel-identical. */
+  function drawAllSediment() {
+    var k, i, n, rng, x, y;
+    sx.globalAlpha = ink.a.dot;
+    sx.fillStyle = ink.dim;
+    sx.beginPath();
+    for (k = 0; k <= N_ROWS; k++) {
+      n = Math.min(bins[k], 400);
+      for (i = 0; i < n; i++) {
+        rng = grainRng(k, i);
+        x = binX(k) + (rng() - 0.5) * PITCH * 0.7;
+        y = stage.base - (i + 0.5) * STACK * gamma;
+        sx.moveTo(x + DOT_R, y);
+        sx.arc(x, y, DOT_R, 0, 6.2832);
+      }
+    }
+    sx.fill();
+    sx.globalAlpha = 1;
+  }
+
   function redrawStatic() {
-    sx.clearRect(0, 0, vw, vh);
+    sx.clearRect(0, 0, staticC.width, staticC.height);
     if (mode === 'band') { drawBand(); return; }
     drawPegs();
-    var k, i;
-    for (k = 0; k <= N_ROWS; k++)
-      for (i = 0; i < bins[k]; i++) drawSedimentDot(k, i);
+    drawAllSediment();
     drawCurve();
   }
 
@@ -289,9 +330,7 @@
      inside the bottom band the CSS padding reserves. Geometry comes
      from layout(). */
   function drawBand() {
-    var k, i;
-    for (k = 0; k <= N_ROWS; k++)
-      for (i = 0; i < bins[k]; i++) drawSedimentDot(k, i);
+    drawAllSediment();
     drawCurve();
   }
 
@@ -301,7 +340,7 @@
     landed = 0;
     rebuildCdf(0.5);
     var m, k;
-    for (m = 0; m < nBalls; m++) {
+    for (m = 1; m <= nBalls; m++) {   // skip vdc(0)=0, as the live engine does
       k = 0;
       var u = vdc(m);
       while (k < N_ROWS && cdf[k] < u) k++;
@@ -335,7 +374,7 @@
   var glowY = new Float32Array(32);
   var glowT = new Float64Array(32);
   var glowHead = 0;
-  var nextM = 0;
+  var nextM = 1;               // vdc(0) = 0 is a degenerate all-left path; start at 1
   var inFlight = 0;
   var ouRng = splitmix32(daySeed ^ 0x5F356495);
 
@@ -366,9 +405,13 @@
   function land(slot) {
     var k = ballBin[slot];
     bins[k]++;
-    drawSedimentDot(k, bins[k] - 1);
+    if (bins[k] <= 400) drawSedimentDot(k, bins[k] - 1);
     landed++;
-    if (landed === CURVE_AFTER || (landed & 15) === 0) redrawStatic();
+    /* Curve rescale cadence backs off geometrically: the relative change
+       per landing shrinks as 1/N, so late repaints buy nothing. */
+    if (landed === CURVE_AFTER ||
+        (landed < 1024 && (landed & 63) === 0) ||
+        (landed & 255) === 0) redrawStatic();
     var tallest = 0, i;
     for (i = 0; i <= N_ROWS; i++) if (bins[i] > tallest) tallest = bins[i];
     if (tallest * STACK * gamma > colCap) {
@@ -437,7 +480,9 @@
   var spawnTimer = 0;
   var spawnRng = splitmix32(daySeed ^ 0x2545F491);
 
-  function frame(now) {
+  var TRAIL_BUCKETS = [0.12, 0.24, 0.4];
+
+  function frame(now, once) {
     raf = 0;
     var dt = lastT ? now - lastT : 16;
     lastT = now;
@@ -463,9 +508,9 @@
     }
     /* trails: batched, three age buckets */
     if (benched.trails) {
-      var buckets = [0.12, 0.24, 0.4], b;
+      var b;
       for (b = 0; b < 3; b++) {
-        lx.globalAlpha = ink.a.ball * buckets[b];
+        lx.globalAlpha = ink.a.ball * TRAIL_BUCKETS[b];
         lx.fillStyle = ink.text;
         lx.beginPath();
         for (slot = 0; slot < CAP; slot++) {
@@ -524,6 +569,8 @@
         benched.frames = null;
       }
     }
+
+    if (once) { lastT = 0; return; }
 
     var anyGlow = false;
     for (i = 0; i < 32; i++) if (glowT[i]) { anyGlow = true; break; }
@@ -599,19 +646,28 @@
     document.documentElement.classList.add('pk-ready');
   }
 
+  /* Shift every stored timestamp forward by a frozen duration so time
+     appears continuous across pause / tab-hide: balls, glows, AND trails. */
+  function shiftClocks(d) {
+    var i;
+    for (i = 0; i < CAP; i++) if (ballOn[i]) ballT0[i] += d;
+    for (i = 0; i < 32; i++) if (glowT[i]) glowT[i] += d;
+    for (i = 0; i < CAP * TRAIL_N; i++) if (trailAge[i] >= 0) trailAge[i] += d;
+  }
+
   function setPaused(p) {
     paused = p;
     if (pauseBtn) {
-      pauseBtn.setAttribute('aria-pressed', String(p));
+      /* The label alone names the action the button will perform.
+         (Label swap + aria-pressed together read contradictorily in
+         screen readers, so no aria-pressed.) */
       pauseBtn.textContent = p ? 'Play motion' : 'Pause motion';
     }
     try { localStorage.setItem('pk-paused', p ? '1' : ''); } catch (e) {}
     if (p) { clearTimeout(spawnTimer); if (raf) { cancelAnimationFrame(raf); raf = 0; } running = false; pauseShift = performance.now(); }
     else {
       if (pauseShift) {
-        var d = performance.now() - pauseShift, i;
-        for (i = 0; i < CAP; i++) if (ballOn[i]) ballT0[i] += d;
-        for (i = 0; i < 32; i++) if (glowT[i]) glowT[i] += d;
+        shiftClocks(performance.now() - pauseShift);
         pauseShift = 0;
       }
       wake();
@@ -633,9 +689,7 @@
       hideShift = performance.now();
     } else if (!paused) {
       if (hideShift) {
-        var d = performance.now() - hideShift, i;
-        for (i = 0; i < CAP; i++) if (ballOn[i]) ballT0[i] += d;
-        for (i = 0; i < 32; i++) if (glowT[i]) glowT[i] += d;
+        shiftClocks(performance.now() - hideShift);
         hideShift = 0;
       }
       wake();
@@ -651,7 +705,7 @@
     if (mode !== 'anim' || paused || document.hidden) return;
     if (e.clientX < stage.left || e.target.closest('a, button')) return;
     var now = performance.now();
-    if (now - lastClick < 250) return;
+    if (now - lastClick < SPAWN_MIN) return;   // same >=500ms floor as ambient drops
     lastClick = now;
     userBoost = 4;
     spawn(now);
@@ -663,23 +717,41 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       var w = window.innerWidth, h = window.innerHeight;
-      if (w === lastW && Math.abs(h - lastH) < 120) return;   // iOS bar churn
+      if (w === lastW && h === lastH) return;
+      if (w === lastW) {
+        /* Height-only change (iOS URL-bar churn, window height drag):
+           refresh backing stores + geometry without clearing flight —
+           ball positions derive from width-stable coordinates, and
+           stage.base/colCap re-anchor cleanly. Mode flips across the
+           620px boundary arrive via the mqWide listener instead. */
+        lastH = h;
+        layout();
+        redrawStatic();
+        return;
+      }
       lastW = w; lastH = h;
       enterMode(decideMode());
     }, 150);
   });
 
   function onMedia() { enterMode(decideMode()); }
-  mqWide.addEventListener('change', onMedia);
-  mqReduce.addEventListener('change', onMedia);
-  mqDark.addEventListener('change', function () {
+  listenMq(mqWide, onMedia);
+  listenMq(mqReduce, onMedia);
+  listenMq(mqDark, function () {
     readInk();
     redrawStatic();
+    if (mode === 'anim' && paused && pauseShift) {
+      /* Repaint the frozen airborne scene in the new theme's ink:
+         advance the frozen clocks to "now", render one frame, and
+         re-freeze, so nothing appears to move. */
+      shiftClocks(performance.now() - pauseShift);
+      pauseShift = performance.now();
+      frame(performance.now(), true);
+    }
   });
 
   try { paused = localStorage.getItem('pk-paused') === '1'; } catch (e) {}
   if (pauseBtn && paused) {
-    pauseBtn.setAttribute('aria-pressed', 'true');
     pauseBtn.textContent = 'Play motion';
   }
 
