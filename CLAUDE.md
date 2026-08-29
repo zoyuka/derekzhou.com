@@ -46,7 +46,8 @@ reaches the browser before any client-side check can run.
 ## Content
 
 Name: Derek Zhou
-Role: Product Manager
+Role: Technology Leader (title/OG identity; the JSON-LD jobTitle stays
+"Team Lead" — the literal role at Accenture Song)
 Bio first sentence (bold): "Derek is a technology leader"
 Bio rest (dimmed): "who leads with clarity, empathy, and genuine enthusiasm
 for AI products and the outcomes they enable. He is accountable for solving
@@ -158,7 +159,7 @@ parlor.v1.js → parlor.v2.js, .sub2 → .sub2, and update every reference
 ## SEO
 
 Canonical URL, Open Graph tags, Twitter card meta, JSON-LD Person schema.
-Title: "Derek Zhou — Product Manager".
+Title: "Derek Zhou — Technology Leader".
 
 ## Security
 
