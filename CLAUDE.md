@@ -42,7 +42,7 @@ reaches the browser before any client-side check can run.
 
 Name: Derek Zhou
 Role: Product Manager
-Bio first sentence (bold): "Derek is a Product Manager"
+Bio first sentence (bold): "Derek is a technology leader"
 Bio rest (dimmed): "who leads with clarity, empathy, and genuine enthusiasm
 for product and the outcomes it enables. He is accountable for solving complex
 product challenges across digital platforms with the perfect balance of user
