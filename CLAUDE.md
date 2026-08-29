@@ -50,8 +50,7 @@ value, business goals, and technical integrity."
 
 Experience:
 
-* Product Team Lead @ Accenture Song, 2022 – Now
-* Product Intern @ Sabre, 2020
+* Team Lead @ Accenture Song, 2022 – Now
 
 Job title, company, and dates only. No per-role project or client lists.
 
