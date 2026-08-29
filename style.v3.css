@@ -186,8 +186,10 @@ body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse 130% 95% at 50% 46%,
-    rgba(8, 8, 10, 0.50) 0%, rgba(8, 8, 10, 0.30) 40%, transparent 68%);
+  background:
+    linear-gradient(to top, rgba(8, 8, 10, 0.55), transparent 150px),
+    radial-gradient(ellipse 130% 95% at 50% 46%,
+      rgba(8, 8, 10, 0.50) 0%, rgba(8, 8, 10, 0.30) 40%, transparent 68%);
 }
 
 /* ------------------------------------------------

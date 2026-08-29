@@ -283,6 +283,9 @@
       if (lampSize[i] * pixelScale > maxPoint) lampSize[i] = maxPoint / pixelScale;
       lampWell[i] = smoothstep(0.22 * mwh, 0.34 * mwh, Math.hypot(lampX[i] - cx, lampY[i] - cy));
       lampWell[i] = 0.10 + 0.90 * lampWell[i];
+      /* footer exclusion strip: lamps fade under the bottom link row so
+         the footer keeps AA contrast over the brightest gold */
+      lampWell[i] *= 0.15 + 0.85 * (1 - smoothstep(H - 130, H - 60, lampY[i]));
     }
   }
 
@@ -516,7 +519,8 @@
   function render(tScene, bloom, breath) {
     var i;
     /* palette: ladder by rDisp, global +-25 deg drift over 377 s */
-    hueDrift = 25 * Math.sin(2 * Math.PI * tScene / HUE_ROT_S);
+    /* 9 deg * 2pi/377 s = 0.15 deg/s max — the envelope ceiling */
+    hueDrift = 9 * Math.sin(2 * Math.PI * tScene / HUE_ROT_S);
     var lc = rDisp < 0.45
       ? mix3(LADDER[0], LADDER[1], smoothstep(0.20, 0.45, rDisp))
       : mix3(LADDER[1], LADDER[2], smoothstep(0.45, 0.65, rDisp));
