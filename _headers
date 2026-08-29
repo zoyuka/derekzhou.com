@@ -20,7 +20,7 @@
 # or the browser double-fetches them.
 /
   Cache-Control: max-age=0, must-revalidate
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests
   Link: </style.v3.css>; rel=preload; as=style
   Link: </assets/fonts/Newsreader-Regular.sub2.woff2>; rel=preload; as=font; crossorigin
   Link: </assets/fonts/Newsreader-Bold.sub2.woff2>; rel=preload; as=font; crossorigin
@@ -29,10 +29,10 @@
 
 /index.html
   Cache-Control: max-age=0, must-revalidate
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests
 
 /404.html
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests
 
 # Immutable assets: changed bytes require a renamed file (style.v3.css,
 # parlor.v2.js, .sub2 fonts) or returning visitors keep stale copies.
