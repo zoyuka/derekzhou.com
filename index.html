@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf8">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111110">
   <title>Derek Zhou &mdash; Product Manager</title>
   <meta name="description" content="Derek Zhou is a Product Manager who leads with clarity, empathy, and genuine enthusiasm for product and the outcomes it enables.">
   <link rel="canonical" href="https://derekzhou.com/">
-  <link rel="icon" type="image/png" href="/assets/favicon.png">
-  <link rel="preload" href="/assets/fonts/Newsreader-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/fonts/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preload" href="/assets/fonts/Newsreader-Regular.sub1.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Newsreader-Bold.sub1.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/DMSans-Regular.sub1.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/DMSans-Medium.sub1.woff2" as="font" type="font/woff2" crossorigin>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Derek Zhou — Product Manager">
   <meta property="og:description" content="Product Manager who leads with clarity, empathy, and genuine enthusiasm for product and the outcomes it enables.">
@@ -17,7 +23,7 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Derek Zhou — Product Manager">
   <meta name="twitter:description" content="Product Manager who leads with clarity, empathy, and genuine enthusiasm for product and the outcomes it enables.">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.v2.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,6 +37,10 @@
   </script>
 </head>
 <body>
+
+  <!-- One decision at a time; the curve shows up anyway. -->
+  <canvas id="pk-static" aria-hidden="true"></canvas>
+  <canvas id="pk-live" aria-hidden="true"></canvas>
 
   <main>
     <header>
@@ -62,9 +72,11 @@
   <footer>
     <a href="#" id="email-link" aria-label="Send email to Derek Zhou">Email &rarr;</a>
     <a href="https://www.linkedin.com/in/derek-z" rel="me" aria-label="Derek Zhou on LinkedIn">LinkedIn &rarr;</a>
+    <button id="pk-pause" class="pk-pause" aria-pressed="false">Pause motion</button>
     <noscript><p class="noscript-email">hello&#64;derekzhou&#46;com</p></noscript>
   </footer>
 
   <script src="/site.js"></script>
+  <script src="/pachinko.js" defer></script>
 </body>
 </html>
