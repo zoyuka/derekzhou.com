@@ -48,7 +48,7 @@ reaches the browser before any client-side check can run.
 Name: Derek Zhou
 Role: Technology Leader (title/OG identity; the JSON-LD jobTitle stays
 "Team Lead" — the literal role at Accenture Song)
-Bio first sentence (bold): "Derek is a technology leader"
+Bio first sentence (bold): "Derek is a hands-on technology leader"
 Bio rest (dimmed): "who leads with clarity, empathy, and genuine enthusiasm
 for AI products and the outcomes they enable. He is accountable for solving
 complex design and engineering challenges across systems with the perfect
