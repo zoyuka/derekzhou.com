@@ -49,9 +49,9 @@ Name: Derek Zhou
 Role: Product Manager
 Bio first sentence (bold): "Derek is a technology leader"
 Bio rest (dimmed): "who leads with clarity, empathy, and genuine enthusiasm
-for product and the outcomes it enables. He is accountable for solving complex
-product challenges across digital platforms with the perfect balance of user
-value, business goals, and technical integrity."
+for AI products and the outcomes they enable. He is accountable for solving
+complex design and engineering challenges across systems with the perfect
+balance of user value, business goals, and technical integrity."
 
 Experience (one line, the .credit row):
 
@@ -166,7 +166,14 @@ All content directly in HTML. No innerHTML. No JS-generated DOM.
 External JS and CSS files (enables strict CSP with no unsafe-inline —
 CI greps index.html and 404.html for inline style/handlers).
 \_headers file: script-src 'self'; style-src 'self'; connect-src 'none';
-frame-ancestors 'none'; form-action 'none'; HSTS.
+frame-ancestors 'none'; form-action 'none'; HSTS with preload;
+require-trusted-types-for 'script' on the home-scope pages (DOM-XSS sinks
+are structurally unusable — site.js sets only link.href, which is not a
+sink); COOP + CORP same-origin; Referrer-Policy no-referrer; broad
+Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
+The /sysco/ CSP deliberately carries NO Trusted Types directives:
+sysco/app.js renders with innerHTML and would break. CI checks that
+security.txt has not expired.
 CSP rules are scoped per HTML path with NO overlapping rules: Cloudflare
 Pages COMBINES same-named headers from every matching rule (it does not
 override), and a doubled CSP means browsers enforce the intersection —
