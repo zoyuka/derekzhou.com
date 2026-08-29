@@ -8,13 +8,13 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /style.v3.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
 /parlor.v1.js           The parlor — the WebGL scene (see Parlor)
-/subset-fonts.sh        Regenerates the .sub1 font subsets (manual tooling)
+/subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
 /assets/favicon.svg     Adaptive circle favicon (dark in light mode, inverse in dark)
 /assets/favicon.png     PNG fallback favicon (32x32)
 /assets/apple-touch-icon.png  180x180 iOS icon
-/assets/fonts/          Self-hosted WOFF2: full faces (sources) + .sub1 subsets (served)
+/assets/fonts/          Self-hosted WOFF2: full faces (sources) + .sub2 subsets (served)
 /robots.txt             Allow search engines, block AI crawlers
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security + caching + Early Hints headers
@@ -138,7 +138,7 @@ Two files, one job each:
 
 ## Fonts + performance
 
-Served fonts are ASCII subsets (.sub1, ~46% smaller; regenerate with
+Served fonts are ASCII subsets (.sub2, ~46% smaller; regenerate with
 ./subset-fonts.sh). The full faces stay in the repo as sources. Neither font
 contains U+2192 (the footer arrows) — the system fallback renders it; this is
 accepted, do not add a glyph. font-display: optional + the metric-matched
@@ -152,7 +152,7 @@ with PNG fallback.
 
 HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump style.vN.css,
-parlor.v1.js → parlor.v2.js, .sub1 → .sub2, and update every reference
+parlor.v1.js → parlor.v2.js, .sub2 → .sub2, and update every reference
 (index.html, 404.html, \_headers Link + cache blocks) in the same commit.
 
 ## SEO

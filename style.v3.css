@@ -6,7 +6,7 @@
 
 @font-face {
   font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Regular.sub1.woff2') format('woff2');
+  src: url('/assets/fonts/Newsreader-Regular.sub2.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: optional;
@@ -14,7 +14,7 @@
 
 @font-face {
   font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Bold.sub1.woff2') format('woff2');
+  src: url('/assets/fonts/Newsreader-Bold.sub2.woff2') format('woff2');
   font-weight: 500 700;
   font-style: normal;
   font-display: optional;
@@ -22,7 +22,7 @@
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Regular.sub1.woff2') format('woff2');
+  src: url('/assets/fonts/DMSans-Regular.sub2.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: optional;
@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Medium.sub1.woff2') format('woff2');
+  src: url('/assets/fonts/DMSans-Medium.sub2.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: optional;
@@ -333,6 +333,16 @@ footer { animation-delay: 0.85s; }
   }
   #parlor {
     transition: none;
+  }
+}
+
+/* Windows High Contrast / forced-colors: text colors are forced but
+   canvas pixels are not — black forced text over the dark scene would
+   be illegible. Drop the scene; the page becomes system-color type. */
+@media (forced-colors: active) {
+  #parlor,
+  .scrim {
+    display: none;
   }
 }
 

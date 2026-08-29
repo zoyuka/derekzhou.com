@@ -19,10 +19,10 @@
   Cache-Control: max-age=0, must-revalidate
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
   Link: </style.v3.css>; rel=preload; as=style
-  Link: </assets/fonts/Newsreader-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
-  Link: </assets/fonts/Newsreader-Bold.sub1.woff2>; rel=preload; as=font; crossorigin
-  Link: </assets/fonts/DMSans-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
-  Link: </assets/fonts/DMSans-Medium.sub1.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/Newsreader-Regular.sub2.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/Newsreader-Bold.sub2.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/DMSans-Regular.sub2.woff2>; rel=preload; as=font; crossorigin
+  Link: </assets/fonts/DMSans-Medium.sub2.woff2>; rel=preload; as=font; crossorigin
 
 /index.html
   Cache-Control: max-age=0, must-revalidate

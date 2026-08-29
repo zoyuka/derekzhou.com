@@ -26,10 +26,10 @@ jobs:
             assets/favicon.png
             assets/favicon.svg
             assets/apple-touch-icon.png
-            assets/fonts/Newsreader-Regular.sub1.woff2
-            assets/fonts/Newsreader-Bold.sub1.woff2
-            assets/fonts/DMSans-Regular.sub1.woff2
-            assets/fonts/DMSans-Medium.sub1.woff2
+            assets/fonts/Newsreader-Regular.sub2.woff2
+            assets/fonts/Newsreader-Bold.sub2.woff2
+            assets/fonts/DMSans-Regular.sub2.woff2
+            assets/fonts/DMSans-Medium.sub2.woff2
             .well-known/security.txt
           )
           missing=0

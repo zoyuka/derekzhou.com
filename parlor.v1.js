@@ -134,7 +134,10 @@
   function fieldFsrc(octaves, warp, folds) {
     return [
       '#version 300 es',
-      'precision mediump float;',
+      /* highp is mandatory in ES 3.00 fragment shaders and required here:
+         mediump is fp16 on mobile GPUs, which overflows at 65504 — the
+         seconds-since-midnight clock crosses that at 18:11 local. */
+      'precision highp float;',
       'uniform vec2 uRes;uniform float uT;uniform sampler2D uN;',
       'uniform float uBloom;uniform float uBreath;uniform float uZoom;',
       'uniform vec2 uKdir[7];uniform float uKphi[7];',
@@ -416,7 +419,8 @@
     pixelScale = Math.min(window.devicePixelRatio || 1, dprCap) * resLadder;
     canvas.width = Math.round(W * pixelScale);
     canvas.height = Math.round(H * pixelScale);
-    if (W < MOBILE_W && folds !== 5) { folds = 5; rebuildField(); }
+    var wantFolds = W < MOBILE_W ? 5 : 7;
+    if (wantFolds !== folds) { folds = wantFolds; rebuildField(); }
     buildLamps();
     if (N !== oscN) initOscillators();
     uploadStatic();
@@ -467,8 +471,10 @@
     var Rout = 0.5 * Math.sqrt(W * W + H * H);
     for (k = 0; k < 3; k++) {
       var pr = (t / COMET_S[k]) % 1;
-      cometRho.push(pr * (Rout + 200) - 100);
-      cometTail.push(Rout / COMET_S[k] * 3);   // 3 s tail in px
+      var tl = Rout / COMET_S[k] * 3;          // 3 s tail in px
+      var mg = 4 * tl + 40;                    // wrap entirely off-lattice
+      cometRho.push(pr * (Rout + 2 * mg) - mg);
+      cometTail.push(tl);
     }
     for (i = 0; i < N; i++) {
       var b = 0.5 + 0.5 * Math.cos(theta[i]);
@@ -547,7 +553,7 @@
       var an = Math.PI * i / 7;
       kd[i * 2] = Math.cos(an) * q;
       kd[i * 2 + 1] = Math.sin(an) * q;
-      kp[i] = qphi0[i] + tScene * 2 * Math.PI / QC_DRIFT_S * (0.6 + 0.13 * i);
+      kp[i] = (qphi0[i] + tScene * 2 * Math.PI / QC_DRIFT_S * (0.6 + 0.13 * i)) % 6.283185307179586;
     }
     gl.uniform2fv(FU.uKdir, kd);
     gl.uniform1fv(FU.uKphi, kp);
@@ -630,6 +636,7 @@
   /* ---------------- main loop + lifecycle ---------------- */
 
   var raf = 0, paused = false, hiddenAt = 0, pauseShiftMs = 0;
+  var capWasActive = false, lastBloom = 0.3, lastBreath = 1;
   var clock0 = 0;                    // rAF ms at scene start
   var lastInput = 0, idleDim = 1, blurCap = 0;
   var nextFrameAt = 0;
@@ -650,6 +657,7 @@
     /* idle dim: ease toward 0.6 after 3 min without input, back over 2 s */
     var idleTarget = (tms - lastInput > IDLE_DIM_S * 1000) ? 0.6 : 1;
     idleDim += (idleTarget - idleDim) * Math.min(1, dt / 2);
+    if (Math.abs(idleTarget - idleDim) < 0.002) idleDim = idleTarget;
     ptrEnv += (ptrTarget - ptrEnv) * Math.min(1, dt / 1.5);
 
     stepKuramoto(dt, t);
@@ -664,9 +672,12 @@
       sparkHead = (sparkHead + 1) & 7;
     }
     composeL(t, bloom, breath, idleDim);
-    /* pointer warmth falloff (updated on move; cheap refresh here) */
     render(t, bloom, breath);
-    benchTick(delta, tms);
+    lastBloom = bloom; lastBreath = breath;
+    /* capped frames pace at 33 ms by design — never count them as jank */
+    var capped = fpsCap > 0;
+    if (!capped && !capWasActive) benchTick(delta, tms);
+    capWasActive = capped;
     if (!paused && !document.hidden) raf = requestAnimationFrame(frame);
   }
 
@@ -738,6 +749,14 @@
   window.addEventListener('focus', function () { blurCap = 0; markInput(); });
 
   var pausedAtMs = 0;
+
+  /* Redraw the exact frozen moment (paused artwork must never advance). */
+  function redrawFrozen() {
+    var t = sceneTime(pausedAtMs || performance.now());
+    composeL(t, lastBloom, lastBreath, 1);
+    render(t, lastBloom, lastBreath);
+  }
+
   function setPaused(p) {
     paused = p;
     if (pauseBtn) pauseBtn.textContent = p ? 'Play motion' : 'Pause motion';
@@ -755,10 +774,8 @@
     clearTimeout(rsTimer);
     rsTimer = setTimeout(function () {
       layout();
-      if (paused || mqReduce.matches) {
-        if (mqReduce.matches) stillFrame();
-        else { composeL(sceneTime(performance.now()), 0.3, 1, 1); render(sceneTime(performance.now()), 0.3, 1); }
-      }
+      if (mqReduce.matches) stillFrame();
+      else if (paused) redrawFrozen();
     }, 150);
   });
 
@@ -779,7 +796,9 @@
   canvas.addEventListener('webglcontextrestored', function () {
     initGL();
     applyRung();
-    if (mqReduce.matches) stillFrame(); else start();
+    if (mqReduce.matches) stillFrame();
+    else if (paused) redrawFrozen();
+    else start();
   }, false);
 
   /* ---------------- boot ---------------- */
