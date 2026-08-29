@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v2.css
+            style.v3.css
             site.js
-            pachinko.js
+            parlor.v1.js
             robots.txt
             _headers
             _redirects
@@ -26,10 +26,10 @@ jobs:
             assets/favicon.png
             assets/favicon.svg
             assets/apple-touch-icon.png
-            assets/fonts/Newsreader-Regular.sub1.woff2
-            assets/fonts/Newsreader-Bold.sub1.woff2
-            assets/fonts/DMSans-Regular.sub1.woff2
-            assets/fonts/DMSans-Medium.sub1.woff2
+            assets/fonts/Newsreader-Regular.sub2.woff2
+            assets/fonts/Newsreader-Bold.sub2.woff2
+            assets/fonts/DMSans-Regular.sub2.woff2
+            assets/fonts/DMSans-Medium.sub2.woff2
             .well-known/security.txt
           )
           missing=0
@@ -87,6 +87,15 @@ jobs:
             exit 1
           fi
           echo "API routing OK"
+
+      - name: security.txt not expired
+        run: |
+          exp=$(grep -oP 'Expires: \K.*' .well-known/security.txt)
+          if [ "$(date -d "$exp" +%s)" -le "$(date +%s)" ]; then
+            echo "::error::security.txt Expires ($exp) is in the past — update it"
+            exit 1
+          fi
+          echo "security.txt valid until $exp"
 
       - name: No inline code on CSP'd pages
         run: |
