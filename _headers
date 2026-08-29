@@ -18,7 +18,7 @@
 /
   Cache-Control: max-age=0, must-revalidate
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
-  Link: </style.v2.css>; rel=preload; as=style
+  Link: </style.v3.css>; rel=preload; as=style
   Link: </assets/fonts/Newsreader-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
   Link: </assets/fonts/Newsreader-Bold.sub1.woff2>; rel=preload; as=font; crossorigin
   Link: </assets/fonts/DMSans-Regular.sub1.woff2>; rel=preload; as=font; crossorigin
@@ -32,14 +32,14 @@
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
 
 # Immutable assets: changed bytes require a renamed file (style.v3.css,
-# pachinko.v2.js, .sub2 fonts) or returning visitors keep stale copies.
-/style.v2.css
+# parlor.v2.js, .sub2 fonts) or returning visitors keep stale copies.
+/style.v3.css
   Cache-Control: public, max-age=31536000, immutable
 
 /site.js
   Cache-Control: public, max-age=31536000, immutable
 
-/pachinko.js
+/parlor.v1.js
   Cache-Control: public, max-age=31536000, immutable
 
 /assets/*

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf8">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111110">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0e1a">
   <title>Derek Zhou &mdash; Product Manager</title>
   <meta name="description" content="Derek Zhou is a Product Manager who leads with clarity, empathy, and genuine enthusiasm for product and the outcomes it enables.">
   <link rel="canonical" href="https://derekzhou.com/">
@@ -23,7 +22,7 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Derek Zhou — Product Manager">
   <meta name="twitter:description" content="Product Manager who leads with clarity, empathy, and genuine enthusiasm for product and the outcomes it enables.">
-  <link rel="stylesheet" href="/style.v2.css">
+  <link rel="stylesheet" href="/style.v3.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -38,16 +37,13 @@
 </head>
 <body>
 
-  <!-- One decision at a time; the curve shows up anyway. -->
-  <canvas id="pk-static" aria-hidden="true"></canvas>
-  <canvas id="pk-live" aria-hidden="true"></canvas>
+  <!-- The parlor was running before you arrived. -->
+  <canvas id="parlor" aria-hidden="true"></canvas>
+  <div class="scrim" aria-hidden="true"></div>
 
   <main>
-    <header>
+    <div class="stack">
       <h1>Derek Zhou</h1>
-    </header>
-
-    <section>
       <p class="bio">
         <strong>Derek is a technology leader</strong>
         <span class="dimmed">who leads with clarity, empathy, and genuine enthusiasm
@@ -55,28 +51,18 @@
         product challenges across digital platforms with the perfect balance of user
         value, business goals, and technical integrity.</span>
       </p>
-    </section>
-
-    <section>
-      <h2>Experience</h2>
-      <ul class="experience" role="list">
-        <li>
-          <span class="exp-title">Team Lead</span>
-          <span class="exp-place">Accenture Song</span>
-          <span class="exp-date">2022 &ndash; Now</span>
-        </li>
-      </ul>
-    </section>
+      <p class="credit">Team Lead &middot; Accenture Song &middot; 2022 &ndash; Now</p>
+    </div>
   </main>
 
   <footer>
     <a href="#" id="email-link" aria-label="Send email to Derek Zhou">Email &rarr;</a>
     <a href="https://www.linkedin.com/in/derek-z" rel="me" aria-label="Derek Zhou on LinkedIn">LinkedIn &rarr;</a>
-    <button id="pk-pause" class="pk-pause">Pause motion</button>
+    <button id="pl-pause" class="pl-pause">Pause motion</button>
     <noscript><p class="noscript-email">hello&#64;derekzhou&#46;com</p></noscript>
   </footer>
 
   <script src="/site.js"></script>
-  <script src="/pachinko.js" defer></script>
+  <script src="/parlor.v1.js" defer></script>
 </body>
 </html>

@@ -37,9 +37,8 @@
 }
 
 /* Metric-matched fallbacks: if the webfont misses first paint,
-   these render the system face at the webfont's exact metrics,
-   so the swap (or the absence of one) shifts nothing. Values
-   computed from the font tables — see CLAUDE.md. */
+   the system face renders at the webfont's exact metrics.
+   Values computed from the font tables — see CLAUDE.md. */
 
 @font-face {
   font-family: 'Newsreader Fallback';
@@ -102,32 +101,27 @@
 }
 
 /* ------------------------------------------------
-   Custom properties
+   Tokens — dark only. The parlor is a nocturne.
    ------------------------------------------------ */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
   --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
-  --color-bg: #fafaf8;
-  --color-text: #111110;
-  --color-dimmed: #6d6d64;
-  --color-focus: #3b5998;
-  --color-selection-bg: #111110;
-  --color-selection-text: #fafaf8;
-}
+  --color-bg: #0b0e1a;
+  --color-text: #ece9e4;
+  --color-dimmed: #b8b4ac;
+  --color-focus: #9db8ff;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #111110;
-    --color-text: #d4d4d0;
-    --color-dimmed: #8a8a82;
-    --color-focus: #7aa2f7;
-    --color-selection-bg: #d4d4d0;
-    --color-selection-text: #111110;
-  }
+  /* scene ink, read by parlor.v1.js at init */
+  --pl-indigo: #8e9ad7;
+  --pl-teal: #48b7bd;
+  --pl-gold: #d3b460;
+  --pl-aur0: #0b0e1a;
+  --pl-aur1: #084150;
+  --pl-aur2: #3f2551;
 }
 
 /* ------------------------------------------------
@@ -148,18 +142,18 @@ body {
   color: var(--color-text);
   cursor: crosshair;
   line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: var(--color-selection-bg);
-  color: var(--color-selection-text);
+  background: var(--color-text);
+  color: var(--color-bg);
 }
-
-/* ------------------------------------------------
-   Focus
-   ------------------------------------------------ */
 
 :focus-visible {
   outline: 2px solid var(--color-focus);
@@ -167,95 +161,72 @@ body {
 }
 
 /* ------------------------------------------------
-   Quincunx canvases — behind everything, inert
+   The parlor — canvas behind everything, inert.
+   A scrim guarantees the text well even if the
+   in-shader luminance clamp ever drifts.
    ------------------------------------------------ */
 
-#pk-static, #pk-live {
+#parlor {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: -2;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: opacity 1.4s ease-out;
 }
 
-.pk-ready #pk-static, .pk-ready #pk-live {
+.pl-ready #parlor {
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #pk-static, #pk-live {
-    transition: none;
-  }
-}
-
-/* On wide viewports the board is staged right of the text column;
-   a mask fades its left edge well clear of the type. */
-@media (min-width: 1280px) and (min-height: 620px) {
-  #pk-static, #pk-live {
-    -webkit-mask-image: linear-gradient(to right, transparent calc(50% + 300px), #000 calc(50% + 364px));
-    mask-image: linear-gradient(to right, transparent calc(50% + 300px), #000 calc(50% + 364px));
-  }
-}
-
-/* Narrow viewports get a static sediment horizon at the bottom;
-   reserve room so it never sits under the footer. */
-@media (max-width: 1279.98px), (max-height: 619.98px) {
-  body {
-    padding-bottom: 120px;
-  }
-}
-
-main, footer {
-  position: relative;
-  z-index: 1;
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 130% 95% at 50% 46%,
+    rgba(8, 8, 10, 0.50) 0%, rgba(8, 8, 10, 0.30) 40%, transparent 68%);
 }
 
 /* ------------------------------------------------
-   Layout
+   Composition — one viewport, type at optical center
    ------------------------------------------------ */
 
 main {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: clamp(4rem, 15vh, 10rem) 1.5rem clamp(3rem, 8vh, 6rem);
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
 }
 
-section + section,
-header + section {
-  margin-top: 3.5rem;
+.stack {
+  transform: translateY(-3vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 34rem;
 }
-
-/* ------------------------------------------------
-   Typography
-   ------------------------------------------------ */
 
 h1 {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: 3.5rem;
+  font-size: clamp(3.25rem, 2rem + 5.5vw, 6rem);
   font-optical-sizing: auto;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-
-h2 {
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--color-dimmed);
-  margin-bottom: 1.25rem;
+  line-height: 1.03;
+  letter-spacing: -0.015em;
 }
 
 .bio {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
-  line-height: 1.6;
-  max-width: 520px;
+  font-size: 1.125rem;
+  line-height: 1.62;
+  letter-spacing: 0.005em;
+  max-width: 38ch;
+  text-align: left;
+  margin-top: 2.25rem;
 }
 
 .bio strong {
@@ -267,56 +238,30 @@ h2 {
   color: var(--color-dimmed);
 }
 
-/* ------------------------------------------------
-   Experience
-   ------------------------------------------------ */
-
-.experience {
-  list-style: none;
-}
-
-.experience > li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.6rem 0;
-}
-
-.experience > li + li {
-  border-top: 1px solid color-mix(in srgb, var(--color-dimmed) 20%, transparent);
-}
-
-.exp-title {
-  font-size: 1rem;
+.credit {
+  margin-top: 2.5rem;
+  font-family: var(--font-sans);
   font-weight: 500;
-}
-
-.exp-place {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
   color: var(--color-dimmed);
-  font-size: 0.9rem;
-}
-
-.exp-date {
-  margin-left: auto;
-  font-size: 0.85rem;
-  color: var(--color-dimmed);
-  white-space: nowrap;
 }
 
 /* ------------------------------------------------
-   Footer / links
+   Footer — full-width bottom row
    ------------------------------------------------ */
 
 footer {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 1.5rem clamp(3rem, 8vh, 6rem);
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
 }
 
 footer a {
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--color-text);
   text-decoration: none;
   transition: color 0.2s;
@@ -326,31 +271,27 @@ footer a:hover {
   color: var(--color-dimmed);
 }
 
-footer a + a {
-  margin-left: 1.5rem;
-}
-
-/* Occupies its footer slot from first paint (visibility, not display)
-   so revealing it can never shift layout; pachinko.js adds .pk-show
-   only when the animation actually runs. */
-.pk-pause {
+/* Reserves its slot from first paint (visibility, not display) so
+   revealing it can never shift layout; parlor.v1.js adds .pl-show
+   only when the loop actually runs. */
+.pl-pause {
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--color-dimmed);
   background: none;
   border: none;
   padding: 0;
-  margin-left: 1.5rem;
+  margin-left: auto;
   cursor: crosshair;
   transition: color 0.2s;
   visibility: hidden;
 }
 
-.pk-pause.pk-show {
+.pl-pause.pl-show {
   visibility: visible;
 }
 
-.pk-pause:hover {
+.pl-pause:hover {
   color: var(--color-text);
 }
 
@@ -361,27 +302,35 @@ footer a + a {
 
 .noscript-email {
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--color-dimmed);
 }
 
 /* ------------------------------------------------
-   Responsive
+   Entrance — pure CSS, opacity/transform only.
+   Runs once from first paint; ends at rest state.
    ------------------------------------------------ */
 
-@media (max-width: 480px) {
-  h1 {
-    font-size: 2.5rem;
-    letter-spacing: -0.02em;
-  }
+@keyframes pl-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .experience > li {
-    flex-direction: column;
-    gap: 0.1rem;
-  }
+h1, .bio, .credit, footer {
+  animation: pl-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
-  .exp-date {
-    margin-left: 0;
+h1     { animation-delay: 0.15s; }
+.bio   { animation-delay: 0.45s; }
+.credit { animation-delay: 0.65s; }
+footer { animation-delay: 0.85s; }
+
+@media (prefers-reduced-motion: reduce) {
+  h1, .bio, .credit, footer {
+    animation: none;
+  }
+  #parlor {
+    transition: none;
   }
 }
 
@@ -390,10 +339,10 @@ footer a + a {
    ------------------------------------------------ */
 
 @media print {
-  footer,
-  #pk-static,
-  #pk-live,
-  .pk-pause {
+  #parlor,
+  .scrim,
+  .pl-pause,
+  footer {
     display: none;
   }
 
@@ -401,14 +350,14 @@ footer a + a {
     cursor: default;
     color: #000;
     background: #fff;
-    padding-bottom: 0;
   }
 
   h1 {
     font-size: 2rem;
   }
 
-  .dimmed {
+  .dimmed,
+  .credit {
     color: #555;
   }
 }

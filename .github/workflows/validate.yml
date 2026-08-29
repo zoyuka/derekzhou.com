@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v2.css
+            style.v3.css
             site.js
-            pachinko.js
+            parlor.v1.js
             robots.txt
             _headers
             _redirects
