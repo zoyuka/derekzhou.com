@@ -168,13 +168,17 @@ External JS and CSS files (enables strict CSP with no unsafe-inline —
 CI greps index.html and 404.html for inline style/handlers).
 \_headers file: script-src 'self'; style-src 'self'; connect-src 'none';
 frame-ancestors 'none'; form-action 'none'; HSTS with preload;
-require-trusted-types-for 'script' on the home-scope pages (DOM-XSS sinks
-are structurally unusable — site.js sets only link.href, which is not a
-sink); COOP + CORP same-origin; Referrer-Policy no-referrer; broad
+COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
-The /sysco/ CSP deliberately carries NO Trusted Types directives:
-sysco/app.js renders with innerHTML and would break. CI checks that
-security.txt has not expired.
+CI checks that security.txt has not expired.
+Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
+rewrites the script tags and re-executes them through dynamic .src
+assignment — a TT sink — so require-trusted-types-for 'script' kills
+site.js AND parlor.v1.js on every TT-enforcing browser (verified by
+reproduction). If Rocket Loader is ever disabled in the Cloudflare
+dashboard, re-add to the three home-scope CSP blocks:
+  ; require-trusted-types-for 'script'; trusted-types
+(and never to /sysco/ — its app renders with innerHTML).
 CSP rules are scoped per HTML path with NO overlapping rules: Cloudflare
 Pages COMBINES same-named headers from every matching rule (it does not
 override), and a doubled CSP means browsers enforce the intersection —
