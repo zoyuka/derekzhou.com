@@ -12,15 +12,22 @@
    lands — a day of landings grows a stand of grass whose silhouette
    settles toward the bell curve (de Moivre-Laplace, drawn as meadow).
    Every little while, too, a small skein of birds — marks in a hand's
-   own zigzag — glides across the open band in stop-motion, wings beating
-   like a flip-book, and leaves the sky empty again.
+   own zigzag — meanders across the open band in stop-motion, wings
+   beating like a flip-book, and leaves the sky quiet again. And ONE
+   WIND moves through all of it (feng is wind, shui is water): a single
+   slow field that the thread sways with, the grass leans into, the
+   canopies shear under, the seed drifts on and the skein bobs over —
+   with spatial phase, so the gust visibly travels across the garden.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
    THE CALM ENVELOPE (any change must keep all of this true):
-   - boil rate <= 6 fps; no motion faster than the thread's 0.08 Hz sway
-     except the falling seed (one at a time, ~9 s apart on average,
-     <= 90 px/s) and the flock's crossings (<= 14 px/s glide, stop-motion
-     wing-beats under 1 Hz, one crossing at a time, long quiet gaps)
+   - boil rate <= 6 fps; THE WIND is one field w(x,t) at 0.048 Hz
+     (~570 px wavelength) driving thread sway (3 px), grass lean
+     (1.3 px), canopy shear (<= 2.4 px), seed drift (2 px) and bird bob
+     (2.5 px) — nothing oscillates faster; exceptions: the falling seed
+     (one at a time, ~9 s apart, <= 90 px/s) and skein crossings
+     (<= 14 px/s glide, wing-beats < 1 Hz, one at a time, quiet gaps
+     10-60 s)
    - strokes only — never clustered dots (hard rule)
    - ink alphas <= 0.85; night ground #181410; palette fixed to the six inks
    - prefers-reduced-motion: the day's garden fully drawn, zero boil,
@@ -41,7 +48,6 @@
   var BOIL_FPS = 5;            // hand-tremor redraw rate
   var JITTER = 1.6;            // px, wobble amplitude
   var GROW_MS = 2600;          // self-draw time per branch generation
-  var THREAD_SWAY_HZ = 0.08;
   var DROP_EVERY_S = 9;        // mean seconds between seedfalls (Poisson)
   var DROP_V = 82;             // px/s fall speed
   var INK = {
@@ -87,6 +93,16 @@
   var noiseTab = new Float32Array(NOISE_N);
   (function () { var r = stream(1), i; for (i = 0; i < NOISE_N; i++) noiseTab[i] = r() * 2 - 1; })();
   function nz(i) { return noiseTab[(i | 0) & (NOISE_N - 1)]; }
+
+  /* ---------------- the wind ----------------
+     feng is wind, shui is water. The thread already meanders as water;
+     this is the wind made visible: ONE slow field moves everything —
+     the thread's sway, the grass's lean, the canopies' shear, the
+     falling seed's drift, the skein's bob — with a spatial phase, so
+     the gust visibly travels across the garden. 0.048 Hz, ~570 px
+     wavelength, day-seeded phase. Nothing oscillates faster. */
+  var windPh = stream(10)() * 6.283;
+  function wind(x, t) { return Math.sin(t * 0.30 + x * 0.011 + windPh); }
 
   /* ---------------- DOM ---------------- */
 
@@ -189,24 +205,34 @@
       }
     }
     grow(x0, y0, ang0, 64 * scale, 0, 0);
-    return { segs: segs, born: born };
+    return { segs: segs, born: born, ox: x0, oy: y0 };
   }
 
   function drawSprig(sprig, tNow) {
-    var i, s, g, t;
+    /* the canopy shears gently with the wind — most at the far tips,
+       nothing at the rooted base */
+    var wv = wind(sprig.ox, tNow) * 2.4;
+    var i, s, g, t, j, d, pts2, tx, ty;
     for (i = 0; i < sprig.segs.length; i++) {
       s = sprig.segs[i];
       g = (tNow - sprig.born) / (GROW_MS / 1000) - s.gen;    // generations stagger
       if (g <= 0) continue;
       t = Math.min(1, g);
       if (s.pts) {
-        stroke(s.pts, INK.line, s.w, 0.8, t, s.key);
+        pts2 = [];
+        for (j = 0; j < s.pts.length; j++) {
+          d = Math.min(1, Math.abs(s.pts[j][1] - sprig.oy) / 190);
+          pts2.push([s.pts[j][0] + wv * d, s.pts[j][1]]);
+        }
+        stroke(pts2, INK.line, s.w, 0.8, t, s.key);
       } else if (t > 0.4) {
+        d = Math.min(1, Math.abs(s.tip[1] - sprig.oy) / 190);
+        tx = s.tip[0] + wv * d; ty = s.tip[1];
         if (s.kind === 'petal') {
-          stroke([[s.tip[0] - 3, s.tip[1]], [s.tip[0] + 1, s.tip[1] - 4]], s.col, 2.2, 0.75, 1, s.key);
-          stroke([[s.tip[0] + 1, s.tip[1] - 1], [s.tip[0] + 4, s.tip[1] + 2]], s.col, 2.0, 0.7, 1, s.key + 11);
+          stroke([[tx - 3, ty], [tx + 1, ty - 4]], s.col, 2.2, 0.75, 1, s.key);
+          stroke([[tx + 1, ty - 1], [tx + 4, ty + 2]], s.col, 2.0, 0.7, 1, s.key + 11);
         } else {
-          starburst(s.tip[0], s.tip[1], 5, s.col, s.key);
+          starburst(tx, ty, 5, s.col, s.key);
         }
       }
     }
@@ -285,8 +311,8 @@
   var threadNarrow = false;
   function drawThread(tNow) {
     if (threadPts.length < 2) return;
-    /* slow pendulum sway, whole thread */
-    var sway = Math.sin(tNow * 2 * Math.PI * THREAD_SWAY_HZ) * 3;
+    /* the thread rides the wind at its own lane */
+    var sway = wind(threadPts[threadPts.length >> 1][0], tNow) * 3;
     var pts = [], i, f;
     for (i = 0; i < threadPts.length; i++) {
       f = i / (threadPts.length - 1);
@@ -347,10 +373,14 @@
   function nextFlight() {
     var r = flight.rng;
     var gap = flight.first ? 3.5 + r() * 4.5
-                           : Math.min(110, Math.max(18, -Math.log(1 - r()) * 45));
+                           : Math.min(60, Math.max(10, -Math.log(1 - r()) * 28));
     flight.first = false;
-    /* who flies today: a coin-flip sum, 2..6 */
-    var n = 2 + (r() < 0.6 ? 1 : 0) + (r() < 0.45 ? 1 : 0)
+    /* who flies: usually a coin-flip skein of 2..6; sometimes a loner,
+       rarely a great skein of 7..8 */
+    var u = r();
+    var n = u < 0.15 ? 1
+          : u < 0.22 ? 7 + (r() < 0.5 ? 1 : 0)
+          : 2 + (r() < 0.6 ? 1 : 0) + (r() < 0.45 ? 1 : 0)
               + (r() < 0.3 ? 1 : 0) + (r() < 0.18 ? 1 : 0);
     var birds = [], back = 0, i;
     for (i = 0; i < n; i++) {
@@ -370,8 +400,14 @@
     flight.t0 = flight.end + gap;
     flight.dur = (W + flight.len + 190) / FLY_V;
     flight.end = flight.t0 + flight.dur;
-    flight.dir = r() < 0.5 ? -1 : 1;
-    flight.yj = 0.15 + r() * 0.7;
+    /* direction alternates more often than not (a Markov flip), so a
+       visit sees both ways; altitude drifts from one seeded level to
+       another across the crossing — a meander, never a straight rush */
+    if (!flight.prevDir) flight.prevDir = r() < 0.5 ? -1 : 1;
+    flight.dir = r() < 0.72 ? -flight.prevDir : flight.prevDir;
+    flight.prevDir = flight.dir;
+    flight.yj = 0.12 + r() * 0.72;
+    flight.yj2 = 0.12 + r() * 0.72;
     flight.ph = r() * 6.283;
     flight.ph2 = r() * 6.283;
   }
@@ -381,9 +417,11 @@
     nextFlight();
   }
 
-  /* the shared undulation the skein rides; followers sample it lagged */
-  function skeinWave(t) {
-    return Math.sin(t * 0.20 + flight.ph) * 5 + Math.sin(t * 0.083 + flight.ph2) * 4;
+  /* the shared undulation the skein rides; followers sample it lagged.
+     Amplitude scales with the band so wide skies get real meanders. */
+  function skeinWave(t, bandH) {
+    var A = Math.min(14, bandH * 0.22);
+    return Math.sin(t * 0.20 + flight.ph) * A + Math.sin(t * 0.083 + flight.ph2) * A * 0.7;
   }
 
   function drawFlock(tNow, animating) {
@@ -416,7 +454,8 @@
       headX = flight.dir > 0
         ? W + 95 - (W + flight.len + 190) * prog
         : -95 - flight.len + (W + flight.len + 190) * prog;
-      yBase = yTop + (yBot - yTop) * flight.yj;
+      var drift = prog * prog * (3 - 2 * prog);
+      yBase = yTop + (yBot - yTop) * (flight.yj + (flight.yj2 - flight.yj) * drift);
       flying = 1;
     }
     var birds = flying ? flight.birds : [{ g: GLYPHS[0], sc: 1, back: 0, side: -4, beatF: 0, beatPh: 0 },
@@ -427,13 +466,15 @@
       /* stop-motion wing-beat, detuned per bird */
       amp = 1;
       if (flying) amp = Math.floor(tNow * bd.beatF + bd.beatPh) % 2 ? 1 : 0.5;
-      /* the follower rides the lead's wave, lagged by its distance back */
+      /* the follower rides the lead's wave, lagged by its distance back,
+         and bobs as the wind field passes under it */
       by = yBase + Math.max(-sideMax, Math.min(sideMax, bd.side))
-         + (flying ? skeinWave(tNow - bd.back / FLY_V) : 0);
-      by = Math.max(yTop, Math.min(yBot, by));
+         + (flying ? skeinWave(tNow - bd.back / FLY_V, yBot - yTop) : 0);
       bx = flying && flight.dir < 0
-        ? headX + flight.len - bd.back - p.w * s * bd.sc   // rightward: front leads right
-        : headX + bd.back;                                 // leftward: followers trail right
+        ? headX + flight.len - bd.back - p.w * s * bd.sc
+        : headX + bd.back;
+      if (flying) by += wind(bx, tNow) * 2.5;
+      by = Math.max(yTop, Math.min(yBot, by));
       pts = [];
       for (i = 0; i < p.pts.length; i++) {
         px = p.pts[i][0];
@@ -547,15 +588,17 @@
   }
 
   function drawMeadow(tNow) {
-    var i, b, t, by, tx, ty;
+    var i, b, t, by, tx, ty, wv;
     for (i = 0; i < fall.blades.length; i++) {
       b = fall.blades[i];
       t = Math.min(1, (tNow - b.born) / 0.6);
       if (t <= 0) continue;
+      /* each blade leans as the gust passes it — the wind made visible */
+      wv = wind(b.x, tNow) * 1.3;
       by = fall.baseY + nz(i * 17) * 1.5;
-      tx = b.x + b.lean * b.h * 0.45; ty = by - b.h;
+      tx = b.x + b.lean * b.h * 0.45 + wv; ty = by - b.h;
       stroke([[b.x, by],
-              [b.x + b.lean * b.h * 0.18, by - b.h * 0.55],
+              [b.x + b.lean * b.h * 0.18 + wv * 0.5, by - b.h * 0.55],
               [tx, ty]],
              b.col, 1.3, 0.7, t, 7300 + i * 67);
       if (b.grain && t === 1) {
@@ -583,6 +626,7 @@
     }
     var i0 = idx | 0, f = idx - i0;
     var x = d.pts[i0][0] + (d.pts[i0 + 1][0] - d.pts[i0][0]) * f;
+    x += wind(x, tNow) * 2;      // the wind carries the seed a little
     /* linden-seed rock, keyed to the descent itself (pause-safe) */
     var a = Math.sin(yNow / 15) * 0.55 + 0.25;
     var ca = Math.cos(a), sa = Math.sin(a);

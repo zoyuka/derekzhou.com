@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v6.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/ink.v6.js              The ink garden — the 2D canvas scene (see Ink garden)
+/ink.v7.js              The ink garden — the 2D canvas scene (see Ink garden)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -76,12 +76,12 @@ a full-viewport 2D-canvas scene of hand-drawn generative ink, at night.
 Dark only (color-scheme: dark; no light palette). Type is matte: no
 text-shadow, no glow, ever. Tokens: bg #181410 (warm night ground),
 text #ece9e4, dimmed #b8b4ac, focus #9db8ff. The six inks live in
-ink.v6.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
+ink.v7.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
 sage #8fa284, slate #8b9cbd (vermillion on ground is the lowest pair,
 4.5:1 — do not darken the ground or dim the inks without re-checking).
 Text contrast comes from composition, not a scrim: the garden is sparse
 line-work and every element is anchored OUTSIDE the measured .stack and
-footer boxes (measureAnchors in ink.v6.js). Keep it that way — nothing
+footer boxes (measureAnchors in ink.v7.js). Keep it that way — nothing
 may draw under the typography. Two sanctioned exceptions, both
 glyph-safe by measurement: in hang mode the falling seed slips down the
 right MARGIN beside the text (strictly right of the measured stack box),
@@ -94,7 +94,7 @@ always on top and always clickable. Entrance is pure CSS (ink-rise
 keyframes, staggered 0.1–0.7 s, disabled under prefers-reduced-motion).
 forced-colors hides the canvas. Print styles hide the scene and footer.
 
-## Ink garden (ink.v6.js)
+## Ink garden (ink.v7.js)
 
 A hand-drawn day, clocked from local midnight. One 2D canvas, no
 libraries, no network. Every stroke is a wobbly polyline redrawn with
@@ -128,22 +128,35 @@ depicted as apparatus:
 * An ochre thread dangles from the top edge, wanders inside the left
   margin, and ends in an Euler-spiral curl (curvature growing along the
   arc) floating in the gap above the footer links — never on glyphs.
+* THE WIND (feng is wind, shui is water; the thread is the water, this
+  is the wind): ONE field, wind(x,t) = sin(t*0.30 + x*0.011 + phase),
+  0.048 Hz, ~570 px wavelength, day-seeded phase. Everything rides it
+  with its own gain — thread sway 3 px, grass lean 1.3 px, canopy
+  shear <= 2.4 px (scaled by distance from the root), seed drift 2 px,
+  bird bob 2.5 px — and because the field has spatial phase, the gust
+  visibly travels across the garden: grass bends blade by blade as it
+  passes, then the tree above it, then the thread. Continuous gentle
+  vitality between events; nothing on the page oscillates faster than
+  this field except wing-beats and the boil.
 * THE SKEIN: birds in the stepped-zigzag stroke of Derek's tattoo. The
-  three tattoo marks are the GLYPH ALPHABET (GLYPHS in ink.v6.js — do
+  three tattoo marks are the GLYPH ALPHABET (GLYPHS in ink.v7.js — do
   not restyle them), not a fixed roster: each crossing draws its own
-  membership as a coin-flip sum (2..6 birds; the long-tailed glyph
-  often leads, and a straggler sometimes trails far behind). The
+  membership: usually a coin-flip sum of 2..6, sometimes a loner (15%),
+  rarely a great skein of 7..8 (7%); the long-tailed glyph
+  often leads, and a straggler sometimes trails far behind. The
   drawing IS flight — each mark a wing mid-beat — so they FLY: every
-  little while (seeded exponential gaps, ~45 s mean, first crossing a
-  few seconds after load) the skein glides across the open band at
-  FLY_V = 12 px/s in stop-motion. The mathematics is folded in, never
-  depicted: the lead bird carries a slow two-sine undulation and every
+  little while (seeded exponential gaps, ~28 s mean, quiet gaps clamped
+  10-60 s, first crossing seconds after load) the skein MEANDERS across
+  the band at FLY_V = 12 px/s in stop-motion — altitude drifts between
+  two seeded levels (an S-curve, never a straight rush; curved paths
+  gather qi). The lead bird carries a slow two-sine undulation and every
   follower echoes it lagged by its distance back over the glide speed
   (the ripple travels down the line, the way real skeins ripple), and
   wing-beats are detuned per bird (0.68–0.95 Hz), so the flock drifts
   in and out of phase across a crossing — emergent beat patterns,
   never a metronome. Direction and altitude are seeded per crossing;
-  as drawn the glyphs fly leftward, so rightward crossings mirror.
+  as drawn the glyphs fly leftward, so rightward crossings mirror;
+  direction is a Markov flip (72% alternate), so a visit sees both.
   Beds mode: the sky band above the typography. Hang mode: the open
   zone between the text and the meadow. Rest: no skein. Reduced motion
   / still frames: a resting pair parked mid-band, as drawn. One
@@ -166,14 +179,14 @@ no seedfall, no meadow, no flock — thread, starburst and curl
 only, and the typography carries the page. Under 700 px the mode is hang
 (or rest when even the sky is too shallow).
 
-The calm envelope (header comment of ink.v6.js mirrors this; any change
+The calm envelope (header comment of ink.v7.js mirrors this; any change
 must keep all of it true):
 
-* Boil rate <= 6 fps (BOIL_FPS = 5); no motion faster than the thread's
-  0.08 Hz sway except the falling seed (one at a time, ~9 s apart on
-  average, <= 90 px/s total speed — DROP_V = 82 vertical) and the
-  flock's crossings (<= 14 px/s glide, stop-motion wing-beats under
-  1 Hz, one crossing at a time, long quiet gaps between).
+* Boil rate <= 6 fps (BOIL_FPS = 5); THE WIND (0.048 Hz field) is the
+  fastest oscillation, driving all sway/lean/shear/bob; exceptions:
+  the falling seed (one at a time, ~9 s apart on average, <= 90 px/s
+  total — DROP_V = 82 vertical) and skein crossings (<= 14 px/s glide,
+  stop-motion wing-beats under 1 Hz, one at a time, gaps 10-60 s).
 * Strokes only — never clustered dots (hard rule; dot
   clusters read as trypophobia triggers).
 * Ink alphas <= 0.85; night ground #181410; palette fixed to the six inks.
@@ -210,7 +223,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. ink.v6.js — the ink garden (see above). Progressive enhancement: with
+2. ink.v7.js — the ink garden (see above). Progressive enhancement: with
    JS off, the page is simply the typography on the night ground.
 
 ## Fonts + performance
@@ -229,7 +242,7 @@ with PNG fallback.
 
 HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump style.vN.css,
-ink.v6.js → ink.v6.js, .sub2 → .sub3, and update every reference
+ink.v7.js → ink.v7.js, .sub2 → .sub3, and update every reference
 (index.html, 404.html, \_headers Link + cache blocks) in the same commit.
 
 ## SEO
@@ -250,7 +263,7 @@ CI checks that security.txt has not expired.
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND ink.v6.js on every TT-enforcing browser (verified by
+site.js AND ink.v7.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
