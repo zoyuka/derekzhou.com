@@ -11,9 +11,9 @@
    each sway of its fall a coin toss, planting a grass blade where it
    lands — a day of landings grows a stand of grass whose silhouette
    settles toward the bell curve (de Moivre-Laplace, drawn as meadow).
-   Every little while, too, a flock of three birds — a hand's own mark —
-   glides across the open band in stop-motion, wings beating like a
-   flip-book, and leaves the sky empty again.
+   Every little while, too, a small skein of birds — marks in a hand's
+   own zigzag — glides across the open band in stop-motion, wings beating
+   like a flip-book, and leaves the sky empty again.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
    THE CALM ENVELOPE (any change must keep all of this true):
@@ -306,29 +306,39 @@
     stroke(sp, INK.ochre, 1.2, 0.8, 1, 5200);
   }
 
-  /* ---------------- the flock ----------------
-     Three stepped-zigzag birds — Derek's tattoo trio, digitized as drawn:
-     the small one above, the pair below, one trailing a long tail. The
-     drawing IS flight — each mark a wing mid-beat — so they fly: every
-     little while (seeded exponential gaps) the trio glides across the
-     open band in stop-motion, each bird's zigzag deepening and
-     flattening like a flip-book wing-beat, then the sky is empty again.
-     Direction and altitude are seeded per crossing; as drawn they fly
-     leftward, so rightward crossings mirror the formation. */
+  /* ---------------- the skein ----------------
+     Birds in the stepped-zigzag stroke of Derek's tattoo — the three
+     tattoo marks are the GLYPH ALPHABET, not a roster. Every little
+     while (seeded exponential gaps) a small skein crosses the open
+     band in stop-motion:
+     - membership is a coin-flip sum per crossing (2..6 birds), some
+       days a pair, some days a strand of six;
+     - the lead bird carries a slow undulation, and each follower
+       echoes it with a lag equal to its distance back over the glide
+       speed — the ripple travels down the line, the way real skeins
+       ripple;
+     - wing-beats are detuned per bird (0.68..0.95 Hz), so the flock
+       drifts in and out of phase across a crossing — emergent beat
+       patterns, never a metronome;
+     - one straggler sometimes trails far behind.
+     Direction and altitude are seeded per crossing; as drawn the
+     glyphs fly leftward, so rightward crossings mirror. One crossing
+     at a time, <= 14 px/s, then the sky is empty again. */
 
   var FLY_V = 12;              // px/s glide — a distant, unhurried crossing
 
-  var BIRDS = [
-    { at: [6, 0],   pts: [[0, 0], [2, 6], [9, 5], [11, 12], [19, 11]] },
-    { at: [0, 44],  pts: [[0, 0], [2, 5], [8, 4], [9, 10], [16, 9]] },
-    { at: [22, 50], pts: [[0, 0], [2, 5], [8, 4], [10, 10], [15, 9], [26, 20]] }
+  var GLYPHS = [
+    { pts: [[0, 0], [2, 6], [9, 5], [11, 12], [19, 11]] },
+    { pts: [[0, 0], [2, 5], [8, 4], [9, 10], [16, 9]] },
+    { pts: [[0, 0], [2, 5], [8, 4], [10, 10], [15, 9], [26, 20]] }  // long tail
   ];
   (function () {
-    var b, i, p, m;
-    for (b = 0; b < BIRDS.length; b++) {
-      p = BIRDS[b]; m = 0;
+    var g, i, p, m;
+    for (g = 0; g < GLYPHS.length; g++) {
+      p = GLYPHS[g]; m = 0;
       for (i = 0; i < p.pts.length; i++) m += p.pts[i][1];
       p.mid = m / p.pts.length;
+      p.w = p.pts[p.pts.length - 1][0];
     }
   })();
 
@@ -339,12 +349,31 @@
     var gap = flight.first ? 3.5 + r() * 4.5
                            : Math.min(110, Math.max(18, -Math.log(1 - r()) * 45));
     flight.first = false;
+    /* who flies today: a coin-flip sum, 2..6 */
+    var n = 2 + (r() < 0.6 ? 1 : 0) + (r() < 0.45 ? 1 : 0)
+              + (r() < 0.3 ? 1 : 0) + (r() < 0.18 ? 1 : 0);
+    var birds = [], back = 0, i;
+    for (i = 0; i < n; i++) {
+      if (i) back += 26 + r() * 16;
+      if (i === n - 1 && n > 2 && r() < 0.3) back += 55 + r() * 40;  // the straggler
+      birds.push({
+        g: GLYPHS[i === 0 && r() < 0.5 ? 2 : (r() * 2) | 0],  // long-tail often leads
+        sc: 0.8 + r() * 0.35,
+        back: back,
+        side: (i % 2 ? 1 : -1) * (6 + r() * 15) * (i ? 1 : 0.3),
+        beatF: 0.68 + r() * 0.27,
+        beatPh: r() * 7
+      });
+    }
+    flight.birds = birds;
+    flight.len = back + 30;
     flight.t0 = flight.end + gap;
-    flight.dur = (W + 190) / FLY_V;
+    flight.dur = (W + flight.len + 190) / FLY_V;
     flight.end = flight.t0 + flight.dur;
     flight.dir = r() < 0.5 ? -1 : 1;
     flight.yj = 0.15 + r() * 0.7;
     flight.ph = r() * 6.283;
+    flight.ph2 = r() * 6.283;
   }
 
   function resetFlight() {
@@ -352,53 +381,65 @@
     nextFlight();
   }
 
+  /* the shared undulation the skein rides; followers sample it lagged */
+  function skeinWave(t) {
+    return Math.sin(t * 0.20 + flight.ph) * 5 + Math.sin(t * 0.083 + flight.ph2) * 4;
+  }
+
   function drawFlock(tNow, animating) {
     if (!anchors || anchors.mode === 'rest' || !flight) return;
     var hangMode = anchors.mode === 'hang';
     var s = hangMode ? 0.62 : 0.85;
-    var bboxW = 48 * s, bboxH = 70 * s;
+    var glyphH = 22 * s;
     var yTop, yBot;
     if (hangMode) {
       /* the open zone between the text and the meadow */
       yTop = anchors.stackBottom + 26;
-      yBot = (fall.baseY || H - 60) - 26 - bboxH;
+      yBot = (fall.baseY || H - 60) - 26 - glyphH;
       if (yBot - yTop < 24) return;             // no room on very short viewports
     } else {
       yTop = 42;
-      yBot = anchors.nameTop - 40 - bboxH;      // the sky band above the name
+      yBot = anchors.nameTop - 40 - glyphH;     // the sky band above the name
       if (yBot < yTop) return;
     }
-    var fx, fy, flying = 0;
+    var sideMax = Math.max(5, Math.min(20, (yBot - yTop) * 0.35));
+    var headX, yBase, flying = 0, prog = 0;
     if (!animating) {
-      /* still frame: the trio at rest mid-band, as drawn */
-      fx = W * 0.5 - bboxW / 2;
-      fy = yTop + (yBot - yTop) * 0.45;
+      /* still frame: a resting pair mid-band, as drawn */
+      headX = W * 0.52; yBase = yTop + (yBot - yTop) * 0.45;
     } else {
       while (tNow > flight.end) nextFlight();
       if (tNow < flight.t0) return;             // quiet sky between crossings
-      var prog = (tNow - flight.t0) / flight.dur;
-      var head = -95 + (W + 190) * prog;
-      /* dir > 0: leftward, as drawn; dir < 0: rightward, mirrored */
-      fx = flight.dir > 0 ? W - head - bboxW : head;
-      fy = yTop + (yBot - yTop) * flight.yj + Math.sin(prog * 9 + flight.ph) * 4;
+      prog = (tNow - flight.t0) / flight.dur;
+      /* dir > 0: leftward as drawn (enters right, lead in front);
+         dir < 0: rightward, mirrored (enters left) */
+      headX = flight.dir > 0
+        ? W + 95 - (W + flight.len + 190) * prog
+        : -95 - flight.len + (W + flight.len + 190) * prog;
+      yBase = yTop + (yBot - yTop) * flight.yj;
       flying = 1;
     }
-    var b, i, p, pts, px, py, amp, pose;
-    for (b = 0; b < 3; b++) {
-      p = BIRDS[b];
-      /* stop-motion wing-beat: each zigzag alternates between a deep
-         beat and a flat glide, staggered per bird, under 1 Hz */
+    var birds = flying ? flight.birds : [{ g: GLYPHS[0], sc: 1, back: 0, side: -4, beatF: 0, beatPh: 0 },
+                                         { g: GLYPHS[2], sc: 0.95, back: 34, side: 6, beatF: 0, beatPh: 0 }];
+    var b, i, p, bd, pts, px, py, amp, bx, by;
+    for (b = 0; b < birds.length; b++) {
+      bd = birds[b]; p = bd.g;
+      /* stop-motion wing-beat, detuned per bird */
       amp = 1;
-      if (flying) {
-        pose = Math.floor(tNow * (0.72 + b * 0.09) + b * 1.31) % 2;
-        amp = pose ? 1 : 0.5;
-      }
+      if (flying) amp = Math.floor(tNow * bd.beatF + bd.beatPh) % 2 ? 1 : 0.5;
+      /* the follower rides the lead's wave, lagged by its distance back */
+      by = yBase + Math.max(-sideMax, Math.min(sideMax, bd.side))
+         + (flying ? skeinWave(tNow - bd.back / FLY_V) : 0);
+      by = Math.max(yTop, Math.min(yBot, by));
+      bx = flying && flight.dir < 0
+        ? headX + flight.len - bd.back - p.w * s * bd.sc   // rightward: front leads right
+        : headX + bd.back;                                 // leftward: followers trail right
       pts = [];
       for (i = 0; i < p.pts.length; i++) {
-        px = p.at[0] + p.pts[i][0];
-        py = p.at[1] + p.mid + (p.pts[i][1] - p.mid) * amp;
-        if (flying && flight.dir < 0) px = 48 - px;   // rightward crossings mirror
-        pts.push([fx + px * s, fy + py * s]);
+        px = p.pts[i][0];
+        py = p.mid + (p.pts[i][1] - p.mid) * amp;
+        if (flying && flight.dir < 0) px = p.w - px;   // rightward crossings mirror
+        pts.push([bx + px * s * bd.sc, by + py * s * bd.sc]);
       }
       stroke(pts, INK.line, 1.9, 0.78, 1, 9100 + b * 97 + (amp === 1 ? 0 : 13));
     }
