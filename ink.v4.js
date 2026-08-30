@@ -27,6 +27,9 @@
    - pause button freezes the frame and all clocks; persists (ink-paused)
    - JS off / canvas failure: typography on the night ground, nothing lost
    - no Math.random, no Date.now in the render path; date read once
+   - no ink under the measured typography or footer boxes; clicks there
+     never plant; when a viewport has no room (short landscape), the
+     garden rests to margins only — thread, stitches, star, curl
    - one 2D canvas, one rAF loop that sleeps between boil frames */
 
 (function () {
@@ -218,30 +221,39 @@
 
   function plantDayGarden() {
     sprigs.length = 0;
+    if (!anchors || anchors.mode === 'rest') return;   // no room: the garden rests
     var r = stream(2);
     var narrow = W < 700;
+    var mode = anchors.mode;
     /* the day decides how much has grown: 0 at 05:00, full at 21:00 —
        eased logistically (smootherstep), the way things actually grow */
     var lin = Math.max(0, Math.min(1, (midnightS / 3600 - 5) / 16));
     var dayFrac = lin * lin * (3 - 2 * lin);
     var total = 2 + Math.round(dayFrac * 4);          // 2..6 sprigs
-    var i, x, y, ang;
+    var i, x, y, ang, sc;
     for (i = 0; i < total; i++) {
       var side = r();
+      var hangThis = mode === 'hang' || (mode === 'beds' && i > 0 && side >= 0.75);
       if (i === 0) {                       // the anchor sprig: the seedfall's canopy
-        if (narrow) { x = W * 0.88; y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.3; }
+        if (mode === 'hang') { x = W * (narrow ? 0.88 : 0.9); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.3; }
         else { x = W * (0.74 + r() * 0.08); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.4; }
-      } else if (narrow) {                 // phone: the garden hangs from the top
-        x = W * (0.45 + side * 0.4); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.4;
-      } else if (side < 0.45) {            // bottom bed, left of the text column
+        sc = (mode === 'hang' ? 0.7 : 1.0) + r() * 0.25;
+      } else if (hangThis) {               // hanging from the top edge
+        x = mode === 'hang' ? W * (0.45 + side * 0.4) : W * (0.84 + r() * 0.1);
+        y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.4;
+        sc = (narrow ? 0.55 : 0.6) + r() * 0.25;
+      } else if (side < 0.6) {             // bottom bed, left of the text column
         x = W * (0.28 + r() * 0.13); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
-      } else if (side < 0.75) {            // bottom-right, clear of the pause button
+        sc = 0.8 + r() * 0.5;
+      } else {                             // bottom-right bed
         x = W * (0.72 + r() * 0.12); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
-      } else {                             // top-right corner, hanging in
-        x = W * (0.84 + r() * 0.1); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.4;
+        sc = 0.8 + r() * 0.5;
       }
-      var sc = i === 0 ? (narrow ? 0.7 : 1.0) + r() * 0.25
-                       : (narrow ? 0.55 : 0.8) + r() * (narrow ? 0.2 : 0.5);
+      /* fit the tree to the measured room, and keep standing canopies
+         clear of the pause button's corner */
+      sc = Math.min(sc, y > 4 ? anchors.bedCap : anchors.hangCap);
+      if (y > 4) x = Math.min(x, anchors.pauseLeft - 30 - 95 * sc);
+      if (sc < 0.3) continue;
       sprigs.push(buildSprig(x, y, ang, sc, r, -60 + i * 3));  // born pre-load: already grown
     }
   }
@@ -254,6 +266,7 @@
     if (!anchors) return;
     var r = stream(4);
     var narrow = W < 700;
+    threadNarrow = narrow;
     var lane = narrow ? 18 : Math.max(60, Math.min(anchors.stackLeft - 70, W * 0.30));
     var x = lane * (0.55 + r() * 0.3), y = -4;
     var tx = narrow ? lane * 0.7 : anchors.footerX;
@@ -330,28 +343,29 @@
   var flockJY = flockRng() * 26, flockJX = (flockRng() - 0.5) * 40;
 
   function drawFlock(tNow, animating) {
-    if (!anchors) return;
-    var narrow = W < 700;
-    var s = narrow ? 0.62 : 0.85;
+    if (!anchors || anchors.mode === 'rest') return;
+    var hangMode = anchors.mode === 'hang';
+    var s = hangMode ? 0.62 : 0.85;
     var bboxW = 48 * s + 10, bboxH = 70 * s;
     var lo, hi, yBase, yRoom;
-    if (narrow) {
+    if (hangMode) {
       /* the open zone between the text and the meadow, left of the seed column */
       var top = anchors.stackBottom + 26;
       var bot = (fall.baseY || H - 60) - 26 - bboxH;
       if (bot - top < 30) return;               // no room on very short viewports
-      lo = 22; hi = Math.max(lo + 20, W * 0.45 - bboxW);
+      lo = 22; hi = Math.max(lo + 20, Math.min(W * 0.45, fall.lo - 30) - bboxW);
       yBase = top + (bot - top) * 0.35;
       yRoom = Math.min(16, (bot - top) * 0.3);
     } else {
       lo = Math.max(W * 0.34, anchors.stackLeft - 60); hi = W * 0.78 - bboxW;
       yBase = 46 + flockJY;
+      if (yBase + bboxH > anchors.nameTop - 36) return;   // no sky: the flock rests
       yRoom = Math.min(18, Math.max(0, anchors.nameTop - 44 - bboxH - yBase));
     }
     /* the day's crossing: same clock as the garden, live within a visit */
     var daySec = midnightS + (animating ? Math.max(0, tNow) : 0);
     var prog = Math.max(0, Math.min(1, (daySec / 3600 - 5) / 16));
-    var fx = lo + (hi - lo) * prog + flockJX * (narrow ? 0.3 : 1);
+    var fx = lo + (hi - lo) * prog + flockJX * (hangMode ? 0.3 : 1);
     fx = Math.max(lo, Math.min(hi, fx));
     var fy = yBase - Math.sin(prog * Math.PI) * yRoom;   // highest at noon
     var b, i, p, pts, t;
@@ -390,14 +404,13 @@
      Desktop pull is light (sigma ~30 px with canopy spread: a real bell);
      the landing clamps into the meadow's bounds — walks stay smooth. */
   function fallPath(rx, ry) {
-    var narrow = W < 700;
     var pts = [[rx, ry]], x = rx, y = ry;
     while (y < fall.baseY - 1) {
       y = Math.min(fall.baseY, y + 26);
-      var inLane = narrow && anchors && y < anchors.stackBottom + 12;
-      var aim = inLane ? W - 12 : fall.x0;
-      var pull = inLane ? 0.5 : (narrow ? 0.35 : 0.06);
-      var sig = inLane ? 2.5 : (narrow ? 9 : 10);
+      var inLane = fall.hang && anchors && y < anchors.stackBottom + 12;
+      var aim = inLane ? fall.laneX : fall.x0;
+      var pull = inLane ? 0.5 : (fall.hang ? 0.35 : 0.06);
+      var sig = inLane ? 2.5 : (fall.hang ? 9 : 10);
       x += (aim - x) * pull + (fall.rng() * 2 - 1) * sig;
       pts.push([x, y]);
     }
@@ -426,15 +439,18 @@
     fall.cells = {};
     fall.drop = null;
     fall.tips.length = 0;
-    var narrow = W < 700;
+    fall.hang = anchors && anchors.mode === 'hang';
     var s0 = sprigs[0], i;
+    if (anchors && anchors.mode === 'rest') return;    // no garden, no fall
     if (s0) for (i = 0; i < s0.segs.length; i++) if (s0.segs[i].tip) fall.tips.push(s0.segs[i].tip);
-    if (narrow) {
-      /* phones: release only from lane-side tips, so the crossing of the
-         text zone stays inside the right margin */
+    if (fall.hang) {
+      /* hanging garden: release only from lane-side tips, so the crossing
+         of the text zone stays strictly right of the measured stack box */
+      var laneMin = (anchors ? anchors.stackRight : W - 24) + 6;
+      fall.laneX = Math.min(W - 6, Math.max(W - 14, laneMin + 4));
       var laneTips = [];
-      for (i = 0; i < fall.tips.length; i++) if (fall.tips[i][0] >= W - 30) laneTips.push(fall.tips[i]);
-      fall.tips = laneTips.length ? laneTips : [[W - 16, 70]];
+      for (i = 0; i < fall.tips.length; i++) if (fall.tips[i][0] >= laneMin) laneTips.push(fall.tips[i]);
+      fall.tips = laneTips.length ? laneTips : [[fall.laneX, 70]];
     } else if (fall.tips.length > 3) {
       /* release only from the upper canopy, so every fall has real air */
       var loY = Infinity, hiY = -Infinity, keep = [];
@@ -447,17 +463,18 @@
       if (keep.length) fall.tips = keep;
     }
     var trunkX = s0 ? s0.segs[0].pts[0][0] : W * 0.75;
-    fall.x0 = narrow ? W * 0.62 : trunkX;
-    fall.baseY = narrow ? ((anchors ? anchors.footerTop : H - 46) - 28) : H - 6;
+    fall.x0 = fall.hang ? W * 0.62 : trunkX;
+    fall.baseY = fall.hang ? ((anchors ? anchors.footerTop : H - 46) - 28) : H - 6;
     var pl = anchors ? anchors.pauseLeft : W - 150;
-    fall.lo = narrow ? Math.max(18, W * 0.30) : fall.x0 - 110;
-    fall.hi = narrow ? Math.min(W - 14, pl - 20)
-                     : Math.min(fall.x0 + 110, pl - 22);
+    fall.lo = fall.hang ? Math.max(18, W * 0.30) : fall.x0 - 110;
+    fall.hi = fall.hang ? Math.min(W - 14, pl - 20)
+                        : Math.min(fall.x0 + 110, pl - 22);
     /* the day so far, replayed: one landing kept per ~8 min of daylight */
-    var kept = Math.min(64, Math.floor(Math.max(0, midnightS - 6.5 * 3600) / 480));
+    var kept = fall.tips.length
+      ? Math.min(64, Math.floor(Math.max(0, midnightS - 6.5 * 3600) / 480)) : 0;
     var d, tip, p;
     for (d = 0; d < kept; d++) {
-      tip = fall.tips.length ? fall.tips[(fall.rng() * fall.tips.length) | 0] : [fall.x0, H * 0.4];
+      tip = fall.tips[(fall.rng() * fall.tips.length) | 0];
       p = fallPath(tip[0], tip[1]);
       addBlade(p[p.length - 1][0], -10);
     }
@@ -538,6 +555,15 @@
     if (name) {
       var r = name.getBoundingClientRect();
       a.nameRight = r.right; a.nameTop = r.top;
+      /* the h1 box spans the whole column; the star must clear the GLYPHS,
+         so measure the text's own line box */
+      a.glyphRight = r.right;
+      try {
+        var rg = document.createRange();
+        rg.selectNodeContents(name);
+        var rr = rg.getBoundingClientRect();
+        if (rr && rr.width) a.glyphRight = rr.right;
+      } catch (e2) {}
     }
     if (links.length) {
       /* The curl (spanning ~footerX+2..+15 plus wobble) must never sit on
@@ -558,8 +584,21 @@
     if (stack) {
       var r3 = stack.getBoundingClientRect();
       a.stackLeft = r3.left;
+      a.stackRight = r3.right;
+      a.stackTop = r3.top;
       a.stackBottom = r3.bottom;
+    } else {
+      a.stackRight = W * 0.7; a.stackTop = H * 0.25;
     }
+    /* Where is there room? Standing trees need ~210*scale+20 px below the
+       text; hanging ones ~140*scale+8 above it. When neither fits (short
+       landscape viewports), the garden rests: thread, stitches, starburst
+       and curl only — the typography carries the page. */
+    a.bedCap = (H - a.stackBottom - 44) / 210;
+    a.hangCap = (a.nameTop - 32) / 140;
+    a.mode = W < 700 ? (a.hangCap >= 0.42 ? 'hang' : 'rest')
+                     : (a.bedCap >= 0.5 ? 'beds'
+                        : (a.hangCap >= 0.42 ? 'hang' : 'rest'));
     anchors = a;
   }
 
@@ -577,7 +616,7 @@
   }
 
   var clock0 = 0, pauseShift = 0, pausedAt = 0, hiddenAt = 0;
-  var paused = false, raf = 0, lastBoil = -1;
+  var paused = false, raf = 0, tmr = 0, lastBoil = -1;
 
   function sceneT(tms) { return (tms - clock0 - pauseShift) / 1000; }
 
@@ -591,8 +630,14 @@
     for (i = 0; i < sprigs.length; i++) drawSprig(sprigs[i], tNow);
     drawThread(animating ? tNow : 0);
     drawSeed(tNow, animating);
-    /* vermillion star beside the name */
-    if (anchors) starburst(Math.min(anchors.nameRight + 24, W - 22), anchors.nameTop + 10, 7, INK.verm, 8500);
+    /* vermillion star in the run-out right of the name — never on glyphs:
+       its leftmost jittered ray must clear the last glyph, or it skips */
+    if (anchors) {
+      var sbx = Math.min(anchors.nameRight + 24, W - 22);
+      if (sbx - 10 >= (anchors.glyphRight || anchors.nameRight) + 3) {
+        starburst(sbx, anchors.nameTop + 10, 7, INK.verm, 8500);
+      }
+    }
   }
 
   function frame(tms) {
@@ -605,13 +650,23 @@
       boilPhase = boil;
       render(t, true);
     }
-    if (!paused && !document.hidden) raf = requestAnimationFrame(frame);
+    if (!paused && !document.hidden) {
+      /* truly sleep until the next boil frame instead of spinning rAF */
+      var wait = Math.max(8, ((boil + 1) / BOIL_FPS - t) * 1000 + 2);
+      tmr = setTimeout(function () {
+        tmr = 0;
+        raf = requestAnimationFrame(frame);
+      }, wait);
+    }
   }
 
   function start() {
-    if (!raf && !paused && !document.hidden && !mqReduce.matches) raf = requestAnimationFrame(frame);
+    if (!raf && !tmr && !paused && !document.hidden && !mqReduce.matches) raf = requestAnimationFrame(frame);
   }
-  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+  function stop() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    if (tmr) { clearTimeout(tmr); tmr = 0; }
+  }
 
   function stillFrame() {
     boilPhase = 3;
@@ -644,13 +699,28 @@
   document.addEventListener('click', function (e) {
     if (paused || mqReduce.matches) return;
     if (e.target.closest('a, button')) return;
+    /* never plant on (or into) the typography: the measured stack and
+       footer are no-plant zones, and near them the planted sprig is
+       scaled to the clearance so its canopy can never reach the glyphs */
+    var sc2 = 0.55 + seedRng() * 0.35;
+    if (anchors) {
+      if (e.clientY > anchors.footerTop - 30) return;
+      if (e.clientY > anchors.stackTop - 40 && e.clientY < anchors.stackBottom + 40 &&
+          e.clientX > anchors.stackLeft - 70 && e.clientX < anchors.stackRight + 70) return;
+      if (e.clientX > anchors.stackLeft - 110 && e.clientX < anchors.stackRight + 110) {
+        var vGap = (e.clientY > H * 0.4 ? e.clientY - anchors.stackBottom
+                                        : anchors.stackTop - e.clientY) - 26;
+        sc2 = Math.min(sc2, vGap / 185);
+        if (sc2 < 0.3) return;
+      }
+    }
     var now = performance.now();
     if (now - lastClick < 600) return;
     lastClick = now;
     if (sprigs.length > 14) sprigs.shift();
     var upward = e.clientY > H * 0.4 ? -Math.PI / 2 : Math.PI / 2;
     sprigs.push(buildSprig(e.clientX, e.clientY, upward + (seedRng() - 0.5) * 0.6,
-                           0.55 + seedRng() * 0.35, seedRng, sceneT(now)));
+                           sc2, seedRng, sceneT(now)));
     start();
   });
 

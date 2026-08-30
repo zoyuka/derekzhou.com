@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#181410">
+  <!-- Cloudflare Pages serves this page for ANY missing path, but the
+       _headers CSP rules match only /404.html itself (CSP on /* would
+       combine with the per-page rules). This meta carries the same policy
+       to every 404 response; frame-ancestors can't ride a meta tag, but
+       X-Frame-Options DENY on /* already covers framing. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
   <title>Not found — Derek Zhou</title>
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/favicon.png" type="image/png">

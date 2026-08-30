@@ -18,7 +18,7 @@ jobs:
             index.html
             style.v6.css
             site.js
-            ink.v3.js
+            ink.v4.js
             robots.txt
             _headers
             _redirects
@@ -96,6 +96,34 @@ jobs:
             exit 1
           fi
           echo "security.txt valid until $exp"
+
+      - name: Asset references must resolve (immutable-rename integrity)
+        run: |
+          # Changed bytes require renamed files; this catches a rename that
+          # missed a reference. Every local href/src in the HTML and every
+          # path in _headers Link/cache rules must exist in the repo.
+          fail=0
+          refs=$(grep -ohE '(href|src)="/[^"#]+"' index.html 404.html | sed -E 's/^(href|src)="//; s/"$//')
+          refs="$refs $(grep -oE 'Link: <[^>]+>' _headers | sed -E 's/Link: <//; s/>//')"
+          refs="$refs $(grep -oE '^/[A-Za-z0-9._-]+\.(css|js|woff2|svg|png)$' _headers)"
+          for ref in $refs; do
+            if [ ! -f ".${ref}" ]; then
+              echo "::error::Reference $ref does not exist as a file"
+              fail=1
+            else
+              echo "OK: $ref"
+            fi
+          done
+          # And the reverse: the versioned css/js the repo ships must be the
+          # ones index.html loads.
+          for f in style.v*.css ink.v*.js; do
+            if [ -f "$f" ] && ! grep -q "\"/$f\"" index.html; then
+              echo "::error::$f exists but index.html does not reference it"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] && echo "All references resolve"
+          exit $fail
 
       - name: No inline code on CSP'd pages
         run: |
