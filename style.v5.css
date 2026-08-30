@@ -247,7 +247,7 @@ footer a:hover {
 }
 
 /* Reserves its slot from first paint (visibility, not display) so
-   revealing it can never shift layout; ink.v1.js adds .ink-show
+   revealing it can never shift layout; ink.v2.js adds .ink-show
    only when the loop actually runs. */
 .ink-pause {
   font-family: var(--font-sans);
