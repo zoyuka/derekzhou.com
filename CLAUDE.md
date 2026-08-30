@@ -5,9 +5,9 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v5.css           All styles (versioned name — see Caching)
+/style.v6.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/ink.v2.js              The ink garden — the 2D canvas scene (see Ink garden)
+/ink.v3.js              The ink garden — the 2D canvas scene (see Ink garden)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -76,12 +76,12 @@ a full-viewport 2D-canvas scene of hand-drawn generative ink, at night.
 Dark only (color-scheme: dark; no light palette). Type is matte: no
 text-shadow, no glow, ever. Tokens: bg #181410 (warm night ground),
 text #ece9e4, dimmed #b8b4ac, focus #9db8ff. The six inks live in
-ink.v2.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
+ink.v3.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
 sage #8fa284, slate #8b9cbd (vermillion on ground is the lowest pair,
 4.5:1 — do not darken the ground or dim the inks without re-checking).
 Text contrast comes from composition, not a scrim: the garden is sparse
 line-work and every element is anchored OUTSIDE the measured .stack and
-footer boxes (measureAnchors in ink.v2.js). Keep it that way — nothing
+footer boxes (measureAnchors in ink.v3.js). Keep it that way — nothing
 may draw under the typography. (The one sanctioned crossing: on phones
 the falling seed slips down the right MARGIN beside the text, never
 behind glyphs.)
@@ -90,7 +90,7 @@ always on top and always clickable. Entrance is pure CSS (ink-rise
 keyframes, staggered 0.1–0.7 s, disabled under prefers-reduced-motion).
 forced-colors hides the canvas. Print styles hide the scene and footer.
 
-## Ink garden (ink.v2.js)
+## Ink garden (ink.v3.js)
 
 A hand-drawn day, clocked from local midnight. One 2D canvas, no
 libraries, no network. Every stroke is a wobbly polyline redrawn with
@@ -117,8 +117,8 @@ depicted as apparatus:
   A day of landings (one kept per ~8 min of daylight, replayed
   deterministically at init) grows a stand of grass whose silhouette
   settles toward the binomial bell: de Moivre-Laplace, drawn as meadow.
-  Repeat landings in a 4 px cell thicken the tuft UPWARD (taller
-  blades), never denser sideways; past the caps (64 blades, height 7)
+  Repeat landings in a 6 px cell thicken the tuft UPWARD (taller
+  blades), never denser sideways; past the caps (64 blades, 7 per cell)
   the meadow rests. Blades are single curved strokes with air between
   them — the meadow must never read as texture.
 * An ochre thread dangles from the top edge, wanders inside the left
@@ -126,6 +126,15 @@ depicted as apparatus:
   arc) floating in the gap above the footer links — never on glyphs.
 * Margin x-stitches appear in golden-ratio order (i*phi mod 1), filling
   the column evenly, never top-down.
+* THE FLOCK: three stepped-zigzag birds — Derek's tattoo trio, digitized
+  as drawn (small one above, the pair below, one trailing a long tail;
+  BIRDS in ink.v3.js — do not restyle or change their membership). They
+  cross the open sky exactly once per day on the garden's clock
+  (~0.02 px/s, imperceptible live; return visits find them further
+  along), flying highest at noon (sine arc). Desktop: the sky band above
+  the typography. Phones: the open zone between the text and the meadow,
+  left of the seed column; skipped when there is no room. Single
+  marker-weight strokes in the line ink, drawn in one by one after load.
 
 Click anywhere open: a seed is planted and a new sprig grows there
 (600 ms debounce, 14-sprig cap, clicks on links and buttons never
@@ -135,12 +144,13 @@ the seed falls down the right margin beside the text before spreading
 into the open zone below it, landing in a meadow strip floating above
 the footer.
 
-The calm envelope (header comment of ink.v2.js mirrors this; any change
+The calm envelope (header comment of ink.v3.js mirrors this; any change
 must keep all of it true):
 
 * Boil rate <= 6 fps (BOIL_FPS = 5); no motion faster than the thread's
   0.08 Hz sway except the falling seed (one at a time, ~9 s apart on
-  average, <= 90 px/s total speed — DROP_V = 82 vertical).
+  average, <= 90 px/s total speed — DROP_V = 82 vertical). The flock's
+  day-migration drifts <= 0.05 px/s.
 * Strokes and stitches only — never clustered dots (hard rule; dot
   clusters read as trypophobia triggers).
 * Ink alphas <= 0.85; night ground #181410; palette fixed to the six inks.
@@ -160,7 +170,7 @@ must keep all of it true):
 
 ## CSS
 
-One file: style.v5.css. Plain CSS. Custom properties for theming.
+One file: style.v6.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
 WCAG AA contrast on all dimmed text over the night ground.
@@ -174,7 +184,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. ink.v2.js — the ink garden (see above). Progressive enhancement: with
+2. ink.v3.js — the ink garden (see above). Progressive enhancement: with
    JS off, the page is simply the typography on the night ground.
 
 ## Fonts + performance
@@ -193,7 +203,7 @@ with PNG fallback.
 
 HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump style.vN.css,
-ink.v2.js → ink.v3.js, .sub2 → .sub3, and update every reference
+ink.v3.js → ink.v3.js, .sub2 → .sub3, and update every reference
 (index.html, 404.html, \_headers Link + cache blocks) in the same commit.
 
 ## SEO
@@ -214,7 +224,7 @@ CI checks that security.txt has not expired.
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND ink.v2.js on every TT-enforcing browser (verified by
+site.js AND ink.v3.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types

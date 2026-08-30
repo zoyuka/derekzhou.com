@@ -11,13 +11,15 @@
    while a seed lets go of the tallest sprig and flutters down, each sway
    of its fall a coin toss, planting a grass blade where it lands — a day
    of landings grows a stand of grass whose silhouette settles toward the
-   bell curve (de Moivre-Laplace, drawn as meadow).
+   bell curve (de Moivre-Laplace, drawn as meadow). A flock of three
+   stepped-zigzag birds — a hand's own mark — crosses the sky once per
+   day on the same clock, highest at noon.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
    THE CALM ENVELOPE (any change must keep all of this true):
    - boil rate <= 6 fps; no motion faster than the thread's 0.08 Hz sway
      except the falling seed (one at a time, ~9 s apart on average,
-     <= 90 px/s)
+     <= 90 px/s); the flock's day-migration drifts <= 0.05 px/s
    - strokes and stitches only — never clustered dots (hard rule)
    - ink alphas <= 0.85; night ground #181410; palette fixed to the six inks
    - prefers-reduced-motion: the day's garden fully drawn, zero boil,
@@ -311,6 +313,59 @@
     }
   }
 
+  /* ---------------- the flock ----------------
+     Three stepped-zigzag birds — Derek's tattoo trio, digitized as drawn:
+     the small one above, the pair below, one trailing a long tail. They
+     cross the open sky exactly once per day on the garden's clock
+     (~0.02 px/s — far under the sway's peak speed), flying highest at
+     noon, settling toward the far edge by dusk. Single angular strokes,
+     marker-weight, boiled like everything else. */
+
+  var BIRDS = [
+    { at: [6, 0],   pts: [[0, 0], [2, 6], [9, 5], [11, 12], [19, 11]] },
+    { at: [0, 44],  pts: [[0, 0], [2, 5], [8, 4], [9, 10], [16, 9]] },
+    { at: [22, 50], pts: [[0, 0], [2, 5], [8, 4], [10, 10], [15, 9], [26, 20]] }
+  ];
+  var flockRng = stream(9);
+  var flockJY = flockRng() * 26, flockJX = (flockRng() - 0.5) * 40;
+
+  function drawFlock(tNow, animating) {
+    if (!anchors) return;
+    var narrow = W < 700;
+    var s = narrow ? 0.62 : 0.85;
+    var bboxW = 48 * s + 10, bboxH = 70 * s;
+    var lo, hi, yBase, yRoom;
+    if (narrow) {
+      /* the open zone between the text and the meadow, left of the seed column */
+      var top = anchors.stackBottom + 26;
+      var bot = (fall.baseY || H - 60) - 26 - bboxH;
+      if (bot - top < 30) return;               // no room on very short viewports
+      lo = 22; hi = Math.max(lo + 20, W * 0.45 - bboxW);
+      yBase = top + (bot - top) * 0.35;
+      yRoom = Math.min(16, (bot - top) * 0.3);
+    } else {
+      lo = Math.max(W * 0.34, anchors.stackLeft - 60); hi = W * 0.78 - bboxW;
+      yBase = 46 + flockJY;
+      yRoom = Math.min(18, Math.max(0, anchors.nameTop - 44 - bboxH - yBase));
+    }
+    /* the day's crossing: same clock as the garden, live within a visit */
+    var daySec = midnightS + (animating ? Math.max(0, tNow) : 0);
+    var prog = Math.max(0, Math.min(1, (daySec / 3600 - 5) / 16));
+    var fx = lo + (hi - lo) * prog + flockJX * (narrow ? 0.3 : 1);
+    fx = Math.max(lo, Math.min(hi, fx));
+    var fy = yBase - Math.sin(prog * Math.PI) * yRoom;   // highest at noon
+    var b, i, p, pts, t;
+    for (b = 0; b < 3; b++) {
+      t = Math.min(1, (tNow - (1.1 + b * 1.3)) / 0.7);   // draw themselves in, one by one
+      if (t <= 0) continue;
+      p = BIRDS[b]; pts = [];
+      for (i = 0; i < p.pts.length; i++) {
+        pts.push([fx + (p.at[0] + p.pts[i][0]) * s, fy + (p.at[1] + p.pts[i][1]) * s]);
+      }
+      stroke(pts, INK.line, 1.9, 0.78, t, 9100 + b * 97);
+    }
+  }
+
   /* ---------------- the seedfall (the garden's own galton board) ----------------
      Every little while a seed lets go of the anchor sprig and flutters
      down. Each row of its fall takes a coin-flip step pulled gently back
@@ -530,6 +585,7 @@
     ctx.clearRect(0, 0, W, H);
     drawFlecks();
     drawStitches(tNow);
+    drawFlock(tNow, animating);
     drawMeadow(tNow);
     var i;
     for (i = 0; i < sprigs.length; i++) drawSprig(sprigs[i], tNow);
