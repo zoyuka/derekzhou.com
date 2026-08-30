@@ -101,19 +101,19 @@
 }
 
 /* ------------------------------------------------
-   Tokens — ink on paper.
+   Tokens — ink on night paper.
    ------------------------------------------------ */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
   --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
-  --color-bg: #f2ede3;
-  --color-text: #3a3733;
-  --color-dimmed: #6f6a62;
-  --color-focus: #5a6b8c;
+  --color-bg: #181410;
+  --color-text: #ece9e4;
+  --color-dimmed: #b8b4ac;
+  --color-focus: #9db8ff;
 }
 
 /* ------------------------------------------------
@@ -142,8 +142,8 @@ body {
 }
 
 ::selection {
-  background: #3a3733;
-  color: #f2ede3;
+  background: #ece9e4;
+  color: #181410;
 }
 
 :focus-visible {

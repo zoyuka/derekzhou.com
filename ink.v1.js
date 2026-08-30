@@ -1,4 +1,4 @@
-/* The ink garden — a hand-drawn day, clocked from local midnight.
+/* The ink garden, at night — a hand-drawn day, clocked from local midnight.
    2D canvas, no libraries, no network. Every stroke is a wobbly polyline
    redrawn with fresh jitter a few times a second (the hand-drawn "boil"),
    so the page feels like ink held in a steady hand, never like a machine.
@@ -16,11 +16,11 @@
    - boil rate <= 6 fps; no motion faster than the thread's 0.08 Hz sway
      except the falling mark (one at a time, ~9 s apart, <= 90 px/s)
    - strokes and stitches only — never clustered dots (hard rule)
-   - ink alphas <= 0.85; paper #f2ede3; palette fixed to the six inks
+   - ink alphas <= 0.85; night ground #181410; palette fixed to the six inks
    - prefers-reduced-motion: the day's garden fully drawn, zero boil,
      rAF never starts; live listener both directions
    - pause button freezes the frame and all clocks; persists (ink-paused)
-   - JS off / canvas failure: typography on paper, nothing lost
+   - JS off / canvas failure: typography on the night ground, nothing lost
    - no Math.random, no Date.now in the render path; date read once
    - one 2D canvas, one rAF loop that sleeps between boil frames */
 
@@ -36,14 +36,13 @@
   var DROP_EVERY_S = 9;        // pachinko mark cadence
   var DROP_V = 85;             // px/s fall speed
   var INK = {
-    line:   '#3a3733',
-    dim:    '#6f6a62',
-    ochre:  '#b0852f',
-    verm:   '#c34a33',
-    sage:   '#7a8a6d',
-    slate:  '#5a6b8c'
+    line:   '#d8d2c4',
+    dim:    '#8f887b',
+    ochre:  '#c79a3d',
+    verm:   '#d05a40',
+    sage:   '#8fa284',
+    slate:  '#8b9cbd'
   };
-  var PAPER = '#f2ede3';
 
   /* ---------------- seeded randomness ---------------- */
 
@@ -388,16 +387,22 @@
 
   function measureAnchors() {
     var name = document.querySelector('h1');
-    var links = document.querySelector('footer a');
+    var links = document.querySelectorAll('footer a');
     var a = { nameRight: W * 0.72, nameTop: H * 0.2, footerX: W * 0.12, footerY: H - 60,
               machineX: W * 0.82, machineY: H * 0.58 };
     if (name) {
       var r = name.getBoundingClientRect();
       a.nameRight = r.right; a.nameTop = r.top;
     }
-    if (links) {
-      var r2 = links.getBoundingClientRect();
-      a.footerX = r2.right + 26; a.footerY = r2.top + 4;
+    if (links.length) {
+      /* The curl (centred at footerX+10, radius ~8 plus wobble) must never
+         sit on label glyphs: float it above the line, mid-gap when possible. */
+      var r2 = links[0].getBoundingClientRect();
+      a.footerY = r2.top - 14;
+      a.footerX = r2.right + 12;
+      if (links.length > 1) {
+        a.footerX = (r2.right + links[1].getBoundingClientRect().left) / 2 - 10;
+      }
     }
     var stack = document.querySelector('.stack');
     a.stackLeft = W * 0.3;
