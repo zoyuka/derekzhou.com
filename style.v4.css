@@ -101,7 +101,7 @@
 }
 
 /* ------------------------------------------------
-   Tokens — dark only. The parlor is a nocturne.
+   Tokens — ink on night paper.
    ------------------------------------------------ */
 
 :root {
@@ -110,18 +110,10 @@
   --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
-  --color-bg: #0b0e1a;
+  --color-bg: #181410;
   --color-text: #ece9e4;
   --color-dimmed: #b8b4ac;
   --color-focus: #9db8ff;
-
-  /* scene ink, read by parlor.v1.js at init */
-  --pl-indigo: #8e9ad7;
-  --pl-teal: #48b7bd;
-  --pl-gold: #d3b460;
-  --pl-aur0: #0b0e1a;
-  --pl-aur1: #084150;
-  --pl-aur2: #3f2551;
 }
 
 /* ------------------------------------------------
@@ -140,7 +132,6 @@ body {
   font-synthesis: none;
   background: var(--color-bg);
   color: var(--color-text);
-  cursor: crosshair;
   line-height: 1.5;
   min-height: 100vh;
   min-height: 100dvh;
@@ -151,8 +142,8 @@ body {
 }
 
 ::selection {
-  background: var(--color-text);
-  color: var(--color-bg);
+  background: #ece9e4;
+  color: #181410;
 }
 
 :focus-visible {
@@ -161,35 +152,22 @@ body {
 }
 
 /* ------------------------------------------------
-   The parlor — canvas behind everything, inert.
-   A scrim guarantees the text well even if the
-   in-shader luminance clamp ever drifts.
+   The ink canvas — behind everything, inert
    ------------------------------------------------ */
 
-#parlor {
+#ink {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: -2;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.4s ease-out;
-}
-
-.pl-ready #parlor {
-  opacity: 1;
-}
-
-.scrim {
-  position: fixed;
-  inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    linear-gradient(to top, rgba(8, 8, 10, 0.55), transparent 150px),
-    radial-gradient(ellipse 130% 95% at 50% 46%,
-      rgba(8, 8, 10, 0.50) 0%, rgba(8, 8, 10, 0.30) 40%, transparent 68%);
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+.ink-ready #ink {
+  opacity: 1;
 }
 
 /* ------------------------------------------------
@@ -204,20 +182,16 @@ main {
 }
 
 .stack {
-  transform: translateY(-3vh);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 34rem;
+  transform: translateY(-2vh);
+  max-width: 30rem;
 }
 
 h1 {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(3.25rem, 2rem + 5.5vw, 6rem);
+  font-size: clamp(3rem, 2rem + 4.5vw, 5.25rem);
   font-optical-sizing: auto;
-  line-height: 1.03;
+  line-height: 1.05;
   letter-spacing: -0.015em;
 }
 
@@ -227,8 +201,7 @@ h1 {
   line-height: 1.62;
   letter-spacing: 0.005em;
   max-width: 38ch;
-  text-align: left;
-  margin-top: 2.25rem;
+  margin-top: 2rem;
 }
 
 .bio strong {
@@ -241,7 +214,7 @@ h1 {
 }
 
 .credit {
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 0.8125rem;
@@ -251,7 +224,7 @@ h1 {
 }
 
 /* ------------------------------------------------
-   Footer — full-width bottom row
+   Footer
    ------------------------------------------------ */
 
 footer {
@@ -274,9 +247,9 @@ footer a:hover {
 }
 
 /* Reserves its slot from first paint (visibility, not display) so
-   revealing it can never shift layout; parlor.v1.js adds .pl-show
+   revealing it can never shift layout; ink.v1.js adds .ink-show
    only when the loop actually runs. */
-.pl-pause {
+.ink-pause {
   font-family: var(--font-sans);
   font-size: 0.875rem;
   color: var(--color-dimmed);
@@ -284,16 +257,16 @@ footer a:hover {
   border: none;
   padding: 0;
   margin-left: auto;
-  cursor: crosshair;
+  cursor: pointer;
   transition: color 0.2s;
   visibility: hidden;
 }
 
-.pl-pause.pl-show {
+.ink-pause.ink-show {
   visibility: visible;
 }
 
-.pl-pause:hover {
+.ink-pause:hover {
   color: var(--color-text);
 }
 
@@ -309,41 +282,30 @@ footer a:hover {
 }
 
 /* ------------------------------------------------
-   Entrance — pure CSS, opacity/transform only.
-   Runs once from first paint; ends at rest state.
+   Entrance — pure CSS, opacity/transform only
    ------------------------------------------------ */
 
-@keyframes pl-rise {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes ink-rise {
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 h1, .bio, .credit, footer {
-  animation: pl-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: ink-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-h1     { animation-delay: 0.15s; }
-.bio   { animation-delay: 0.45s; }
-.credit { animation-delay: 0.65s; }
-footer { animation-delay: 0.85s; }
+h1     { animation-delay: 0.1s; }
+.bio   { animation-delay: 0.3s; }
+.credit { animation-delay: 0.5s; }
+footer { animation-delay: 0.7s; }
 
 @media (prefers-reduced-motion: reduce) {
-  h1, .bio, .credit, footer {
-    animation: none;
-  }
-  #parlor {
-    transition: none;
-  }
+  h1, .bio, .credit, footer { animation: none; }
+  #ink { transition: none; }
 }
 
-/* Windows High Contrast / forced-colors: text colors are forced but
-   canvas pixels are not — black forced text over the dark scene would
-   be illegible. Drop the scene; the page becomes system-color type. */
 @media (forced-colors: active) {
-  #parlor,
-  .scrim {
-    display: none;
-  }
+  #ink { display: none; }
 }
 
 /* ------------------------------------------------
@@ -351,25 +313,17 @@ footer { animation-delay: 0.85s; }
    ------------------------------------------------ */
 
 @media print {
-  #parlor,
-  .scrim,
-  .pl-pause,
+  #ink,
+  .ink-pause,
   footer {
     display: none;
   }
 
   body {
-    cursor: default;
     color: #000;
     background: #fff;
   }
 
-  h1 {
-    font-size: 2rem;
-  }
-
-  .dimmed,
-  .credit {
-    color: #555;
-  }
+  h1 { font-size: 2rem; }
+  .dimmed, .credit { color: #555; }
 }

@@ -5,9 +5,9 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v3.css           All styles (versioned name — see Caching)
+/style.v4.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/parlor.v1.js           The parlor — the WebGL scene (see Parlor)
+/ink.v1.js              The ink garden — the 2D canvas scene (see Ink garden)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -67,65 +67,80 @@ Links:
   also listed in the JSON-LD Person sameAs)
 
 Both live in the footer, plus the "Pause motion" button (only visible when
-the parlor is animating).
+the ink garden is animating).
 
 ## Design
 
-One immersive, non-scrolling viewport: typography at the optical center of
-"the parlor" — a full-viewport WebGL scene. Dark only (color-scheme: dark;
-no light palette). Type is matte: no text-shadow, no glow, ever.
-Bg #0b0e1a, text #ece9e4, dimmed #b8b4ac, focus #9db8ff.
-cursor: crosshair. Entrance is pure CSS (opacity/transform keyframes,
-staggered 250-850 ms, disabled under prefers-reduced-motion).
-Text contrast is guaranteed twice: an in-shader radial luminance well
-(field clamped low inside 0.22*min(W,H), feather to 0.34) AND a CSS scrim
-(radial-gradient div between canvas and content). Never weaken either.
-Print styles hide the scene and footer.
+One immersive, non-scrolling viewport: typography over "the ink garden" —
+a full-viewport 2D-canvas scene of hand-drawn generative ink, at night.
+Dark only (color-scheme: dark; no light palette). Type is matte: no
+text-shadow, no glow, ever. Tokens: bg #181410 (warm night ground),
+text #ece9e4, dimmed #b8b4ac, focus #9db8ff. The six inks live in
+ink.v1.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
+sage #8fa284, slate #8b9cbd (vermillion on ground is the lowest pair,
+4.5:1 — do not darken the ground or dim the inks without re-checking).
+Text contrast comes from composition, not a scrim: the garden is sparse
+line-work and every element is anchored OUTSIDE the measured .stack and
+footer boxes (measureAnchors in ink.v1.js). Keep it that way — nothing
+may draw under the typography.
+The canvas is z-index -1 and pointer-events none, so text and links are
+always on top and always clickable. Entrance is pure CSS (ink-rise
+keyframes, staggered 0.1–0.7 s, disabled under prefers-reduced-motion).
+forced-colors hides the canvas. Print styles hide the scene and footer.
 
-## Parlor (parlor.v1.js)
+## Ink garden (ink.v1.js)
 
-A pachinko machine at rest. Full-viewport WebGL2, two draw calls: a
-domain-warped value-noise aurora + 7-fold quasicrystal interference
-mandala (one fullscreen triangle), and 328 lamps on a golden-angle
-phyllotaxis spiral (gl.POINTS, premultiplied additive). The lamps run
-mean-field Kuramoto dynamics; the coupling K(t) tides across the exact
-critical threshold Kc = 2*gamma every 233 s, so the machine's escalation
-ladder (idle twinkle -> patchy synchrony -> full phase-lock bloom -> decay)
-EMERGES from the mathematics — nothing is scripted. The order parameter r
-is the single master signal: bloom, hue ladder (indigo -> teal -> gold,
-iridescent sheen only above r=0.68), mandala contrast, zoom.
-Date-seeded, clocked from local midnight: same day, same edition,
-mid-cycle on load. Click = a slow radial cascade carrying a coupling kick
-(~17 s melt). Pointer proximity = gentle local coupling warmth.
+A hand-drawn day, clocked from local midnight. One 2D canvas, no
+libraries, no network. Every stroke is a wobbly polyline redrawn with
+fresh jitter a few times a second (the hand-drawn "boil"), so the page
+feels like ink held in a steady hand, never like a machine.
 
-The calm envelope (header comment of parlor.v1.js mirrors this; any change
+The garden is date-seeded (xmur3 day-string seed + splitmix32 streams)
+and grows with the day: sparse at dawn, in full bloom by evening — the
+same garden for every visitor, all day. Branch sprigs draw themselves
+in generation by generation; an ochre thread dangles from the top edge,
+wanders inside the left margin, and lands in a small spiral floating in
+the gap above the footer links (never on the label glyphs); a margin of
+embroidered x-stitches appears one by one; and a matchbox pachinko
+machine drops one ink mark through stitch-pegs every little while, its
+landings accumulating into a thumb-sized bell of tick strokes (n=4
+binomial, five bins). Click anywhere open: a seed is planted and a new
+sprig grows there (600 ms debounce, 14-sprig cap, clicks on links and
+buttons never plant). Under 700 px the garden hangs from the top edge,
+the thread runs along the left edge off-page, and there are no margin
+stitches.
+
+The calm envelope (header comment of ink.v1.js mirrors this; any change
 must keep all of it true):
 
-* Two hue families at any instant; palette drift <= 0.15 deg/s.
-* Fastest single-lamp modulation 0.23 Hz (frequency tails trimmed by
-  construction); fastest full-field 0.1 Hz. No square waves, no springs.
-* Additive cap 0.35/lamp; white ceiling #f2e8d5; r_disp in [0.10, 0.78].
-* >= 35% of the frame stays <= 0.03 luminance (black budget).
-* Motion tempo never changes with performance — the benchmark ladder
-  lowers resolution/octaves/folds/fps, never the choreography clock.
-  Rungs persist in localStorage (pl-rung) in try/catch.
-* prefers-reduced-motion: one analytically converged frame (Ott-Antonsen
-  Mobius placement at r=0.707), rAF never starts; live listener both ways.
-* Pause button in footer (WCAG 2.2.2): label swap only, freezes on the
-  last frame, halts all clocks (resume continues the same moment),
-  persists (pl-paused). Ships wherever the loop ships. Non-negotiable.
-* No WebGL2 / context creation failure: canvas removed, page is pure
-  typography over #0b0e1a — identical to the JS-off experience.
-* webglcontextlost/restored handled; scene state lives in CPU arrays.
+* Boil rate <= 6 fps (BOIL_FPS = 5); no motion faster than the thread's
+  0.08 Hz sway except the falling mark (one at a time, ~9 s apart,
+  <= 90 px/s).
+* Strokes and stitches only — never clustered dots (hard rule; dot
+  clusters read as trypophobia triggers).
+* Ink alphas <= 0.85; night ground #181410; palette fixed to the six inks.
+* prefers-reduced-motion: the day's garden fully drawn as one still
+  frame, zero boil, rAF never starts; live listener both directions.
+* Pause button in footer (WCAG 2.2.2): label swap only, freezes the
+  frame and all clocks (resume continues the same moment via
+  pauseShift), persists (ink-paused) in try/catch. Ships wherever the
+  loop ships. Non-negotiable.
+* JS off / canvas failure: typography on the night ground, nothing lost.
 * No Math.random, no Date.now in the render path; the date is read once
-  at init. Zero network. Two draw calls. No libraries.
+  at init. Zero network. One 2D canvas, one rAF loop that sleeps
+  between boil frames.
+* Layout is measured from the real DOM (measureAnchors) and rebuilt on
+  resize; visibilitychange shifts the clock like pause so backgrounded
+  tabs don't fast-forward.
 
 ## CSS
 
-One file: style.v3.css. Plain CSS. Custom properties for theming.
+One file: style.v4.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
-WCAG AA contrast on all dimmed text over the scrimmed well.
+WCAG AA contrast on all dimmed text over the night ground.
+The .ink-pause button reserves its layout slot from first paint
+(visibility, not display) so revealing it can never shift layout.
 
 ## JS
 
@@ -134,8 +149,8 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. parlor.v1.js — the parlor (see above). Progressive enhancement: with JS
-   off, the page is simply the typography on the dark ground.
+2. ink.v1.js — the ink garden (see above). Progressive enhancement: with
+   JS off, the page is simply the typography on the night ground.
 
 ## Fonts + performance
 
@@ -146,14 +161,14 @@ accepted, do not add a glyph. font-display: optional + the metric-matched
 fallbacks give CLS = 0 by construction. All four subsets are preloaded in
 index.html and Early-Hinted via Link headers on / in \_headers.
 
-Single dark theme-color (#0b0e1a). The favicon is SVG-first
+Single dark theme-color (#181410). The favicon is SVG-first
 with PNG fallback.
 
 ## Caching
 
 HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump style.vN.css,
-parlor.v1.js → parlor.v2.js, .sub2 → .sub2, and update every reference
+ink.v1.js → ink.v2.js, .sub2 → .sub3, and update every reference
 (index.html, 404.html, \_headers Link + cache blocks) in the same commit.
 
 ## SEO
@@ -174,7 +189,7 @@ CI checks that security.txt has not expired.
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND parlor.v1.js on every TT-enforcing browser (verified by
+site.js AND ink.v1.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
