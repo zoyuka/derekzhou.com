@@ -6,21 +6,22 @@
    The garden is date-seeded and grows with the day: sparse at dawn, in
    full bloom by evening — the same garden for every visitor, all day.
    Branches draw themselves in; an ochre thread dangles from the top edge
-   and wanders down to the footer, ending in a small curl; a margin of
-   embroidered x-stitches appears in golden-ratio order; and every little
-   while a seed lets go of the tallest sprig and flutters down, each sway
-   of its fall a coin toss, planting a grass blade where it lands — a day
-   of landings grows a stand of grass whose silhouette settles toward the
-   bell curve (de Moivre-Laplace, drawn as meadow). A flock of three
-   stepped-zigzag birds — a hand's own mark — crosses the sky once per
-   day on the same clock, highest at noon.
+   and wanders down to the footer, ending in a small curl; and every
+   little while a seed lets go of the tallest sprig and flutters down,
+   each sway of its fall a coin toss, planting a grass blade where it
+   lands — a day of landings grows a stand of grass whose silhouette
+   settles toward the bell curve (de Moivre-Laplace, drawn as meadow).
+   Every little while, too, a flock of three birds — a hand's own mark —
+   glides across the open band in stop-motion, wings beating like a
+   flip-book, and leaves the sky empty again.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
    THE CALM ENVELOPE (any change must keep all of this true):
    - boil rate <= 6 fps; no motion faster than the thread's 0.08 Hz sway
      except the falling seed (one at a time, ~9 s apart on average,
-     <= 90 px/s); the flock's day-migration drifts <= 0.05 px/s
-   - strokes and stitches only — never clustered dots (hard rule)
+     <= 90 px/s) and the flock's crossings (<= 14 px/s glide, stop-motion
+     wing-beats under 1 Hz, one crossing at a time, long quiet gaps)
+   - strokes only — never clustered dots (hard rule)
    - ink alphas <= 0.85; night ground #181410; palette fixed to the six inks
    - prefers-reduced-motion: the day's garden fully drawn, zero boil,
      rAF never starts; live listener both directions
@@ -29,7 +30,7 @@
    - no Math.random, no Date.now in the render path; date read once
    - no ink under the measured typography or footer boxes; clicks there
      never plant; when a viewport has no room (short landscape), the
-     garden rests to margins only — thread, stitches, star, curl
+     garden rests to margins only — thread, star, curl
    - one 2D canvas, one rAF loop that sleeps between boil frames */
 
 (function () {
@@ -130,11 +131,6 @@
     }
     ctx.stroke();
     ctx.globalAlpha = 1;
-  }
-
-  function xstitch(x, y, s, color, alpha, key) {
-    stroke([[x - s, y - s], [x + s, y + s]], color, 1.3, alpha, 1, key);
-    stroke([[x + s, y - s], [x - s, y + s]], color, 1.3, alpha, 1, key + 977);
   }
 
   function starburst(x, y, r, color, key) {
@@ -310,73 +306,101 @@
     stroke(sp, INK.ochre, 1.2, 0.8, 1, 5200);
   }
 
-  /* ---------------- margin stitches ---------------- */
-
-  function drawStitches(tNow) {
-    if (W < 700) return;           // no margin to stitch on a phone
-    var r = stream(5);
-    var n = 7, i;
-    var x = W * 0.045;
-    for (i = 0; i < n; i++) {
-      var y = H * 0.18 + i * 26 + (r() - 0.5) * 4;
-      var appear = ((i * 0.6180339887) % 1) * 4.8 - 0.5;  // golden-ratio order: fills the column evenly, never top-down
-      if (tNow < appear) continue;
-      var col = i === 4 ? INK.verm : (i % 2 ? INK.dim : INK.slate);
-      xstitch(x + (r() - 0.5) * 3, y, 4.5, col, 0.7, 6000 + i * 89);
-    }
-  }
-
   /* ---------------- the flock ----------------
      Three stepped-zigzag birds — Derek's tattoo trio, digitized as drawn:
-     the small one above, the pair below, one trailing a long tail. They
-     cross the open sky exactly once per day on the garden's clock
-     (~0.02 px/s — far under the sway's peak speed), flying highest at
-     noon, settling toward the far edge by dusk. Single angular strokes,
-     marker-weight, boiled like everything else. */
+     the small one above, the pair below, one trailing a long tail. The
+     drawing IS flight — each mark a wing mid-beat — so they fly: every
+     little while (seeded exponential gaps) the trio glides across the
+     open band in stop-motion, each bird's zigzag deepening and
+     flattening like a flip-book wing-beat, then the sky is empty again.
+     Direction and altitude are seeded per crossing; as drawn they fly
+     leftward, so rightward crossings mirror the formation. */
+
+  var FLY_V = 12;              // px/s glide — a distant, unhurried crossing
 
   var BIRDS = [
     { at: [6, 0],   pts: [[0, 0], [2, 6], [9, 5], [11, 12], [19, 11]] },
     { at: [0, 44],  pts: [[0, 0], [2, 5], [8, 4], [9, 10], [16, 9]] },
     { at: [22, 50], pts: [[0, 0], [2, 5], [8, 4], [10, 10], [15, 9], [26, 20]] }
   ];
-  var flockRng = stream(9);
-  var flockJY = flockRng() * 26, flockJX = (flockRng() - 0.5) * 40;
+  (function () {
+    var b, i, p, m;
+    for (b = 0; b < BIRDS.length; b++) {
+      p = BIRDS[b]; m = 0;
+      for (i = 0; i < p.pts.length; i++) m += p.pts[i][1];
+      p.mid = m / p.pts.length;
+    }
+  })();
+
+  var flight = null;
+
+  function nextFlight() {
+    var r = flight.rng;
+    var gap = flight.first ? 3.5 + r() * 4.5
+                           : Math.min(110, Math.max(18, -Math.log(1 - r()) * 45));
+    flight.first = false;
+    flight.t0 = flight.end + gap;
+    flight.dur = (W + 190) / FLY_V;
+    flight.end = flight.t0 + flight.dur;
+    flight.dir = r() < 0.5 ? -1 : 1;
+    flight.yj = 0.15 + r() * 0.7;
+    flight.ph = r() * 6.283;
+  }
+
+  function resetFlight() {
+    flight = { rng: stream(9), end: 0, first: true };
+    nextFlight();
+  }
 
   function drawFlock(tNow, animating) {
-    if (!anchors || anchors.mode === 'rest') return;
+    if (!anchors || anchors.mode === 'rest' || !flight) return;
     var hangMode = anchors.mode === 'hang';
     var s = hangMode ? 0.62 : 0.85;
-    var bboxW = 48 * s + 10, bboxH = 70 * s;
-    var lo, hi, yBase, yRoom;
+    var bboxW = 48 * s, bboxH = 70 * s;
+    var yTop, yBot;
     if (hangMode) {
-      /* the open zone between the text and the meadow, left of the seed column */
-      var top = anchors.stackBottom + 26;
-      var bot = (fall.baseY || H - 60) - 26 - bboxH;
-      if (bot - top < 30) return;               // no room on very short viewports
-      lo = 22; hi = Math.max(lo + 20, Math.min(W * 0.45, fall.lo - 30) - bboxW);
-      yBase = top + (bot - top) * 0.35;
-      yRoom = Math.min(16, (bot - top) * 0.3);
+      /* the open zone between the text and the meadow */
+      yTop = anchors.stackBottom + 26;
+      yBot = (fall.baseY || H - 60) - 26 - bboxH;
+      if (yBot - yTop < 24) return;             // no room on very short viewports
     } else {
-      lo = Math.max(W * 0.34, anchors.stackLeft - 60); hi = W * 0.78 - bboxW;
-      yBase = 46 + flockJY;
-      if (yBase + bboxH > anchors.nameTop - 36) return;   // no sky: the flock rests
-      yRoom = Math.min(18, Math.max(0, anchors.nameTop - 44 - bboxH - yBase));
+      yTop = 42;
+      yBot = anchors.nameTop - 40 - bboxH;      // the sky band above the name
+      if (yBot < yTop) return;
     }
-    /* the day's crossing: same clock as the garden, live within a visit */
-    var daySec = midnightS + (animating ? Math.max(0, tNow) : 0);
-    var prog = Math.max(0, Math.min(1, (daySec / 3600 - 5) / 16));
-    var fx = lo + (hi - lo) * prog + flockJX * (hangMode ? 0.3 : 1);
-    fx = Math.max(lo, Math.min(hi, fx));
-    var fy = yBase - Math.sin(prog * Math.PI) * yRoom;   // highest at noon
-    var b, i, p, pts, t;
+    var fx, fy, flying = 0;
+    if (!animating) {
+      /* still frame: the trio at rest mid-band, as drawn */
+      fx = W * 0.5 - bboxW / 2;
+      fy = yTop + (yBot - yTop) * 0.45;
+    } else {
+      while (tNow > flight.end) nextFlight();
+      if (tNow < flight.t0) return;             // quiet sky between crossings
+      var prog = (tNow - flight.t0) / flight.dur;
+      var head = -95 + (W + 190) * prog;
+      /* dir > 0: leftward, as drawn; dir < 0: rightward, mirrored */
+      fx = flight.dir > 0 ? W - head - bboxW : head;
+      fy = yTop + (yBot - yTop) * flight.yj + Math.sin(prog * 9 + flight.ph) * 4;
+      flying = 1;
+    }
+    var b, i, p, pts, px, py, amp, pose;
     for (b = 0; b < 3; b++) {
-      t = Math.min(1, (tNow - (1.1 + b * 1.3)) / 0.7);   // draw themselves in, one by one
-      if (t <= 0) continue;
-      p = BIRDS[b]; pts = [];
-      for (i = 0; i < p.pts.length; i++) {
-        pts.push([fx + (p.at[0] + p.pts[i][0]) * s, fy + (p.at[1] + p.pts[i][1]) * s]);
+      p = BIRDS[b];
+      /* stop-motion wing-beat: each zigzag alternates between a deep
+         beat and a flat glide, staggered per bird, under 1 Hz */
+      amp = 1;
+      if (flying) {
+        pose = Math.floor(tNow * (0.72 + b * 0.09) + b * 1.31) % 2;
+        amp = pose ? 1 : 0.5;
       }
-      stroke(pts, INK.line, 1.9, 0.78, t, 9100 + b * 97);
+      pts = [];
+      for (i = 0; i < p.pts.length; i++) {
+        px = p.at[0] + p.pts[i][0];
+        py = p.at[1] + p.mid + (p.pts[i][1] - p.mid) * amp;
+        if (flying && flight.dir < 0) px = 48 - px;   // rightward crossings mirror
+        pts.push([fx + px * s, fy + py * s]);
+      }
+      stroke(pts, INK.line, 1.9, 0.78, 1, 9100 + b * 97 + (amp === 1 ? 0 : 13));
     }
   }
 
@@ -592,7 +616,7 @@
     }
     /* Where is there room? Standing trees need ~210*scale+20 px below the
        text; hanging ones ~140*scale+8 above it. When neither fits (short
-       landscape viewports), the garden rests: thread, stitches, starburst
+       landscape viewports), the garden rests: thread, starburst
        and curl only — the typography carries the page. */
     a.bedCap = (H - a.stackBottom - 44) / 210;
     a.hangCap = (a.nameTop - 32) / 140;
@@ -613,6 +637,7 @@
     plantDayGarden();
     buildThread();
     meadowInit();
+    resetFlight();
   }
 
   var clock0 = 0, pauseShift = 0, pausedAt = 0, hiddenAt = 0;
@@ -623,7 +648,6 @@
   function render(tNow, animating) {
     ctx.clearRect(0, 0, W, H);
     drawFlecks();
-    drawStitches(tNow);
     drawFlock(tNow, animating);
     drawMeadow(tNow);
     var i;
