@@ -3,42 +3,102 @@
    redrawn with fresh jitter a few times a second (the hand-drawn "boil"),
    so the page feels like ink held in a steady hand, never like a machine.
 
-   The garden is date-seeded and grows with the day: sparse at dawn, in
+   THE PLACE is date-seeded and grows with the day: sparse at dawn, in
    full bloom by evening — the same garden for every visitor, all day.
-   Branches draw themselves in; an ochre thread dangles from the top edge
-   and wanders down to the footer, ending in a small curl; and every
-   little while a seed lets go of the tallest sprig and flutters down,
-   each sway of its fall a coin toss, planting a grass blade where it
-   lands — a day of landings grows a stand of grass whose silhouette
-   settles toward the bell curve (de Moivre-Laplace, drawn as meadow).
-   Every little while, too, a small skein of birds — marks in a hand's
-   own zigzag — meanders across the open band in stop-motion, wings
-   beating like a flip-book, and leaves the sky quiet again. And ONE
-   WIND moves through all of it (feng is wind, shui is water): a single
-   slow field that the thread sways with, the grass leans into, the
-   canopies shear under, the seed drifts on and the skein bobs over —
-   with spatial phase, so the gust visibly travels across the garden.
+   Branches draw themselves in (the youngest is still drawing its last
+   generation as the door opens — growth in progress, never an event);
+   an ochre thread dangles from the top edge and wanders down to the
+   footer, ending in a small curl; every little while a seed lets go of
+   the anchor sprig and flutters down, each sway of its fall a coin
+   toss, planting a grass blade where it lands — a day of landings grows
+   a stand of grass whose silhouette settles toward the bell curve (de
+   Moivre-Laplace, drawn as meadow). Every little while, too, a small
+   skein of birds — marks in a hand's own zigzag — meanders across the
+   open band in stop-motion, wings beating like a flip-book, and leaves
+   the sky quiet again. And ONE WIND moves through all of it (feng is
+   wind, shui is water): a single slow field that the thread sways
+   with, the grass leans into, the canopies shear under, the seed drifts
+   on and the skein bobs over — with spatial phase, so the gust visibly
+   travels across the garden, in this visit's direction.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
+   THE WEATHER is visit-seeded — the one =rand() cell on the page: ONE
+   entropy read at init, layered over the day seed; never stored, never
+   shown, never in the URL, never contingent on anything the visitor
+   does. It owns only what a day's weather would: a triangular "front"
+   and four facets — the breeze (breeze in [0.17, 1.0], applied as the
+   gust gain g = 0.75 + 0.25*breeze*(0.7 + 0.3*noise) in [0.75, 1.0],
+   with a travel direction), the sky's traffic, the seedfall's tempo,
+   the hand's steadiness — plus the thread's wander (the one line that
+   spans the whole page hangs differently every visit: its start, its
+   phase and its pace) and what is already underway when the door
+   opens: a skein mid-crossing (45 %), a seed (20 %: mid-fall where the
+   fall is long enough, else letting go right after the reveal), or a
+   quiet sky (35 %). The place is the day's; the
+   weather is this visit's; the reduced-motion still frame is the day's
+   alone (its thread is the day's).
+
    THE CALM ENVELOPE (any change must keep all of this true):
-   - boil rate <= 6 fps; THE WIND is one field w(x,t) at 0.048 Hz
-     (~570 px wavelength) driving thread sway (3 px), grass lean
-     (1.3 px), canopy shear (<= 2.4 px), seed drift (2 px) and bird bob
-     (2.5 px) — nothing oscillates faster; exceptions: the falling seed
-     (one at a time, ~9 s apart, <= 90 px/s) and skein crossings
-     (<= 14 px/s glide, wing-beats < 1 Hz, one at a time, quiet gaps
-     10-60 s)
-   - strokes only — never clustered dots (hard rule)
+   - boil rate <= 6 fps (BOIL_FPS 5); jitter <= 1.6 px (1.2–1.6 per visit)
+   - THE WIND is one field w(x,t) at 0.048 Hz (~570 px wavelength), the
+     fastest oscillation on the page, driving thread sway (3 px), grass
+     lean (1.3 px), canopy shear (<= 2.4 px), seed drift (2 px) and bird
+     bob (2.5 px); those gains are CEILINGS, scaled by this visit's
+     gust gain in [0.75, 1.0] (breeze itself spans [0.17, 1.0]) under a
+     110–180 s gust envelope, travelling leftward or rightward per visit
+   - exceptions: the falling seed (one at a time, <= 90 px/s total,
+     DROP_V 82 vertical; the next release is scheduled from the LANDING
+     — mean gap 9–13 s, 12–16 s after 23:00 / before 05:00, clamped
+     5.5–18 s — so a long phone fall never chains straight into the
+     next) and skein crossings (<= 14 px/s glide,
+     wing-beats < 1 Hz, one at a time, mean gap 26–44 s, 36–54 s late,
+     clamped 10–60 s)
+   - strokes only — never clustered dots (hard rule); no fills, no arcs
    - ink alphas <= 0.85; night ground #181410; palette fixed to the six inks
-   - prefers-reduced-motion: the day's garden fully drawn, zero boil,
-     rAF never starts; live listener both directions
-   - pause button freezes the frame and all clocks; persists (ink-paused)
+   - prefers-reduced-motion: the DAY's garden fully drawn as one still
+     frame (day wind phase, no weather), zero boil, rAF never starts;
+     live listener both directions; forced-colors (canvas hidden by
+     CSS) is treated the same — no loop, no pause button
+   - pause button: label swap only; freezes the frame and all clocks
+     (resume continues the same moment via pauseShift — a paused load
+     draws the live frame at t = 0, the exact frame resume continues
+     from, never the far-future still frame; a span frozen BEFORE the
+     first live frame is never a shift, so resume can never run the
+     scene clock negative); persists (ink-paused); ships wherever the
+     loop ships
    - JS off / canvas failure: typography on the night ground, nothing lost
-   - no Math.random, no Date.now in the render path; date read once
    - no ink under the measured typography or footer boxes; clicks there
-     never plant; when a viewport has no room (short landscape), the
-     garden rests to margins only — thread, star, curl
-   - one 2D canvas, one rAF loop that sleeps between boil frames */
+     never plant; click-planted sprigs keep 60 px root spacing; when a
+     viewport has no room (short landscape), the garden rests to margins
+     only — thread, star, curl
+   - ONE clock read and ONE entropy read, both at init above the
+     INIT-END marker; nothing below it reads the wall clock or unseeded
+     randomness (performance.now DELTAS only, for pause / hidden-tab
+     bookkeeping — not a clock read)
+   - one 2D canvas, one rAF loop that truly sleeps between boil frames
+   - the tab title and the favicon never change; nothing listens for the
+     pointer's position, idling, focus loss or leaving (pagehide only
+     clears the frame timers, so bfcache can keep the page) — idle is
+     not a state, leaving is silence
+   - a hidden tab freezes the clocks (one frozenAt for pause, hidden and
+     reduced motion together, so no path can double-count or skip a
+     span); a return after >= 8 min shows only a statically fuller
+     garden (the day's own replay continued: <= 12 blades and at most
+     one fully grown sprig — a frozen still/paused frame is redrawn
+     once to show it); a page opened in a background tab counts the
+     span until its first look and plants the place at that minute, the
+     first look being the arrival; nothing animates, fires or is
+     scheduled on return
+   - no state persisted but ink-paused
+   - shakkei (borrowed scenery) entries are protected as EXTENT, not
+     decoration: the thread enters from beyond the top edge, the skein
+     from beyond the canvas edge, the hang-mode thread runs off-page
+   - rejected: toasts, a visible seed or forecast, easter eggs, a second
+     novel system; and grep-enforced by CI (validate.yml, "Absences are
+     enforced"): custom cursors, exit/idle/title handlers, any query or
+     hash hook on the URL (a ?seed= would be one), any sound, unseeded
+     randomness, any clock or entropy read below INIT-END, fills, arcs,
+     alphas above 0.85 */
 
 (function () {
   'use strict';
@@ -46,9 +106,8 @@
   /* ---------------- config ---------------- */
 
   var BOIL_FPS = 5;            // hand-tremor redraw rate
-  var JITTER = 1.6;            // px, wobble amplitude
+  var JITTER = 1.6;            // px, wobble ceiling (the still frame's hand)
   var GROW_MS = 2600;          // self-draw time per branch generation
-  var DROP_EVERY_S = 9;        // mean seconds between seedfalls (Poisson)
   var DROP_V = 82;             // px/s fall speed
   var INK = {
     line:   '#d8d2c4',
@@ -83,10 +142,66 @@
       return ((t ^ (t >>> 15)) >>> 0) / 4294967296;
     };
   }
-  var now0 = new Date();                     // the only Date read
+  var now0 = new Date();                     // the only clock read
   var daySeed = xmur3(now0.getFullYear() + '-' + (now0.getMonth() + 1) + '-' + now0.getDate())();
   var midnightS = now0.getHours() * 3600 + now0.getMinutes() * 60 + now0.getSeconds();
+  /* DAY streams — the place: 1 noise table, 2 day sprigs, 3 click sprigs,
+     4 the still frame's thread, 6 meadow replay, 8 urn, 10 still-frame
+     wind phase */
   var stream = function (n) { return sm32((daySeed ^ Math.imul(n + 1, 0x9E3779B9)) >>> 0); };
+
+  /* =rand(): the one entropy read. A visit seed, layered over the day
+     seed, owns the weather and nothing else. Drawn once, here; never
+     persisted, never displayed, never in the URL, never reseeded by a
+     click, a resize or a returning tab. Everything downstream is a pure
+     function of (daySeed, visitSeed, measured layout, clicks, scene time). */
+  var visitSeed = (function () {
+    try { if (self.crypto && crypto.getRandomValues) { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] >>> 0; } } catch (e) {}
+    return ((performance.now() * 1000) ^ daySeed) >>> 0;
+  })();
+  /* VISIT streams — the weather: 4 the live thread's wander, 6 live
+     seedfall, 9 skein, 11 weather record, 12 wind, 13 opening state,
+     15 hand */
+  var vstream = function (n) { return sm32((visitSeed ^ daySeed ^ Math.imul(n + 1, 0x9E3779B9)) >>> 0); };
+
+  /* the weather record: ONE front, four facets, quiet hours. The front is
+     triangular (most visits ordinary, extremes rare) and every facet leans
+     on it, so a still visit is still everywhere — low breeze, sparse sky,
+     slow seeds, steadier hand — and a breezy one breezy everywhere; never
+     five unrelated dials. Every draw maps into a designed, audited range. */
+  var wr = vstream(11);
+  var front = (wr() + wr()) / 2;
+  function facet() { return 0.7 * front + 0.3 * wr(); }
+  var fBreeze = facet(), fTraffic = facet(), fTempo = facet(), fHand = facet();
+  var night = midnightS >= 23 * 3600 || midnightS < 5 * 3600;   // quiet hours: behaviour, never palette
+  var breeze = (0.2 + 0.8 * fBreeze) * (night ? 0.85 : 1);      // [0.17, 1.0]
+  var skeinMean = (night ? 36 : 26) + 18 * (1 - fTraffic);       // s: [26, 44] ([36, 54] late)
+  var dropMean = (night ? 12 : 9) + 4 * (1 - fTempo);            // s: [9, 13] ([12, 16] late)
+  var handJitter = 1.2 + 0.4 * fHand;                            // px: [1.2, 1.6]
+
+  /* the wind's visit: its own phase, a travel direction, and a gust
+     envelope period (incommensurate with the 20.9 s field period) */
+  var windPhDay = stream(10)() * 6.283;      // the still frame's phase: the day's
+  var wv = vstream(12);
+  var windPhVisit = wv() * 6.283;
+  var windDir = wv() < 0.5 ? -1 : 1;
+  var gustP = 110 + 70 * wv();               // s per gust sample: 110–180
+  var gustOff = (wv() * 4096) | 0;
+
+  /* what is already underway when the door opens — exactly one thing may
+     be stirring, never two: a skein mid-crossing (45 %), a seed mid-fall
+     (20 %, only where the fall is long enough), or a quiet sky (35 %) */
+  var op = vstream(13);
+  var u0 = op();
+  var opening = u0 < 0.45 ? 'skein' : (u0 < 0.65 ? 'seed' : 'quiet');
+  var openU = op();                          // how far along the opening seed already is
+  var quietSeedS = 5 + 4 * op();             // a quiet opening's first live seed: 5–9 s
+
+  /* the hand's visit: a steadiness (handJitter) and a tremor offset */
+  var hv = vstream(15);
+  var tremorOff = (hv() * 4096) | 0;
+
+  /* ---- INIT-END: no clock or entropy reads below this line ---- */
 
   /* deterministic smooth noise for the boil (indexed, not time-random) */
   var NOISE_N = 4096;
@@ -100,9 +215,19 @@
      the thread's sway, the grass's lean, the canopies' shear, the
      falling seed's drift, the skein's bob — with a spatial phase, so
      the gust visibly travels across the garden. 0.048 Hz, ~570 px
-     wavelength, day-seeded phase. Nothing oscillates faster. */
-  var windPh = stream(10)() * 6.283;
-  function wind(x, t) { return Math.sin(t * 0.30 + x * 0.011 + windPh); }
+     wavelength, fixed. The still frame rides the day's phase at gain 1;
+     live frames ride this visit's phase, travel direction and gust. */
+  var wPh = windPhDay, wDir = 1, wG = 1;    // set at the head of every render()
+  function wind(x, t) { return Math.sin(t * 0.30 + wDir * x * 0.011 + wPh) * wG; }
+  /* the gust envelope: two day-noise samples per period, smoothstepped —
+     1/f-shaped, never faster than the field. Floor 0.75, so the thread
+     never sways under 2.25 px and nothing that should move reads as still. */
+  function gust(t) {
+    var k = t / gustP, i = Math.floor(k), f = k - i;
+    f = f * f * (3 - 2 * f);
+    var a = nz(i + gustOff), v = a + (nz(i + 1 + gustOff) - a) * f;
+    return 0.75 + 0.25 * breeze * (0.7 + 0.3 * v);                // >= 0.767 (lowest breeze, v = -1); documented floor 0.75, ceiling 1.0
+  }
 
   /* ---------------- DOM ---------------- */
 
@@ -114,6 +239,10 @@
   if (!ctx) { canvas.parentNode.removeChild(canvas); doc.classList.add('ink-ready'); return; }
 
   var mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+  /* forced colors hide the canvas (style.css): no loop, no pause button —
+     a control for nothing is exactly the body language the page refuses */
+  var mqForced = matchMedia('(forced-colors: active)');
+  function still() { return mqReduce.matches || mqForced.matches; }
   function listenMq(mq, fn) {
     if (mq.addEventListener) mq.addEventListener('change', fn);
     else if (mq.addListener) mq.addListener(fn);
@@ -125,12 +254,18 @@
   /* ---------------- stroke machinery ---------------- */
 
   var boilPhase = 0;           // increments per boil frame; keys the jitter
+  var animatingNow = false;    // set by render(): live frames use this visit's hand
 
-  /* draw a polyline with hand wobble; t in [0,1] reveals it progressively */
+  /* draw a polyline with hand wobble; t in [0,1] reveals it progressively.
+     The polyline is the day's; only the boil's wobble — its amplitude
+     (1.2–1.6 px) and noise offset — is this visit's. The still frame keeps
+     the ceiling (1.6 px) and offset 0, so it is the day's alone. */
   function stroke(pts, color, width, alpha, t, key) {
     var n = pts.length;
     if (n < 2) return;
     var upto = Math.max(2, Math.ceil(n * (t === undefined ? 1 : t)));
+    var jit = animatingNow ? handJitter : JITTER;
+    var off = animatingNow ? tremorOff : 0;
     ctx.strokeStyle = color;
     ctx.globalAlpha = alpha === undefined ? 0.85 : alpha;
     ctx.lineWidth = width;
@@ -139,9 +274,9 @@
     ctx.beginPath();
     var i, jx, jy, k;
     for (i = 0; i < upto; i++) {
-      k = (key || 0) + i * 7 + boilPhase * 131;
-      jx = nz(k) * JITTER;
-      jy = nz(k + 61) * JITTER;
+      k = (key || 0) + i * 7 + boilPhase * 131 + off;
+      jx = nz(k) * jit;
+      jy = nz(k + 61) * jit;
       if (i === 0) ctx.moveTo(pts[0][0] + jx, pts[0][1] + jy);
       else ctx.lineTo(pts[i][0] + jx, pts[i][1] + jy);
     }
@@ -238,66 +373,99 @@
     }
   }
 
-  var sprigs = [];
+  var sprigs = [];             // day sprigs first (sprigs[0] is the anchor), click sprigs after
   var seedRng = stream(3);
+  var gardenRng = null;        // the day's sprig stream, kept alive so a return can continue it
+  var dayCount = 0;            // day sprigs present in sprigs[]
+  var dayPlanted = 0;          // day slots consumed (a sprig too small to draw still uses its slot)
+
+  /* the day's clock: read once at init; a hidden tab adds the seconds it
+     was away, so the place a returning visitor sees is the place a fresh
+     visitor at that minute would see — statically, nothing fast-forwards */
+  var awayS = 0;
+  function dayS() { return midnightS + awayS; }
+  /* the day decides how much has grown: 0 at 05:00, full at 21:00 —
+     eased logistically (smootherstep), the way things actually grow */
+  function dayFrac() {
+    var lin = Math.max(0, Math.min(1, (dayS() / 3600 - 5) / 16));
+    return lin * lin * (3 - 2 * lin);
+  }
+  function daySprigs() { return 2 + Math.round(dayFrac() * 4); }   // 2..6
+
+  function plantOne(i, r, born) {
+    var narrow = W < 700;
+    var mode = anchors.mode;
+    var x, y, ang, sc;
+    var side = r();
+    var hangThis = mode === 'hang' || (mode === 'beds' && i > 0 && side >= 0.75);
+    if (i === 0) {                       // the anchor sprig: the seedfall's canopy
+      if (mode === 'hang') { x = W * (narrow ? 0.88 : 0.9); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.3; }
+      else { x = W * (0.74 + r() * 0.08); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.4; }
+      sc = (mode === 'hang' ? 0.7 : 1.0) + r() * 0.25;
+    } else if (hangThis) {               // hanging from the top edge
+      x = mode === 'hang' ? W * (0.45 + side * 0.4) : W * (0.84 + r() * 0.1);
+      y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.4;
+      sc = (narrow ? 0.55 : 0.6) + r() * 0.25;
+    } else if (side < 0.6) {             // bottom bed, left of the text column
+      x = W * (0.28 + r() * 0.13); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
+      sc = 0.8 + r() * 0.5;
+    } else {                             // bottom-right bed
+      x = W * (0.72 + r() * 0.12); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
+      sc = 0.8 + r() * 0.5;
+    }
+    /* fit the tree to the measured room, and keep standing canopies
+       clear of the pause button's corner */
+    sc = Math.min(sc, y > 4 ? anchors.bedCap : anchors.hangCap);
+    if (y > 4) x = Math.min(x, anchors.pauseLeft - 30 - 95 * sc);
+    dayPlanted++;
+    if (sc < 0.3) return;
+    sprigs.splice(dayCount, 0, buildSprig(x, y, ang, sc, r, born));
+    dayCount++;
+  }
 
   function plantDayGarden() {
     sprigs.length = 0;
+    dayCount = 0; dayPlanted = 0; gardenRng = null;
     if (!anchors || anchors.mode === 'rest') return;   // no room: the garden rests
-    var r = stream(2);
-    var narrow = W < 700;
-    var mode = anchors.mode;
-    /* the day decides how much has grown: 0 at 05:00, full at 21:00 —
-       eased logistically (smootherstep), the way things actually grow */
-    var lin = Math.max(0, Math.min(1, (midnightS / 3600 - 5) / 16));
-    var dayFrac = lin * lin * (3 - 2 * lin);
-    var total = 2 + Math.round(dayFrac * 4);          // 2..6 sprigs
-    var i, x, y, ang, sc;
+    gardenRng = stream(2);
+    var total = daySprigs(), i;
     for (i = 0; i < total; i++) {
-      var side = r();
-      var hangThis = mode === 'hang' || (mode === 'beds' && i > 0 && side >= 0.75);
-      if (i === 0) {                       // the anchor sprig: the seedfall's canopy
-        if (mode === 'hang') { x = W * (narrow ? 0.88 : 0.9); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.3; }
-        else { x = W * (0.74 + r() * 0.08); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.4; }
-        sc = (mode === 'hang' ? 0.7 : 1.0) + r() * 0.25;
-      } else if (hangThis) {               // hanging from the top edge
-        x = mode === 'hang' ? W * (0.45 + side * 0.4) : W * (0.84 + r() * 0.1);
-        y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.4;
-        sc = (narrow ? 0.55 : 0.6) + r() * 0.25;
-      } else if (side < 0.6) {             // bottom bed, left of the text column
-        x = W * (0.28 + r() * 0.13); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
-        sc = 0.8 + r() * 0.5;
-      } else {                             // bottom-right bed
-        x = W * (0.72 + r() * 0.12); y = H - 6; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
-        sc = 0.8 + r() * 0.5;
-      }
-      /* fit the tree to the measured room, and keep standing canopies
-         clear of the pause button's corner */
-      sc = Math.min(sc, y > 4 ? anchors.bedCap : anchors.hangCap);
-      if (y > 4) x = Math.min(x, anchors.pauseLeft - 30 - 95 * sc);
-      if (sc < 0.3) continue;
-      sprigs.push(buildSprig(x, y, ang, sc, r, -60 + i * 3));  // born pre-load: already grown
+      /* born pre-load, already grown — except the youngest, born at
+         -10.4 s: its last generation draws itself in over the first
+         2.6 s and its tip blossoms open at ~3.6 s (growth already in
+         progress, not an event); at t = 1e4 (the still frame) it is
+         complete, so the reduced-motion frame is unchanged */
+      plantOne(i, gardenRng, (i === total - 1 && total > 1) ? -10.4 : -60 + i * 3);
     }
   }
 
   /* ---------------- the thread ---------------- */
 
+  /* The thread is the one line that spans the whole page, so it is the
+     one legible thing the visit owns: live frames hang THIS VISIT's
+     thread (its start in the lane, the phase and pace of its wander),
+     the reduced-motion still frame hangs the DAY's (the fixed line,
+     identical across visits). Both stay inside the same lane and end at
+     the same measured gap above the footer, so composition never moves. */
   var threadPts = [];
   function buildThread() {
     threadPts.length = 0;
     if (!anchors) return;
-    var r = stream(4);
+    var live = !still();
+    var r = live ? vstream(4) : stream(4);
     var narrow = W < 700;
     threadNarrow = narrow;
     var lane = narrow ? 18 : Math.max(60, Math.min(anchors.stackLeft - 70, W * 0.30));
     var x = lane * (0.55 + r() * 0.3), y = -4;
+    var ph = live ? r() * 6.283 : 0;             // where the wander bulges
+    var pace = live ? 3.6 + r() * 2.4 : 4.6;     // how many bends on the way down
     var tx = narrow ? lane * 0.7 : anchors.footerX;
     var ty = narrow ? H + 20 : anchors.footerY;
     var i, n = 46;
     for (i = 0; i <= n; i++) {
       var f = i / n;
       /* wander inside the left margin; converge to the footer only late */
-      var wander = Math.sin(f * 4.6 + r() * 0.2) * lane * 0.35 * (1 - f * f);
+      var wander = Math.sin(f * pace + ph + r() * 0.2) * lane * 0.35 * (1 - f * f);
       var base = x + (tx - x) * Math.pow(f, 3);
       var clamped = Math.min(base + wander * (f < 0.15 ? f / 0.15 : 1), lane);
       var free = Math.max(0, Math.min(1, (f - 0.78) / 0.22));   // ease into the approach
@@ -335,10 +503,10 @@
   /* ---------------- the skein ----------------
      Birds in the stepped-zigzag stroke of Derek's tattoo — the three
      tattoo marks are the GLYPH ALPHABET, not a roster. Every little
-     while (seeded exponential gaps) a small skein crosses the open
-     band in stop-motion:
+     while (this visit's exponential gaps, mean 26–44 s) a small skein
+     crosses the open band in stop-motion:
      - membership is a coin-flip sum per crossing (2..6 birds), some
-       days a pair, some days a strand of six;
+       crossings a loner, some a strand of six, rarely a great skein;
      - the lead bird carries a slow undulation, and each follower
        echoes it with a lag equal to its distance back over the glide
        speed — the ripple travels down the line, the way real skeins
@@ -346,10 +514,13 @@
      - wing-beats are detuned per bird (0.68..0.95 Hz), so the flock
        drifts in and out of phase across a crossing — emergent beat
        patterns, never a metronome;
-     - one straggler sometimes trails far behind.
-     Direction and altitude are seeded per crossing; as drawn the
-     glyphs fly leftward, so rightward crossings mirror. One crossing
-     at a time, <= 14 px/s, then the sky is empty again. */
+     - one straggler sometimes trails far behind;
+     - entry altitude follows a golden-ratio (Kronecker) sequence, so
+       consecutive crossings never fly the same lane.
+     Direction is a Markov flip per crossing; as drawn the glyphs fly
+     leftward, so rightward crossings mirror. One crossing at a time,
+     <= 14 px/s, then the sky is empty again. The first crossing is the
+     opening: sometimes already mid-band as the door opens. */
 
   var FLY_V = 12;              // px/s glide — a distant, unhurried crossing
 
@@ -371,10 +542,9 @@
   var flight = null;
 
   function nextFlight() {
-    var r = flight.rng;
-    var gap = flight.first ? 3.5 + r() * 4.5
-                           : Math.min(60, Math.max(10, -Math.log(1 - r()) * 28));
+    var r = flight.rng, first = flight.first;
     flight.first = false;
+    var gap = first ? 0 : Math.min(60, Math.max(10, -Math.log(1 - r()) * skeinMean));
     /* who flies: usually a coin-flip skein of 2..6; sometimes a loner,
        rarely a great skein of 7..8 */
     var u = r();
@@ -397,23 +567,33 @@
     }
     flight.birds = birds;
     flight.len = back + 30;
-    flight.t0 = flight.end + gap;
     flight.dur = (W + flight.len + 190) / FLY_V;
+    /* the first crossing is the opening: either already mid-band when the
+       door opens (0.2–0.6 of the way across — never at a band edge, never
+       entering at the load instant) or entering from beyond the edge at
+       6–16 s (visible ~8 s later at 12 px/s) — never during the reveal */
+    if (first) flight.t0 = opening === 'skein' ? -flight.dur * (0.2 + 0.4 * r()) : 6 + 10 * r();
+    else flight.t0 = flight.end + gap;
     flight.end = flight.t0 + flight.dur;
     /* direction alternates more often than not (a Markov flip), so a
-       visit sees both ways; altitude drifts from one seeded level to
-       another across the crossing — a meander, never a straight rush */
+       visit sees both ways; altitude drifts from one level to another
+       across the crossing — a meander, never a straight rush */
     if (!flight.prevDir) flight.prevDir = r() < 0.5 ? -1 : 1;
     flight.dir = r() < 0.72 ? -flight.prevDir : flight.prevDir;
     flight.prevDir = flight.dir;
-    flight.yj = 0.12 + r() * 0.72;
-    flight.yj2 = 0.12 + r() * 0.72;
+    /* entry altitude from a Kronecker sequence (golden-ratio steps):
+       consecutive crossings are always >= 0.27 of the band apart; the
+       drift target stays uniform */
+    flight.yj = 0.12 + 0.72 * ((flight.a0 + flight.k * 0.6180339887) % 1);
+    flight.k++;
+    flight.yj2 = 0.12 + 0.72 * r();
     flight.ph = r() * 6.283;
     flight.ph2 = r() * 6.283;
   }
 
   function resetFlight() {
-    flight = { rng: stream(9), end: 0, first: true };
+    flight = { rng: vstream(9), end: 0, first: true, k: 0 };
+    flight.a0 = flight.rng();
     nextFlight();
   }
 
@@ -494,22 +674,29 @@
      takes root. A day of landings grows a stand of grass whose silhouette
      settles toward the binomial bell: de Moivre-Laplace, drawn as meadow.
      Release times are Poisson (exponential gaps), so the rhythm is
-     memoryless — never a metronome. */
+     memoryless — never a metronome; the gap is counted from the LANDING,
+     so a long fall (hang mode: ~8 s) never chains straight into the next.
+     Two streams: the DAY's (fall.rng) replays the meadow so far, identical
+     for every visitor at the same minute; this VISIT's (fall.vrng) drives
+     every live seed — its arrival, its walk, its release twig — so live
+     landings never desynchronise the day's replay. */
 
-  var fall = { rng: null, next: 0, drop: null, tips: [], x0: 0, baseY: 0,
-               lo: 0, hi: 0, blades: [], cells: {} };
+  var fall = { rng: null, vrng: null, next: 0, drop: null, tips: [], x0: 0, baseY: 0,
+               lo: 0, hi: 0, blades: [], cells: {}, replayed: 0, dayCount: 0, b0: 0, k: 0 };
 
   function fallGap() {
-    var u = fall.rng();
-    return Math.min(15, Math.max(5.5, -Math.log(1 - u) * DROP_EVERY_S));
+    var u = fall.vrng();
+    return Math.min(18, Math.max(5.5, -Math.log(1 - u) * dropMean));
   }
 
   /* precomputed descent, one waypoint per 26 px air-row; on phones the
      seed keeps to the right margin while crossing the text, then drifts
      free below it (a channel opening into a spread — still pachinko).
      Desktop pull is light (sigma ~30 px with canopy spread: a real bell);
-     the landing clamps into the meadow's bounds — walks stay smooth. */
-  function fallPath(rx, ry) {
+     the landing clamps into the meadow's bounds — walks stay smooth.
+     The coin flips stay genuinely pseudo-random and unstratified: the
+     bell must remain honest. */
+  function fallPath(rx, ry, rng) {
     var pts = [[rx, ry]], x = rx, y = ry;
     while (y < fall.baseY - 1) {
       y = Math.min(fall.baseY, y + 26);
@@ -517,34 +704,57 @@
       var aim = inLane ? fall.laneX : fall.x0;
       var pull = inLane ? 0.5 : (fall.hang ? 0.35 : 0.06);
       var sig = inLane ? 2.5 : (fall.hang ? 9 : 10);
-      x += (aim - x) * pull + (fall.rng() * 2 - 1) * sig;
+      x += (aim - x) * pull + (rng() * 2 - 1) * sig;
       pts.push([x, y]);
     }
     pts[pts.length - 1][0] = Math.max(fall.lo, Math.min(fall.hi, x));
     return pts;
   }
 
-  function addBlade(x, born) {
+  function addBlade(x, born, rng) {
     var c = Math.round((x - fall.x0) / 6);
     var n = fall.cells[c] || 0;
     fall.cells[c] = n + 1;
     /* repeat landings thicken the tuft upward, never denser sideways;
        past the caps the meadow simply rests */
     if (n >= 7 || fall.blades.length >= 64) return;
-    var bx = fall.x0 + c * 6 + (fall.rng() - 0.5) * 3.2;
-    var h = 6 + n * 2.0 + fall.rng() * 1.5;
-    var lean = (fall.rng() < 0.5 ? -1 : 1) * (0.25 + fall.rng() * 0.45);
+    var bx = fall.x0 + c * 6 + (rng() - 0.5) * 3.2;
+    var h = 6 + n * 2.0 + rng() * 1.5;
+    var lean = (rng() < 0.5 ? -1 : 1) * (0.25 + rng() * 0.45);
     fall.blades.push({ x: bx, h: h, lean: lean, born: born,
-                       col: fall.rng() < 0.82 ? INK.sage : INK.dim,
-                       grain: fall.rng() < 0.16 });
+                       col: rng() < 0.82 ? INK.sage : INK.dim,
+                       grain: rng() < 0.16 });
+  }
+
+  /* the day so far: one landing kept per ~8 min of daylight after 06:30 */
+  function dayKept() {
+    return fall.tips.length ? Math.min(64, Math.floor(Math.max(0, dayS() - 6.5 * 3600) / 480)) : 0;
+  }
+  function replayLandings(count) {
+    var d, tip, p;
+    for (d = 0; d < count; d++) {
+      tip = fall.tips[(fall.rng() * fall.tips.length) | 0];
+      p = fallPath(tip[0], tip[1], fall.rng);
+      addBlade(p[p.length - 1][0], -10, fall.rng);
+    }
+    fall.replayed += count;
+  }
+  /* live release twigs are spread by a Kronecker sequence (never the same
+     twig twice running); the walk below stays a fair coin */
+  function releaseTip() {
+    var tip = fall.tips[(((fall.b0 + fall.k * 0.6180339887) % 1) * fall.tips.length) | 0];
+    fall.k++;
+    return tip;
   }
 
   function meadowInit() {
     fall.rng = stream(6);
+    fall.vrng = vstream(6);
     fall.blades.length = 0;
     fall.cells = {};
     fall.drop = null;
     fall.tips.length = 0;
+    fall.replayed = 0; fall.dayCount = 0; fall.k = 0; fall.b0 = 0;
     fall.hang = anchors && anchors.mode === 'hang';
     var s0 = sprigs[0], i;
     if (anchors && anchors.mode === 'rest') return;    // no garden, no fall
@@ -575,16 +785,32 @@
     fall.lo = fall.hang ? Math.max(18, W * 0.30) : fall.x0 - 110;
     fall.hi = fall.hang ? Math.min(W - 14, pl - 20)
                         : Math.min(fall.x0 + 110, pl - 22);
-    /* the day so far, replayed: one landing kept per ~8 min of daylight */
-    var kept = fall.tips.length
-      ? Math.min(64, Math.floor(Math.max(0, midnightS - 6.5 * 3600) / 480)) : 0;
-    var d, tip, p;
-    for (d = 0; d < kept; d++) {
-      tip = fall.tips[(fall.rng() * fall.tips.length) | 0];
-      p = fallPath(tip[0], tip[1]);
-      addBlade(p[p.length - 1][0], -10);
+    /* the day so far, replayed from the day's stream */
+    replayLandings(dayKept());
+    fall.dayCount = fall.blades.length;
+    fall.b0 = fall.vrng();
+    /* after a resize the live schedule simply resumes from now */
+    if (tLast > 0) { fall.next = tLast + fallGap(); return; }
+    /* the opening: a seed already mid-fall where the fall is long enough
+       (hang mode, ~8 s): >= 2.5 s of air left at t = 0, so it is still
+       falling after the 1.8 s reveal and lands as a visible landing,
+       never during the reveal. Where the fall is short (beds mode: the
+       anchor canopy offers ~2 s at most, even from its top), the seed
+       instead LETS GO from the canopy's top at 2.5 s — just after the
+       reveal, the moment the eye lands on the page — rather than at a
+       quiet opening's 5–9 s. Either way the next release follows its
+       landing by a normal gap. */
+    if (opening === 'seed' && fall.tips.length) {
+      var tip = fall.tips[0];
+      if (fall.hang) tip = releaseTip();
+      else for (i = 1; i < fall.tips.length; i++) if (fall.tips[i][1] < tip[1]) tip = fall.tips[i];
+      var pts = fallPath(tip[0], tip[1], fall.vrng);
+      var fallDur = (fall.baseY - tip[1]) / DROP_V;
+      var t0 = fallDur >= 2.5 ? -openU * (fallDur - 2.5) : 2.5;
+      fall.drop = { t0: t0, pts: pts, ry: tip[1] };
+      return;
     }
-    fall.next = 3.5 + fall.rng() * 3;
+    fall.next = quietSeedS;                              // quiet: first live seed at 5–9 s
   }
 
   function drawMeadow(tNow) {
@@ -610,18 +836,19 @@
   function drawSeed(tNow, animating) {
     if (!animating) return;
     if (!fall.drop && tNow >= fall.next && fall.tips.length) {
-      var tip = fall.tips[(fall.rng() * fall.tips.length) | 0];
-      fall.drop = { t0: tNow, pts: fallPath(tip[0], tip[1]), ry: tip[1] };
-      fall.next = tNow + fallGap();
+      var tip = releaseTip();
+      fall.drop = { t0: tNow, pts: fallPath(tip[0], tip[1], fall.vrng), ry: tip[1] };
     }
     if (!fall.drop) return;
     var d = fall.drop;
+    if (tNow < d.t0) return;     // released, but not yet let go (the beds-mode opening)
     var yNow = d.ry + (tNow - d.t0) * DROP_V;
     var last = d.pts.length - 1;
     var idx = (yNow - d.ry) / 26;
     if (yNow >= fall.baseY || idx >= last) {
-      addBlade(d.pts[last][0], tNow);
+      addBlade(d.pts[last][0], tNow, fall.vrng);
       fall.drop = null;
+      fall.next = tNow + fallGap();     // the gap is counted from the landing
       return;
     }
     var i0 = idx | 0, f = idx - i0;
@@ -634,24 +861,6 @@
            INK.verm, 1.6, 0.85, 1, 7999);
     stroke([[x + 2 * ca, yNow + 2 * sa], [x + 2 * ca - 3 * sa, yNow + 2 * sa + 3 * ca]],
            INK.verm, 1.2, 0.7, 1, 7998);
-  }
-
-  /* ---------------- paper flecks ---------------- */
-
-  function drawFlecks() {
-    var r = stream(7), i;
-    ctx.globalAlpha = 0.16;
-    ctx.strokeStyle = INK.dim;
-    ctx.lineWidth = 1;
-    ctx.lineCap = 'round';
-    for (i = 0; i < 26; i++) {
-      var x = r() * W, y = r() * H, a = r() * Math.PI;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(a) * 2, y + Math.sin(a) * 2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
   }
 
   /* ---------------- layout + frame ---------------- */
@@ -679,7 +888,7 @@
          label glyphs: float it above the line, mid-gap when possible. */
       var r2 = links[0].getBoundingClientRect();
       a.footerTop = r2.top;
-      a.footerY = r2.top - 14;
+      a.footerY = r2.top - 18;   // the curl floats clear of the 3 px focus ring
       a.footerX = r2.right + 12;
       if (links.length > 1) {
         a.footerX = (r2.right + links[1].getBoundingClientRect().left) / 2 - 10;
@@ -711,6 +920,8 @@
     anchors = a;
   }
 
+  /* a resize re-plants the place; it never rerolls the weather (the visit
+     streams restart from their seeds; the opening belongs to t = 0 only) */
   function layout() {
     W = window.innerWidth;
     H = window.innerHeight;
@@ -725,14 +936,20 @@
     resetFlight();
   }
 
-  var clock0 = 0, pauseShift = 0, pausedAt = 0, hiddenAt = 0;
+  var clock0 = 0, pauseShift = 0;
+  var frozenAt = 0;            // performance.now() when the live clock last froze (pause, hidden tab or reduced motion); 0 while it runs
+  var hiddenAt = 0;            // performance.now() when the tab was hidden; only the day's clock is told how long
+  var seen = !document.hidden; // false for a page opened in a background tab: its first view is the arrival
   var paused = false, raf = 0, tmr = 0, lastBoil = -1;
+  var tLast = 0;               // the last rendered scene time (0 until the loop first runs)
 
   function sceneT(tms) { return (tms - clock0 - pauseShift) / 1000; }
 
   function render(tNow, animating) {
+    animatingNow = animating;
+    if (animating) { wPh = windPhVisit; wDir = windDir; wG = gust(tNow); }
+    else { wPh = windPhDay; wDir = 1; wG = 1; }
     ctx.clearRect(0, 0, W, H);
-    drawFlecks();
     drawFlock(tNow, animating);
     drawMeadow(tNow);
     var i;
@@ -757,6 +974,7 @@
     if (boil !== lastBoil) {
       lastBoil = boil;
       boilPhase = boil;
+      tLast = t;
       render(t, true);
     }
     if (!paused && !document.hidden) {
@@ -770,7 +988,7 @@
   }
 
   function start() {
-    if (!raf && !tmr && !paused && !document.hidden && !mqReduce.matches) raf = requestAnimationFrame(frame);
+    if (!raf && !tmr && !paused && !document.hidden && !still()) raf = requestAnimationFrame(frame);
   }
   function stop() {
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
@@ -781,32 +999,88 @@
     boilPhase = 3;
     render(1e4, false);   // far future: everything fully grown, thread at rest
   }
+  /* the paused frame: the live scene at the moment the clock froze (t = 0
+     on a paused load — the frame resume continues from, so nothing can
+     vanish and regrow on resume) */
+  function pausedFrame() {
+    boilPhase = Math.max(0, lastBoil);
+    render(tLast, true);
+  }
+  /* the frozen frame, whichever it is, redrawn after the model changed
+     under it (a resize, a catch-up): a static re-render is not animation */
+  function redrawFrozen() {
+    if (still()) stillFrame();
+    else if (paused) pausedFrame();
+  }
+  /* ONE freeze/thaw for pause, hidden tab and reduced motion: the live
+     clock stops at the first of them and restarts at the last, so no
+     path can double-count a span or let one slip through */
+  function sync() {
+    if (!paused && !document.hidden && !still()) {
+      /* a span frozen before the live clock exists is not a shift: the
+         first live frame anchors clock0 to the thaw moment, so t = 0 is
+         the frame the paused/still load drew (shifting here would push
+         scene time NEGATIVE and un-grow the garden for the span) */
+      if (frozenAt) { if (clock0) pauseShift += performance.now() - frozenAt; frozenAt = 0; }
+      start();
+    } else {
+      if (!frozenAt) frozenAt = performance.now();
+      stop();
+    }
+  }
 
   /* ---------------- lifecycle ---------------- */
 
+  function label(p) {
+    if (!pauseBtn) return;
+    pauseBtn.textContent = p ? 'Resume the ink' : 'Pause the ink';
+    pauseBtn.setAttribute('aria-label', (p ? 'Resume' : 'Pause') + ' the ink, the moving drawing behind the text');
+  }
+
   function setPaused(p) {
     paused = p;
-    if (pauseBtn) pauseBtn.textContent = p ? 'Play motion' : 'Pause motion';
+    label(p);
     try { localStorage.setItem('ink-paused', p ? '1' : ''); } catch (e) {}
-    if (p) { pausedAt = performance.now(); stop(); }
-    else {
-      if (pausedAt) { pauseShift += performance.now() - pausedAt; pausedAt = 0; }
-      start();
-    }
+    sync();
   }
   if (pauseBtn) pauseBtn.addEventListener('click', function () { setPaused(!paused); });
 
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { hiddenAt = performance.now(); stop(); }
-    else if (!paused && !mqReduce.matches) {
-      if (hiddenAt) { pauseShift += performance.now() - hiddenAt; hiddenAt = 0; }
-      start();
+  /* returning after >= 8 min hidden: the day moved on. Continue the DAY's
+     own replay — the landings and, at most, the one sprig a fresh visitor
+     at this minute would already see — fully grown, statically. Nothing
+     animates, nothing is scheduled, no flock, no seed. */
+  function catchUp() {
+    replayLandings(Math.max(0, Math.min(12, dayKept() - fall.replayed)));
+    if (gardenRng && anchors && anchors.mode !== 'rest' && dayPlanted < 6 && daySprigs() > dayPlanted) {
+      plantOne(dayPlanted, gardenRng, tLast - 60);
     }
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { hiddenAt = performance.now(); sync(); return; }
+    if (hiddenAt) {
+      /* the live clock froze while hidden (sync() below thaws it — no
+         fast-forward of wind, skein or seed, whatever else was toggled
+         meanwhile); only the day's own clock is told how long it was */
+      var hiddenFor = performance.now() - hiddenAt;
+      hiddenAt = 0;
+      awayS += hiddenFor / 1000;
+      if (!seen) {
+        /* opened in a background tab: nobody has seen anything yet, so
+           this first look IS the arrival — the place is re-planted at
+           this minute (the boot frame does it itself if it has not run;
+           the weather and the opening still belong to t = 0, which is now) */
+        seen = true;
+        if (anchors) { layout(); redrawFrozen(); }
+      } else if (hiddenFor >= 480e3) { catchUp(); redrawFrozen(); }
+    }
+    sync();
   });
+  window.addEventListener('pagehide', stop);   // timers only; bfcache-friendly
 
   var lastClick = 0;
   document.addEventListener('click', function (e) {
-    if (paused || mqReduce.matches) return;
+    if (paused || still()) return;
     if (e.target.closest('a, button')) return;
     /* never plant on (or into) the typography: the measured stack and
        footer are no-plant zones, and near them the planted sprig is
@@ -823,10 +1097,19 @@
         if (sc2 < 0.3) return;
       }
     }
+    /* 60 px root spacing: two trees never crowd into busy ink — the same
+       kind of non-response as the debounce, and just as deterministic */
+    var i, dx, dy;
+    for (i = 0; i < sprigs.length; i++) {
+      dx = sprigs[i].ox - e.clientX; dy = sprigs[i].oy - e.clientY;
+      if (dx * dx + dy * dy < 3600) return;
+    }
     var now = performance.now();
     if (now - lastClick < 600) return;
     lastClick = now;
-    if (sprigs.length > 14) sprigs.shift();
+    /* the cap evicts the oldest click-planted sprig, never a day sprig
+       (sprigs[0] is the anchor the seedfall releases from) */
+    if (sprigs.length >= 14) sprigs.splice(dayCount, 1);
     var upward = e.clientY > H * 0.4 ? -Math.PI / 2 : Math.PI / 2;
     sprigs.push(buildSprig(e.clientX, e.clientY, upward + (seedRng() - 0.5) * 0.6,
                            sc2, seedRng, sceneT(now)));
@@ -838,27 +1121,32 @@
     clearTimeout(rsTimer);
     rsTimer = setTimeout(function () {
       layout();
-      if (paused || mqReduce.matches) stillFrame();
+      redrawFrozen();
     }, 150);
   });
 
-  listenMq(mqReduce, function () {
-    if (mqReduce.matches) { stop(); stillFrame(); if (pauseBtn) pauseBtn.classList.remove('ink-show'); }
-    else { if (pauseBtn) pauseBtn.classList.add('ink-show'); if (!paused) start(); }
-  });
+  function onStillChange() {
+    sync();                    // freeze or thaw the live clock (never double-counted with a hidden tab)
+    buildThread();             // the day's thread for the still frame, this visit's for live frames
+    if (still()) { stillFrame(); if (pauseBtn) pauseBtn.classList.remove('ink-show'); }
+    else { if (pauseBtn) pauseBtn.classList.add('ink-show'); if (paused) pausedFrame(); }
+  }
+  listenMq(mqReduce, onStillChange);
+  listenMq(mqForced, onStillChange);
 
   /* ---------------- boot ---------------- */
 
   try { paused = localStorage.getItem('ink-paused') === '1'; } catch (e) {}
-  if (pauseBtn && paused) pauseBtn.textContent = 'Play motion';
+  if (paused) label(true);
+  if (!seen) hiddenAt = performance.now();   // the day's clock will be told the span until the first look
 
   requestAnimationFrame(function () {
     layout();
-    if (mqReduce.matches) {
+    if (still()) {
       stillFrame();
     } else {
       if (pauseBtn) pauseBtn.classList.add('ink-show');
-      if (paused) stillFrame();
+      if (paused) pausedFrame();
       else start();
     }
     doc.classList.add('ink-ready');

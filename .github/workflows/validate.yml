@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v6.css
+            style.v7.css
             site.js
-            ink.v7.js
+            ink.v8.js
             robots.txt
             _headers
             _redirects
@@ -29,7 +29,6 @@ jobs:
             assets/fonts/Newsreader-Regular.sub2.woff2
             assets/fonts/Newsreader-Bold.sub2.woff2
             assets/fonts/DMSans-Regular.sub2.woff2
-            assets/fonts/DMSans-Medium.sub2.woff2
             .well-known/security.txt
           )
           missing=0
@@ -136,6 +135,60 @@ jobs:
             exit 1
           fi
           echo "No inline code"
+
+      - name: Absences are enforced
+        run: |
+          INK=$(ls ink.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
+          echo "checking $INK and $CSS"
+          # The page has none of the internet's body language, and CI fails
+          # (rather than remembers) if any of it comes back. Scoped to the
+          # shipped files only — never to CLAUDE.md prose.
+          fail=0
+          # (1) chrome: arrows, cookie/analytics vocabulary, loading states, nav roles
+          if grep -nE '&rarr;|→|cookie|analytics|gtag|Loading|role="navigation"' index.html 404.html; then
+            echo "::error::internet body language found in the HTML"
+            fail=1
+          fi
+          # (2) behaviour: no hush, exit, idle, pointer-position or title handlers
+          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage' site.js $INK; then
+            echo "::error::a needy behaviour (exit/idle/title/pointer handler) was reintroduced"
+            fail=1
+          fi
+          # (3) render-path purity: ONE clock read and ONE entropy read, both above INIT-END
+          if [ "$(grep -c 'new Date' $INK)" != "1" ]; then
+            echo "::error::$INK must read the clock exactly once (new Date count != 1)"
+            fail=1
+          fi
+          if grep -n 'Math\.random' $INK; then
+            echo "::error::Math.random in $INK — the only entropy is the visit seed at init"
+            fail=1
+          fi
+          if ! grep -q -- '---- INIT-END:' $INK; then
+            echo "::error::INIT-END marker missing from $INK"
+            fail=1
+          fi
+          bad=$(awk '/---- INIT-END:/{p=1;next} p && /new Date|Date\.now|Math\.random|getRandomValues/{print NR": "$0}' $INK)
+          if [ -n "$bad" ]; then
+            echo "$bad"
+            echo "::error::clock or entropy read below the INIT-END marker"
+            fail=1
+          fi
+          # (4) strokes only (no fills, no arcs) and ink alphas <= 0.85
+          if grep -nE '\.arc\(|\.fill\(|fillRect|globalAlpha *= *0\.(8[6-9]|9)' $INK; then
+            echo "::error::fill/arc or an alpha above 0.85 in $INK"
+            fail=1
+          fi
+          # (5) no URL hook (?seed=, #hash), no sound, no custom cursor
+          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $INK index.html 404.html; then
+            echo "::error::a URL hook or sound was introduced (the seed is never in the URL; the page is silent)"
+            fail=1
+          fi
+          if grep -nE 'cursor *:' $CSS; then
+            echo "::error::a cursor rule in $CSS — OS cursors only"
+            fail=1
+          fi
+          [ "$fail" -eq 0 ] && echo "All absences hold"
+          exit $fail
 
       - name: Validate HTML
         run: |

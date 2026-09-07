@@ -28,14 +28,6 @@
   font-display: optional;
 }
 
-@font-face {
-  font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Medium.sub2.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: optional;
-}
-
 /* Metric-matched fallbacks: if the webfont misses first paint,
    the system face renders at the webfont's exact metrics.
    Values computed from the font tables — see CLAUDE.md. */
@@ -71,16 +63,6 @@
 }
 
 @font-face {
-  font-family: 'DM Sans Fallback';
-  src: local('Arial');
-  font-weight: 500;
-  size-adjust: 116.50%;
-  ascent-override: 85.15%;
-  descent-override: 26.61%;
-  line-gap-override: 0%;
-}
-
-@font-face {
   font-family: 'DM Sans Fallback Android';
   src: local('Roboto');
   font-weight: 400;
@@ -90,18 +72,10 @@
   line-gap-override: 0%;
 }
 
-@font-face {
-  font-family: 'DM Sans Fallback Android';
-  src: local('Roboto Medium'), local('Roboto');
-  font-weight: 500;
-  size-adjust: 114.66%;
-  ascent-override: 86.52%;
-  descent-override: 27.04%;
-  line-gap-override: 0%;
-}
-
 /* ------------------------------------------------
    Tokens — ink on night paper.
+   Focus is the thread's own ochre (7.08:1 on the ground); selection is
+   a dim-ink ground under the text colour (6.11:1), never paper-white.
    ------------------------------------------------ */
 
 :root {
@@ -113,7 +87,8 @@
   --color-bg: #181410;
   --color-text: #ece9e4;
   --color-dimmed: #b8b4ac;
-  --color-focus: #9db8ff;
+  --color-focus: #c79a3d;
+  --color-selection: #5a554c;
 }
 
 /* ------------------------------------------------
@@ -142,17 +117,19 @@ body {
 }
 
 ::selection {
-  background: #ece9e4;
-  color: #181410;
+  background: var(--color-selection);
+  color: var(--color-text);
 }
 
 :focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 /* ------------------------------------------------
-   The ink canvas — behind everything, inert
+   The ink canvas — behind everything, inert.
+   The type is dry at first paint; only the canvas eases in — a 0.2 s
+   beat, then a 1.6 s opacity-only ease (eyes adjusting to the dark).
    ------------------------------------------------ */
 
 #ink {
@@ -163,7 +140,7 @@ body {
   z-index: -1;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1s ease-out;
+  transition: opacity 1.6s ease-out .2s;
 }
 
 .ink-ready #ink {
@@ -213,18 +190,18 @@ h1 {
   color: var(--color-dimmed);
 }
 
+/* A serif caption, in the bio's own voice — no uppercase, no tracking. */
 .credit {
   margin-top: 2.25rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: .9375rem;
   color: var(--color-dimmed);
 }
 
 /* ------------------------------------------------
-   Footer
+   Footer — plain underlined words. Nothing on the page answers the
+   pointer: no hover replies, no transitions, OS cursors only.
    ------------------------------------------------ */
 
 footer {
@@ -238,12 +215,13 @@ footer a {
   font-family: var(--font-sans);
   font-size: 0.875rem;
   color: var(--color-text);
-  text-decoration: none;
-  transition: color 0.2s;
 }
 
-footer a:hover {
-  color: var(--color-dimmed);
+footer a, .ink-pause, .back-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-dimmed);
+  text-underline-offset: .18em;
 }
 
 /* Reserves its slot from first paint (visibility, not display) so
@@ -257,8 +235,6 @@ footer a:hover {
   border: none;
   padding: 0;
   margin-left: auto;
-  cursor: pointer;
-  transition: color 0.2s;
   visibility: hidden;
 }
 
@@ -266,13 +242,8 @@ footer a:hover {
   visibility: visible;
 }
 
-.ink-pause:hover {
-  color: var(--color-text);
-}
-
 .back-link {
   color: inherit;
-  text-decoration: none;
 }
 
 .noscript-email {
@@ -282,30 +253,18 @@ footer a:hover {
 }
 
 /* ------------------------------------------------
-   Entrance — pure CSS, opacity/transform only
+   Motion preferences and forced colors
    ------------------------------------------------ */
 
-@keyframes ink-rise {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-h1, .bio, .credit, footer {
-  animation: ink-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-h1     { animation-delay: 0.1s; }
-.bio   { animation-delay: 0.3s; }
-.credit { animation-delay: 0.5s; }
-footer { animation-delay: 0.7s; }
-
 @media (prefers-reduced-motion: reduce) {
-  h1, .bio, .credit, footer { animation: none; }
   #ink { transition: none; }
 }
 
 @media (forced-colors: active) {
   #ink { display: none; }
+  /* no scene, so no control for it (the ink script also stops the loop and
+     never adds .ink-show here); the slot stays reserved, not shown */
+  .ink-pause, .ink-pause.ink-show { visibility: hidden; }
 }
 
 /* ------------------------------------------------
@@ -325,5 +284,8 @@ footer { animation-delay: 0.7s; }
   }
 
   h1 { font-size: 2rem; }
+  /* .bio strong sets the screen text colour explicitly (near-white);
+     on paper it must print black, not vanish */
+  h1, .bio strong { color: #000; }
   .dimmed, .credit { color: #555; }
 }
