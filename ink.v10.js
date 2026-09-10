@@ -4,7 +4,8 @@
    so the page feels like ink held in a steady hand, never like a machine.
 
    THE PLACE is date-seeded and grows with the day: sparse at dawn, in
-   full bloom by evening — the same garden for every visitor, all day.
+   full bloom by evening, held through the small hours until dawn clears
+   it — the same garden for every visitor, all day.
    Branches draw themselves in (the youngest is still drawing its last
    generation as the door opens — growth in progress, never an event);
    every little while a seed lets go of
@@ -63,8 +64,12 @@
      loop ships
    - JS off / canvas failure: typography on the night ground, nothing lost
    - no ink under the measured typography or footer boxes; clicks there
-     never plant; click-planted sprigs keep 60 px root spacing; when a
-     viewport has no room (short landscape), the garden rests: nothing
+     never plant; click-planted sprigs keep 60 px root spacing; on a
+     phone the sprigs hang from the top edge when the sky allows and
+     stand on the meadow strip above the footer when that fits, and
+     where no tree fits the seeds still let go from beyond the top edge
+     (borrowed scenery) and root in the strip; when a viewport has no
+     room at all (short landscape), the garden rests: nothing
      is drawn, the loop does not run and the pause button stays hidden
      (a control for nothing is exactly the body language the page
      refuses); the typography carries the page
@@ -381,9 +386,12 @@
   var awayS = 0;
   function dayS() { return midnightS + awayS; }
   /* the day decides how much has grown: 0 at 05:00, full at 21:00 —
-     eased logistically (smootherstep), the way things actually grow */
+     eased logistically (smootherstep), the way things actually grow —
+     and the small hours keep the evening's fullness until dawn clears it */
   function dayFrac() {
-    var lin = Math.max(0, Math.min(1, (dayS() / 3600 - 5) / 16));
+    var h = dayS() / 3600;
+    if (h < 5) return 1;
+    var lin = Math.min(1, (h - 5) / 16);
     return lin * lin * (3 - 2 * lin);
   }
   function daySprigs() { return 2 + Math.round(dayFrac() * 4); }   // 2..6
@@ -391,8 +399,32 @@
   function plantOne(i, r, born) {
     var narrow = W < 700;
     var mode = anchors.mode;
-    var x, y, ang, sc;
+    var x, y, ang, sc, cap;
     var side = r();
+    if (narrow && mode === 'hang') {
+      /* a phone: the anchor hangs top-right when the sky allows, else it
+         stands on the strip above the footer; companions hang or stand by
+         whichever fits (both fit: a coin decides). No tree fits at all:
+         nothing is planted — the seeds then come from beyond the top edge */
+      if (!anchors.canopy && !anchors.stand) { dayPlanted++; return; }
+      var hangs = anchors.canopy && (i === 0 || !anchors.stand || side < 0.5);
+      if (hangs) {
+        x = i === 0 ? W * 0.88 : W * (0.45 + side * 0.4);
+        y = 4; ang = Math.PI / 2 + (r() - 0.5) * (i === 0 ? 0.3 : 0.4);
+        sc = (i === 0 ? 0.7 : 0.55) + r() * 0.25; cap = anchors.hangCap;
+      } else {
+        var slot = r();
+        x = i === 0 ? W * (0.72 + r() * 0.1) : (slot < 0.55 ? W * (0.14 + r() * 0.16) : W * (0.4 + r() * 0.14));
+        y = anchors.stripY; ang = -Math.PI / 2 + (r() - 0.5) * 0.5;
+        sc = (i === 0 ? 0.8 : 0.65) + r() * 0.25; cap = anchors.standCap;
+      }
+      sc = Math.min(sc, cap);
+      dayPlanted++;
+      if (sc < 0.3) return;
+      sprigs.splice(dayCount, 0, buildSprig(x, y, ang, sc, r, born));
+      dayCount++;
+      return;
+    }
     var hangThis = mode === 'hang' || (mode === 'beds' && i > 0 && side >= 0.75);
     if (i === 0) {                       // the anchor sprig: the seedfall's canopy
       if (mode === 'hang') { x = W * (narrow ? 0.88 : 0.9); y = 4; ang = Math.PI / 2 + (r() - 0.5) * 0.3; }
@@ -661,9 +693,12 @@
                        grain: rng() < 0.16 });
   }
 
-  /* the day so far: one landing kept per ~8 min of daylight after 06:30 */
+  /* the day so far: one landing kept per ~8 min of daylight after 06:30;
+     the small hours keep the evening's full stand */
   function dayKept() {
-    return fall.tips.length ? Math.min(64, Math.floor(Math.max(0, dayS() - 6.5 * 3600) / 480)) : 0;
+    if (!fall.tips.length) return 0;
+    if (dayS() < 5 * 3600) return 64;
+    return Math.min(64, Math.floor(Math.max(0, dayS() - 6.5 * 3600) / 480));
   }
   function replayLandings(count) {
     var d, tip, p;
@@ -693,16 +728,26 @@
     fall.hang = anchors && anchors.mode === 'hang';
     var s0 = sprigs[0], i;
     if (anchors && anchors.mode === 'rest') return;    // no garden, no fall
+    var anchorHangs = !!s0 && s0.oy <= 4;
     if (s0) for (i = 0; i < s0.segs.length; i++) if (s0.segs[i].tip) fall.tips.push(s0.segs[i].tip);
     if (fall.hang) {
-      /* hanging garden: release only from lane-side tips, so the crossing
-         of the text zone stays strictly right of the measured stack box */
       var laneMin = (anchors ? anchors.stackRight : W - 24) + 6;
       fall.laneX = Math.min(W - 6, Math.max(W - 14, laneMin + 4));
-      var laneTips = [];
-      for (i = 0; i < fall.tips.length; i++) if (fall.tips[i][0] >= laneMin) laneTips.push(fall.tips[i]);
-      fall.tips = laneTips.length ? laneTips : [[fall.laneX, 70]];
-    } else if (fall.tips.length > 3) {
+      if (anchorHangs) {
+        /* hanging canopy: release only from lane-side tips, so the crossing
+           of the text zone stays strictly right of the measured stack box */
+        var laneTips = [];
+        for (i = 0; i < fall.tips.length; i++) if (fall.tips[i][0] >= laneMin) laneTips.push(fall.tips[i]);
+        fall.tips = laneTips.length ? laneTips : [[fall.laneX, -12]];
+      } else if (!fall.tips.length) {
+        /* no tree fits: the canopy is beyond the top edge (borrowed scenery)
+           and the seed enters down the lane from above the frame */
+        fall.tips = [[fall.laneX, -12]];
+      }
+      /* a standing anchor on the strip releases from its canopy like a bed
+         tree does, below the text — the upper-canopy filter follows */
+    }
+    if (!fall.hang || !anchorHangs) if (fall.tips.length > 3) {
       /* release only from the upper canopy, so every fall has real air */
       var loY = Infinity, hiY = -Infinity, keep = [];
       for (i = 0; i < fall.tips.length; i++) {
@@ -821,14 +866,22 @@
       a.stackRight = W * 0.7; a.stackTop = H * 0.25;
     }
     /* Where is there room? Standing trees need ~210*scale+20 px below the
-       text; hanging ones ~140*scale+8 above it. When neither fits (short
-       landscape viewports), the garden rests — nothing is drawn and the
-       typography carries the page. */
+       text; hanging ones ~140*scale+8 above it. On a phone the meadow
+       strip above the footer can carry standing trees too (standCap), and
+       even without any tree the seeds can still fall into the strip when
+       the band between the text and the footer is 60 px or more. When
+       nothing fits (short landscape viewports), the garden rests — nothing
+       is drawn and the typography carries the page. */
     a.bedCap = (H - a.stackBottom - 44) / 210;
     a.hangCap = (a.nameTop - 32) / 140;
-    a.mode = W < 700 ? (a.hangCap >= 0.42 ? 'hang' : 'rest')
+    a.stripY = a.footerTop - 30;
+    a.standCap = (a.stripY - a.stackBottom - 22) / 210;
+    a.canopy = a.hangCap >= 0.42;
+    a.stand = W < 700 && a.standCap >= 0.32;
+    var band = a.footerTop - a.stackBottom;
+    a.mode = W < 700 ? ((a.canopy || a.stand || band >= 60) ? 'hang' : 'rest')
                      : (a.bedCap >= 0.5 ? 'beds'
-                        : (a.hangCap >= 0.42 ? 'hang' : 'rest'));
+                        : (a.canopy ? 'hang' : 'rest'));
     anchors = a;
   }
 
