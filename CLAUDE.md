@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v7.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/ink.v9.js              The ink garden — the 2D canvas scene (see Ink garden)
+/ink.v10.js              The ink garden — the 2D canvas scene (see Ink garden)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -89,7 +89,7 @@ Dark only (color-scheme: dark; no light palette). Type is matte: no
 text-shadow, no glow, ever. Tokens: bg #181410 (warm night ground),
 text #ece9e4, dimmed #b8b4ac, focus #c79a3d (the ochre ink, 7.08:1), selection ground #5a554c (under the text colour, 6.11:1 — never
 paper-white). The six inks live in
-ink.v9.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
+ink.v10.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
 sage #8fa284, slate #8b9cbd (vermillion on ground is the lowest pair,
 4.5:1 — do not darken the ground or dim the inks without re-checking).
 Links are plain underlined words (1px, dimmed underline, .18em offset);
@@ -97,7 +97,7 @@ nothing reacts to hover; OS cursors only (never cursor:none, never a
 custom cursor).
 Text contrast comes from composition, not a scrim: the garden is sparse
 line-work and every element is anchored OUTSIDE the measured .stack and
-footer boxes (measureAnchors in ink.v9.js). Keep it that way — nothing
+footer boxes (measureAnchors in ink.v10.js). Keep it that way — nothing
 may draw under the typography. One sanctioned exception, glyph-safe by
 measurement: in hang mode the falling seed slips down the right MARGIN
 beside the text (strictly right of the measured stack box).
@@ -109,11 +109,11 @@ first paint in its final place; only the canvas eases in (opacity, 1.6 s
 after a 0.2 s beat; none under prefers-reduced-motion). Nothing fires
 inside that reveal unless it was already underway before the visitor
 arrived (see the opening state below).
-forced-colors hides the canvas, and ink.v9.js treats it like reduced
+forced-colors hides the canvas, and ink.v10.js treats it like reduced
 motion (no loop, no pause button — a control for nothing). Print styles
 hide the scene and footer.
 
-## Ink garden (ink.v9.js)
+## Ink garden (ink.v10.js)
 
 A hand-drawn day, clocked from local midnight. One 2D canvas, no
 libraries, no network. Every stroke is a wobbly polyline redrawn with
@@ -122,8 +122,10 @@ feels like ink held in a steady hand, never like a machine.
 
 THE PLACE is date-seeded (xmur3 day-string seed + splitmix32 streams)
 and grows with the day — logistically (smootherstep on the day
-fraction): sparse at dawn, in full bloom by evening, the same garden for
-every visitor all day. The youngest day sprig is still drawing its last
+fraction): sparse at dawn, in full bloom by evening, held through the
+small hours (00:00–05:00 keep the evening's fullness and the full
+meadow) until dawn clears it — the same garden for every visitor all
+day. The youngest day sprig is still drawing its last
 generation at first paint (born -10.4 s: its final generation draws in
 over 0–2.6 s, tip blossoms at ~3.6 s — growth in progress, never an
 event; the still frame at t = 1e4 is unaffected). The mathematics is
@@ -143,8 +145,9 @@ folded into the forms, never depicted as apparatus:
   and flutters down, each 26 px air-row a coin-flip step mean-reverting
   to its release column (a discrete Ornstein-Uhlenbeck walk). Where it
   lands, a grass blade takes root. A day of landings (one kept per
-  ~8 min of daylight after 06:30, replayed deterministically from the
-  DAY stream at init) grows a stand of grass whose silhouette settles
+  ~8 min of daylight after 06:30, the full stand through the small
+  hours, replayed deterministically from the DAY stream at init) grows
+  a stand of grass whose silhouette settles
   toward the binomial bell: de Moivre-Laplace, drawn as meadow. Live
   seeds ride the VISIT stream (arrival, walk, release twig — twigs
   spread by a golden-ratio Kronecker sequence; the coin flips stay a
@@ -167,7 +170,7 @@ folded into the forms, never depicted as apparatus:
   page oscillates faster than this field except wing-beats and the
   boil. The still frame rides the DAY's phase at gain 1, direction +1.
 * THE SKEIN: birds in the stepped-zigzag stroke of Derek's tattoo. The
-  three tattoo marks are the GLYPH ALPHABET (GLYPHS in ink.v9.js — do
+  three tattoo marks are the GLYPH ALPHABET (GLYPHS in ink.v10.js — do
   not restyle them), not a fixed roster: each crossing draws its own
   membership: usually a coin-flip sum of 2..6, sometimes a loner (15%),
   rarely a great skein of 7..8 (7%); the long-tailed glyph
@@ -244,13 +247,21 @@ fits (the garden hangs from the top edge, the seed slips down the
 measured right margin
 beside the text before spreading into the open zone below it, landing in
 a meadow strip floating above the footer; the flock moves to that open
-zone); "rest" when neither fits (short landscape viewports): no sprigs,
+zone). On phones (under 700 px) hang mode also uses the strip: when the
+band above the footer fits standing trees (standCap = (footerTop - 30 -
+stackBottom - 22)/210 >= 0.32) companions stand on the strip — both
+fit: a coin decides per sprig; only the strip fits: the anchor stands
+there too and releases from its upper canopy like a bed tree; no tree
+fits at all but the band between the text and the footer is >= 60 px:
+nothing is planted and the seeds enter down the lane from beyond the
+top edge (borrowed scenery), rooting in the strip. "rest" when nothing
+fits (short landscape viewports): no sprigs,
 no seedfall, no meadow, no flock — nothing is drawn, the loop does not
 run and the pause button stays hidden (a control for nothing); the
-typography carries the page. Under 700 px the mode is hang
-(or rest when even the sky is too shallow).
+typography carries the page. Under 700 px the mode is hang (or rest
+when neither the sky, the strip nor a 60 px band fits).
 
-The calm envelope (header comment of ink.v9.js mirrors this; any change
+The calm envelope (header comment of ink.v10.js mirrors this; any change
 must keep all of it true):
 
 * Boil rate <= 6 fps (BOIL_FPS = 5), jitter <= 1.6 px (1.2–1.6 per
@@ -296,7 +307,7 @@ must keep all of it true):
   ceiling, or change the palette — verify with comp-audit.js across
   seeds before touching any of them.
 * ONE clock read and ONE entropy read, both at init above the INIT-END
-  marker in ink.v9.js; no Math.random anywhere, no Date.now, nothing
+  marker in ink.v10.js; no Math.random anywhere, no Date.now, nothing
   below the marker reads the wall clock or entropy (performance.now
   deltas only, for pause/hidden bookkeeping — not a clock read). The
   PLACE is date-seeded, the WEATHER is visit-seeded. Zero network. One
@@ -340,7 +351,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. ink.v9.js — the ink garden (see above). Progressive enhancement: with
+2. ink.v10.js — the ink garden (see above). Progressive enhancement: with
    JS off, the page is simply the typography on the night ground.
 
 ## Fonts + performance
@@ -391,20 +402,20 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-ink.v9.js, plus style.v7.css for cursors — never to this prose) fails
+ink.v10.js, plus style.v7.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
 sessionStorage handler in the JS; any clock or entropy read below
-ink.v9.js's INIT-END marker, Math.random anywhere, or a `new Date`
+ink.v10.js's INIT-END marker, Math.random anywhere, or a `new Date`
 count other than 1; any fill/arc call or globalAlpha literal above 0.85
-in ink.v9.js; any URL hook (location.search/hash/href, URLSearchParams
+in ink.v10.js; any URL hook (location.search/hash/href, URLSearchParams
 — the seed is never in the URL) or sound (Audio, AudioContext, <audio>,
 speechSynthesis) in the JS or HTML; and any `cursor:` rule in the
 stylesheet (OS cursors only).
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND ink.v9.js on every TT-enforcing browser (verified by
+site.js AND ink.v10.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
