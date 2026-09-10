@@ -18,7 +18,7 @@ jobs:
             index.html
             style.v7.css
             site.js
-            ink.v8.js
+            ink.v9.js
             robots.txt
             _headers
             _redirects

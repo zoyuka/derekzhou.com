@@ -7,8 +7,7 @@
    full bloom by evening — the same garden for every visitor, all day.
    Branches draw themselves in (the youngest is still drawing its last
    generation as the door opens — growth in progress, never an event);
-   an ochre thread dangles from the top edge and wanders down to the
-   footer, ending in a small curl; every little while a seed lets go of
+   every little while a seed lets go of
    the anchor sprig and flutters down, each sway of its fall a coin
    toss, planting a grass blade where it lands — a day of landings grows
    a stand of grass whose silhouette settles toward the bell curve (de
@@ -16,9 +15,8 @@
    skein of birds — marks in a hand's own zigzag — meanders across the
    open band in stop-motion, wings beating like a flip-book, and leaves
    the sky quiet again. And ONE WIND moves through all of it (feng is
-   wind, shui is water): a single slow field that the thread sways
-   with, the grass leans into, the canopies shear under, the seed drifts
-   on and the skein bobs over — with spatial phase, so the gust visibly
+   wind, shui is water): a single slow field that the grass leans into,
+   the canopies shear under, the seed drifts on and the skein bobs over — with spatial phase, so the gust visibly
    travels across the garden, in this visit's direction.
    Click anywhere open: a seed is planted and a new sprig grows there.
 
@@ -29,21 +27,18 @@
    and four facets — the breeze (breeze in [0.17, 1.0], applied as the
    gust gain g = 0.75 + 0.25*breeze*(0.7 + 0.3*noise) in [0.75, 1.0],
    with a travel direction), the sky's traffic, the seedfall's tempo,
-   the hand's steadiness — plus the thread's wander (the one line that
-   spans the whole page hangs differently every visit: its start, its
-   phase and its pace) and what is already underway when the door
+   the hand's steadiness — plus what is already underway when the door
    opens: a skein mid-crossing (45 %), a seed (20 %: mid-fall where the
    fall is long enough, else letting go right after the reveal), or a
    quiet sky (35 %). The place is the day's; the
    weather is this visit's; the reduced-motion still frame is the day's
-   alone (its thread is the day's).
+   alone.
 
    THE CALM ENVELOPE (any change must keep all of this true):
    - boil rate <= 6 fps (BOIL_FPS 5); jitter <= 1.6 px (1.2–1.6 per visit)
    - THE WIND is one field w(x,t) at 0.048 Hz (~570 px wavelength), the
-     fastest oscillation on the page, driving thread sway (3 px), grass
-     lean (1.3 px), canopy shear (<= 2.4 px), seed drift (2 px) and bird
-     bob (2.5 px); those gains are CEILINGS, scaled by this visit's
+     fastest oscillation on the page, driving grass lean (1.3 px),
+     canopy shear (<= 2.4 px), seed drift (2 px) and bird bob (2.5 px); those gains are CEILINGS, scaled by this visit's
      gust gain in [0.75, 1.0] (breeze itself spans [0.17, 1.0]) under a
      110–180 s gust envelope, travelling leftward or rightward per visit
    - exceptions: the falling seed (one at a time, <= 90 px/s total,
@@ -69,8 +64,10 @@
    - JS off / canvas failure: typography on the night ground, nothing lost
    - no ink under the measured typography or footer boxes; clicks there
      never plant; click-planted sprigs keep 60 px root spacing; when a
-     viewport has no room (short landscape), the garden rests to margins
-     only — thread, star, curl
+     viewport has no room (short landscape), the garden rests: nothing
+     is drawn, the loop does not run and the pause button stays hidden
+     (a control for nothing is exactly the body language the page
+     refuses); the typography carries the page
    - ONE clock read and ONE entropy read, both at init above the
      INIT-END marker; nothing below it reads the wall clock or unseeded
      randomness (performance.now DELTAS only, for pause / hidden-tab
@@ -91,8 +88,7 @@
      scheduled on return
    - no state persisted but ink-paused
    - shakkei (borrowed scenery) entries are protected as EXTENT, not
-     decoration: the thread enters from beyond the top edge, the skein
-     from beyond the canvas edge, the hang-mode thread runs off-page
+     decoration: the skein enters from beyond the canvas edge
    - rejected: toasts, a visible seed or forecast, easter eggs, a second
      novel system; and grep-enforced by CI (validate.yml, "Absences are
      enforced"): custom cursors, exit/idle/title handlers, any query or
@@ -146,8 +142,7 @@
   var daySeed = xmur3(now0.getFullYear() + '-' + (now0.getMonth() + 1) + '-' + now0.getDate())();
   var midnightS = now0.getHours() * 3600 + now0.getMinutes() * 60 + now0.getSeconds();
   /* DAY streams — the place: 1 noise table, 2 day sprigs, 3 click sprigs,
-     4 the still frame's thread, 6 meadow replay, 8 urn, 10 still-frame
-     wind phase */
+     6 meadow replay, 8 urn, 10 still-frame wind phase */
   var stream = function (n) { return sm32((daySeed ^ Math.imul(n + 1, 0x9E3779B9)) >>> 0); };
 
   /* =rand(): the one entropy read. A visit seed, layered over the day
@@ -159,9 +154,8 @@
     try { if (self.crypto && crypto.getRandomValues) { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] >>> 0; } } catch (e) {}
     return ((performance.now() * 1000) ^ daySeed) >>> 0;
   })();
-  /* VISIT streams — the weather: 4 the live thread's wander, 6 live
-     seedfall, 9 skein, 11 weather record, 12 wind, 13 opening state,
-     15 hand */
+  /* VISIT streams — the weather: 6 live seedfall, 9 skein, 11 weather
+     record, 12 wind, 13 opening state, 15 hand */
   var vstream = function (n) { return sm32((visitSeed ^ daySeed ^ Math.imul(n + 1, 0x9E3779B9)) >>> 0); };
 
   /* the weather record: ONE front, four facets, quiet hours. The front is
@@ -210,18 +204,17 @@
   function nz(i) { return noiseTab[(i | 0) & (NOISE_N - 1)]; }
 
   /* ---------------- the wind ----------------
-     feng is wind, shui is water. The thread already meanders as water;
-     this is the wind made visible: ONE slow field moves everything —
-     the thread's sway, the grass's lean, the canopies' shear, the
-     falling seed's drift, the skein's bob — with a spatial phase, so
-     the gust visibly travels across the garden. 0.048 Hz, ~570 px
+     feng is wind, shui is water. This is the wind made visible: ONE
+     slow field moves everything — the grass's lean, the canopies'
+     shear, the falling seed's drift, the skein's bob — with a spatial
+     phase, so the gust visibly travels across the garden. 0.048 Hz, ~570 px
      wavelength, fixed. The still frame rides the day's phase at gain 1;
      live frames ride this visit's phase, travel direction and gust. */
   var wPh = windPhDay, wDir = 1, wG = 1;    // set at the head of every render()
   function wind(x, t) { return Math.sin(t * 0.30 + wDir * x * 0.011 + wPh) * wG; }
   /* the gust envelope: two day-noise samples per period, smoothstepped —
-     1/f-shaped, never faster than the field. Floor 0.75, so the thread
-     never sways under 2.25 px and nothing that should move reads as still. */
+     1/f-shaped, never faster than the field. Floor 0.75, so nothing
+     that should move reads as still. */
   function gust(t) {
     var k = t / gustP, i = Math.floor(k), f = k - i;
     f = f * f * (3 - 2 * f);
@@ -243,6 +236,9 @@
      a control for nothing is exactly the body language the page refuses */
   var mqForced = matchMedia('(forced-colors: active)');
   function still() { return mqReduce.matches || mqForced.matches; }
+  /* no room for a garden (short landscape): nothing is drawn, so the
+     loop does not run and the pause button is not shown */
+  function resting() { return !!anchors && anchors.mode === 'rest'; }
   function listenMq(mq, fn) {
     if (mq.addEventListener) mq.addEventListener('change', fn);
     else if (mq.addListener) mq.addListener(fn);
@@ -437,67 +433,6 @@
          complete, so the reduced-motion frame is unchanged */
       plantOne(i, gardenRng, (i === total - 1 && total > 1) ? -10.4 : -60 + i * 3);
     }
-  }
-
-  /* ---------------- the thread ---------------- */
-
-  /* The thread is the one line that spans the whole page, so it is the
-     one legible thing the visit owns: live frames hang THIS VISIT's
-     thread (its start in the lane, the phase and pace of its wander),
-     the reduced-motion still frame hangs the DAY's (the fixed line,
-     identical across visits). Both stay inside the same lane and end at
-     the same measured gap above the footer, so composition never moves. */
-  var threadPts = [];
-  function buildThread() {
-    threadPts.length = 0;
-    if (!anchors) return;
-    var live = !still();
-    var r = live ? vstream(4) : stream(4);
-    var narrow = W < 700;
-    threadNarrow = narrow;
-    var lane = narrow ? 18 : Math.max(60, Math.min(anchors.stackLeft - 70, W * 0.30));
-    var x = lane * (0.55 + r() * 0.3), y = -4;
-    var ph = live ? r() * 6.283 : 0;             // where the wander bulges
-    var pace = live ? 3.6 + r() * 2.4 : 4.6;     // how many bends on the way down
-    var tx = narrow ? lane * 0.7 : anchors.footerX;
-    var ty = narrow ? H + 20 : anchors.footerY;
-    var i, n = 46;
-    for (i = 0; i <= n; i++) {
-      var f = i / n;
-      /* wander inside the left margin; converge to the footer only late */
-      var wander = Math.sin(f * pace + ph + r() * 0.2) * lane * 0.35 * (1 - f * f);
-      var base = x + (tx - x) * Math.pow(f, 3);
-      var clamped = Math.min(base + wander * (f < 0.15 ? f / 0.15 : 1), lane);
-      var free = Math.max(0, Math.min(1, (f - 0.78) / 0.22));   // ease into the approach
-      free = free * free * (3 - 2 * free);
-      var px = clamped + (base - clamped) * free;
-      var py = y + (ty - y) * f;
-      threadPts.push([px, py]);
-    }
-  }
-
-  var threadNarrow = false;
-  function drawThread(tNow) {
-    if (threadPts.length < 2) return;
-    /* the thread rides the wind at its own lane */
-    var sway = wind(threadPts[threadPts.length >> 1][0], tNow) * 3;
-    var pts = [], i, f;
-    for (i = 0; i < threadPts.length; i++) {
-      f = i / (threadPts.length - 1);
-      pts.push([threadPts[i][0] + sway * Math.sin(f * Math.PI), threadPts[i][1]]);
-    }
-    stroke(pts, INK.ochre, 1.4, 0.8, 1, 5000);
-    if (threadNarrow) return;      // edge thread runs off-page; no curl
-    /* the end curls like real thread: curvature grows along the arc (an
-       Euler spiral), tightening inward instead of coiling evenly */
-    var ex = pts[pts.length - 1][0], ey = pts[pts.length - 1][1];
-    var sp = [], th = -0.5, kv = 0.16, st = 1.9, cx = ex + 2, cy = ey - 1;
-    for (i = 0; i <= 24; i++) {
-      sp.push([cx, cy]);
-      cx += Math.cos(th) * st; cy += Math.sin(th) * st;
-      th += kv; kv *= 1.05; st *= 0.955;
-    }
-    stroke(sp, INK.ochre, 1.2, 0.8, 1, 5200);
   }
 
   /* ---------------- the skein ----------------
@@ -868,32 +803,9 @@
   function measureAnchors() {
     var name = document.querySelector('h1');
     var links = document.querySelectorAll('footer a');
-    var a = { nameRight: W * 0.72, nameTop: H * 0.2, footerX: W * 0.12, footerY: H - 60,
-              footerTop: H - 46, pauseLeft: W - 150, stackLeft: W * 0.3, stackBottom: H * 0.6 };
-    if (name) {
-      var r = name.getBoundingClientRect();
-      a.nameRight = r.right; a.nameTop = r.top;
-      /* the h1 box spans the whole column; the star must clear the GLYPHS,
-         so measure the text's own line box */
-      a.glyphRight = r.right;
-      try {
-        var rg = document.createRange();
-        rg.selectNodeContents(name);
-        var rr = rg.getBoundingClientRect();
-        if (rr && rr.width) a.glyphRight = rr.right;
-      } catch (e2) {}
-    }
-    if (links.length) {
-      /* The curl (spanning ~footerX+2..+15 plus wobble) must never sit on
-         label glyphs: float it above the line, mid-gap when possible. */
-      var r2 = links[0].getBoundingClientRect();
-      a.footerTop = r2.top;
-      a.footerY = r2.top - 18;   // the curl floats clear of the 3 px focus ring
-      a.footerX = r2.right + 12;
-      if (links.length > 1) {
-        a.footerX = (r2.right + links[1].getBoundingClientRect().left) / 2 - 10;
-      }
-    }
+    var a = { nameTop: H * 0.2, footerTop: H - 46, pauseLeft: W - 150, stackLeft: W * 0.3, stackBottom: H * 0.6 };
+    if (name) a.nameTop = name.getBoundingClientRect().top;
+    if (links.length) a.footerTop = links[0].getBoundingClientRect().top;
     if (pauseBtn) {
       var r4 = pauseBtn.getBoundingClientRect();
       if (r4.width) a.pauseLeft = r4.left;
@@ -910,8 +822,8 @@
     }
     /* Where is there room? Standing trees need ~210*scale+20 px below the
        text; hanging ones ~140*scale+8 above it. When neither fits (short
-       landscape viewports), the garden rests: thread, starburst
-       and curl only — the typography carries the page. */
+       landscape viewports), the garden rests — nothing is drawn and the
+       typography carries the page. */
     a.bedCap = (H - a.stackBottom - 44) / 210;
     a.hangCap = (a.nameTop - 32) / 140;
     a.mode = W < 700 ? (a.hangCap >= 0.42 ? 'hang' : 'rest')
@@ -931,7 +843,6 @@
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     measureAnchors();
     plantDayGarden();
-    buildThread();
     meadowInit();
     resetFlight();
   }
@@ -954,16 +865,7 @@
     drawMeadow(tNow);
     var i;
     for (i = 0; i < sprigs.length; i++) drawSprig(sprigs[i], tNow);
-    drawThread(animating ? tNow : 0);
     drawSeed(tNow, animating);
-    /* vermillion star in the run-out right of the name — never on glyphs:
-       its leftmost jittered ray must clear the last glyph, or it skips */
-    if (anchors) {
-      var sbx = Math.min(anchors.nameRight + 24, W - 22);
-      if (sbx - 10 >= (anchors.glyphRight || anchors.nameRight) + 3) {
-        starburst(sbx, anchors.nameTop + 10, 7, INK.verm, 8500);
-      }
-    }
   }
 
   function frame(tms) {
@@ -988,7 +890,7 @@
   }
 
   function start() {
-    if (!raf && !tmr && !paused && !document.hidden && !still()) raf = requestAnimationFrame(frame);
+    if (!raf && !tmr && !paused && !document.hidden && !still() && !resting()) raf = requestAnimationFrame(frame);
   }
   function stop() {
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
@@ -997,7 +899,7 @@
 
   function stillFrame() {
     boilPhase = 3;
-    render(1e4, false);   // far future: everything fully grown, thread at rest
+    render(1e4, false);   // far future: everything fully grown
   }
   /* the paused frame: the live scene at the moment the clock froze (t = 0
      on a paused load — the frame resume continues from, so nothing can
@@ -1009,14 +911,21 @@
   /* the frozen frame, whichever it is, redrawn after the model changed
      under it (a resize, a catch-up): a static re-render is not animation */
   function redrawFrozen() {
-    if (still()) stillFrame();
+    if (resting()) ctx.clearRect(0, 0, W, H);
+    else if (still()) stillFrame();
     else if (paused) pausedFrame();
   }
-  /* ONE freeze/thaw for pause, hidden tab and reduced motion: the live
-     clock stops at the first of them and restarts at the last, so no
-     path can double-count a span or let one slip through */
+  /* the control ships wherever the loop ships — and only there */
+  function showControl() {
+    if (!pauseBtn) return;
+    if (still() || resting()) pauseBtn.classList.remove('ink-show');
+    else pauseBtn.classList.add('ink-show');
+  }
+  /* ONE freeze/thaw for pause, hidden tab, reduced motion and a resting
+     viewport: the live clock stops at the first of them and restarts at
+     the last, so no path can double-count a span or let one slip through */
   function sync() {
-    if (!paused && !document.hidden && !still()) {
+    if (!paused && !document.hidden && !still() && !resting()) {
       /* a span frozen before the live clock exists is not a shift: the
          first live frame anchors clock0 to the thaw moment, so t = 0 is
          the frame the paused/still load drew (shifting here would push
@@ -1080,7 +989,7 @@
 
   var lastClick = 0;
   document.addEventListener('click', function (e) {
-    if (paused || still()) return;
+    if (paused || still() || resting()) return;
     if (e.target.closest('a, button')) return;
     /* never plant on (or into) the typography: the measured stack and
        footer are no-plant zones, and near them the planted sprig is
@@ -1120,16 +1029,17 @@
   window.addEventListener('resize', function () {
     clearTimeout(rsTimer);
     rsTimer = setTimeout(function () {
-      layout();
+      layout();               // may change the mode (a rotated phone)
+      showControl();
+      sync();
       redrawFrozen();
     }, 150);
   });
 
   function onStillChange() {
     sync();                    // freeze or thaw the live clock (never double-counted with a hidden tab)
-    buildThread();             // the day's thread for the still frame, this visit's for live frames
-    if (still()) { stillFrame(); if (pauseBtn) pauseBtn.classList.remove('ink-show'); }
-    else { if (pauseBtn) pauseBtn.classList.add('ink-show'); if (paused) pausedFrame(); }
+    showControl();
+    redrawFrozen();
   }
   listenMq(mqReduce, onStillChange);
   listenMq(mqForced, onStillChange);
@@ -1142,13 +1052,10 @@
 
   requestAnimationFrame(function () {
     layout();
-    if (still()) {
-      stillFrame();
-    } else {
-      if (pauseBtn) pauseBtn.classList.add('ink-show');
-      if (paused) pausedFrame();
-      else start();
-    }
+    showControl();
+    if (still()) stillFrame();
+    else if (paused) pausedFrame();
+    else start();
     doc.classList.add('ink-ready');
   });
 })();
