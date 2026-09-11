@@ -74,8 +74,8 @@
 
 /* ------------------------------------------------
    Tokens — ink on night paper.
-   Focus is the thread's own ochre (7.08:1 on the ground); selection is
-   a dim-ink ground under the text colour (6.11:1), never paper-white.
+   Focus is the ochre ink (7.08:1 on the ground); selection is a dim-ink
+   ground under the text colour (6.11:1), never paper-white.
    ------------------------------------------------ */
 
 :root {
@@ -114,6 +114,8 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* taps answer at once: no double-tap zoom delay on touch screens */
+  touch-action: manipulation;
 }
 
 ::selection {
@@ -127,9 +129,8 @@ body {
 }
 
 /* ------------------------------------------------
-   The ink canvas — behind everything, inert.
-   The type is dry at first paint; only the canvas eases in — a 0.2 s
-   beat, then a 1.6 s opacity-only ease (eyes adjusting to the dark).
+   The ink canvas — behind everything, inert. No fade: the type is dry
+   at first paint and the garden draws itself in on the canvas.
    ------------------------------------------------ */
 
 #ink {
@@ -139,12 +140,6 @@ body {
   height: 100%;
   z-index: -1;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.6s ease-out .2s;
-}
-
-.ink-ready #ink {
-  opacity: 1;
 }
 
 /* ------------------------------------------------
@@ -201,7 +196,7 @@ h1 {
 
 /* ------------------------------------------------
    Footer — plain underlined words. Nothing on the page answers the
-   pointer: no hover replies, no transitions, OS cursors only.
+   pointer's position: no hover replies, no transitions, OS cursors only.
    ------------------------------------------------ */
 
 footer {
@@ -217,29 +212,11 @@ footer a {
   color: var(--color-text);
 }
 
-footer a, .ink-pause, .back-link {
+footer a, .back-link {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-decoration-color: var(--color-dimmed);
   text-underline-offset: .18em;
-}
-
-/* Reserves its slot from first paint (visibility, not display) so
-   revealing it can never shift layout; the ink script adds .ink-show
-   only when the loop actually runs. */
-.ink-pause {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  color: var(--color-dimmed);
-  background: none;
-  border: none;
-  padding: 0;
-  margin-left: auto;
-  visibility: hidden;
-}
-
-.ink-pause.ink-show {
-  visibility: visible;
 }
 
 .back-link {
@@ -256,15 +233,8 @@ footer a, .ink-pause, .back-link {
    Motion preferences and forced colors
    ------------------------------------------------ */
 
-@media (prefers-reduced-motion: reduce) {
-  #ink { transition: none; }
-}
-
 @media (forced-colors: active) {
   #ink { display: none; }
-  /* no scene, so no control for it (the ink script also stops the loop and
-     never adds .ink-show here); the slot stays reserved, not shown */
-  .ink-pause, .ink-pause.ink-show { visibility: hidden; }
 }
 
 /* ------------------------------------------------
@@ -273,7 +243,6 @@ footer a, .ink-pause, .back-link {
 
 @media print {
   #ink,
-  .ink-pause,
   footer {
     display: none;
   }

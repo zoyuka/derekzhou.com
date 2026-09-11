@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v7.css
+            style.v8.css
             site.js
-            ink.v10.js
+            ink.v11.js
             robots.txt
             _headers
             _redirects
