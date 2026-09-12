@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v8.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/ink.v12.js              The ink garden — the 2D canvas scene (see Ink garden)
+/ink.v13.js              The ink garden — the 2D canvas scene (see Ink garden)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -91,7 +91,7 @@ Dark only (color-scheme: dark; no light palette). Type is matte: no
 text-shadow, no glow, ever. Tokens: bg #181410 (warm night ground),
 text #ece9e4, dimmed #b8b4ac, focus #c79a3d (the ochre ink, 7.08:1), selection ground #5a554c (under the text colour, 6.11:1 — never
 paper-white). The six inks live in
-ink.v12.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
+ink.v13.js: line #d8d2c4, dim #8f887b, ochre #c79a3d, vermillion #d05a40,
 sage #8fa284, slate #8b9cbd (vermillion on ground is the lowest pair,
 4.5:1 — do not darken the ground or dim the inks without re-checking).
 Links are plain underlined words (1px, dimmed underline, .18em offset);
@@ -99,7 +99,7 @@ nothing reacts to hover; OS cursors only (never cursor:none, never a
 custom cursor).
 Text contrast comes from composition, not a scrim: the garden is sparse
 line-work and every element is anchored OUTSIDE the measured .stack and
-footer boxes (measureAnchors in ink.v12.js). Keep it that way — nothing
+footer boxes (measureAnchors in ink.v13.js). Keep it that way — nothing
 may draw under the typography. One sanctioned exception, glyph-safe by
 measurement: in hang mode the falling seed slips down the right MARGIN
 beside the text (strictly right of the measured stack box).
@@ -110,11 +110,11 @@ always on top and always clickable (taps reach the document, which is
 where the garden listens). No entrance for the type: it is present at
 first paint in its final place; the garden draws itself in on the
 canvas over the 4 s opening (no CSS fade, nothing under
-prefers-reduced-motion). forced-colors hides the canvas, and ink.v12.js
+prefers-reduced-motion). forced-colors hides the canvas, and ink.v13.js
 treats it like reduced motion (a still frame, no opening, no answers).
 Print styles hide the scene and footer.
 
-## Ink garden (ink.v12.js)
+## Ink garden (ink.v13.js)
 
 A hand-drawn day, clocked from local midnight. One 2D canvas, no
 libraries, no network. A STILL DRAWING THAT ANSWERS TOUCH: nothing on
@@ -147,9 +147,11 @@ apparatus:
 
 THE OPENING (the one automatic motion, once per load, OPEN_S 4 s): the
 garden is ALREADY THERE as the door opens — drawn, still, the day's —
-except the youngest sprig, which is finishing its last generation
-(born -10.4 s: that generation draws over 0–2.6 s and its tips blossom
-at ~3.6 s — growth in progress, never an event). Nothing else is
+except the youngest sprig, which is finishing its last generation (born
+YOUNG_BORN = −genStart(4), derived from GROW_S and GEN0 rather than
+written as a number, so the two stay in step: that generation draws
+over 0–2.6 s and its tips blossom at 3.64 s, inside OPEN_S — growth in
+progress, never an event). Nothing else is
 underway: no skein, no seed, no blade sweeping in. At 4 s the garden
 SETTLES: one resting frame is drawn in the DAY's hand (jitter 1.6,
 offset 0, no wind), identical to the reduced-motion still frame, pixel
@@ -185,10 +187,14 @@ the answer (in this order):
   shear (2.4 px, scaled by distance from the root), falling seeds
   drift (2 px), birds bob (2.5 px) — one motion, many small marks. Its
   strength is the visit's breeze; its lean is the visit's direction.
-* On the sky (beds: y < nameTop − 30; hang: the open zone between the
-  text and the meadow): a SKEIN MEANDERS across the band at FLY_V
-  12 px/s — a crossing takes minutes, the way a distant flock does —
-  birds in the stepped-zigzag stroke of Derek's tattoo (GLYPHS — the three
+* On the sky (the band the birds actually fly in, padded 24 px so a
+  thumb finds it; checked BEFORE the meadow, since on a short phone the
+  two nearly touch and the birds are the answer that is hard to find):
+  a SKEIN MEANDERS across at FLY_V 12 px/s, its lead bird starting
+  SKEIN_EDGE 10 px outside the frame so it is VISIBLE within a second
+  of the tap, the crossing bounded by SKEIN_MAX 80 s so a wide screen
+  glides a little faster instead of running for minutes — birds in the
+  stepped-zigzag stroke of Derek's tattoo (GLYPHS — the three
   marks are the alphabet, do not restyle them): membership a coin-flip
   sum of 2..6 (a busy visit's sky leans one larger), a loner 15 %, a
   great skein of 7..8 7 %, the long-tailed glyph often leading, a
@@ -198,19 +204,36 @@ the answer (in this order):
   altitude drifting between two levels (an S-curve), the entry level a
   golden-ratio Kronecker sequence, direction a Markov flip (72 %
   alternate). One crossing at a time: a sky tap during one only stirs
-  a gust.
+  a gust. THE BAND is whichever of the two clear strips is better: the
+  sky above the name when nothing hangs in it and it is at least 24 px
+  tall (desktops, and phones whose sprigs stand on the strip), else the
+  open zone between the text and the meadow (phones whose garden hangs
+  from the top edge). A band that does not exist is a tap that does
+  nothing, so the margins are thin — 10 px, and a 25 px strip still
+  carries a 14 px bird.
 * On open ground (anywhere else that is not the words or the footer's
   words): a seed is pressed into it and a SPRIG draws itself in there
-  generation by generation (GROW_S 2.6 s each, ~13 s in all; 250 ms
+  generation by generation: the first shoot quickly (GEN0, 0.35 × GROW_S
+  = 0.9 s, so the tap shows something at once) and then 2.6 s a
+  generation, blossoms included, SPRIG_S ≈ 13.9 s in all (250 ms
   debounce, 14-sprig cap that evicts the oldest
   PLANTED sprig and never a day sprig, 60 px root spacing, scaled to
   the clearance near the measured boxes so its canopy can never reach
   the glyphs; upward below 40 % of the height, hanging above it).
 
-Every tap also sends a small gust (0.35 of a meadow gust). While
-awake a faint breath (0.15, 0.03 Hz) sways everything; at rest the
-wind is zero. Taps on or near the typography and the footer's words do
-nothing, ever; in rest mode taps do nothing.
+Every tap also sends a small gust (0.35 of a meadow gust), including a
+tap with no other answer (too near the words to plant, too near another
+root) — a tap is never simply swallowed. While awake a faint breath
+(0.15, 0.03 Hz) sways everything; at rest the wind is zero.
+
+THE GUARDS are deliberately two different sizes. A tap ON the words is
+for reading and selecting, so the stack box + 6 px and the footer's
+links + 12 px answer nothing at all. CLEARANCE from the glyphs is a
+PLANTING concern only, and plantAt() enforces it alone (the ±110 px
+window and the vGap scale clamp). Do not widen the first guard into the
+second: a 40 px halo below the text is the whole width of a phone, and
+it silently swallowed every skein tap until it was found by probing.
+In rest mode taps do nothing.
 
 WHY THERE IS NO PAUSE CONTROL: WCAG 2.2.2 requires one only for
 motion that (1) starts AUTOMATICALLY, (2) lasts longer than five
@@ -265,26 +288,36 @@ taps do nothing; the typography carries the page. Under 700 px the
 mode is hang (or rest when neither the sky, the strip nor a 60 px
 band fits).
 
-The calm envelope (header comment of ink.v12.js mirrors this; any
+The calm envelope (header comment of ink.v13.js mirrors this; any
 change must keep all of it true):
 
 * At rest: zero motion, zero CPU — no loop runs; the resting frame is
   drawn in the day's hand (jitter 1.6, offset 0): the day's garden plus
   this visit's landings and planted sprigs — nothing else of the visit.
-* Awake: 5 fps — the boil IS the frame rate, so nothing is smooth and
-  everything is stop-motion; jitter <= 1.6 px (1.2–1.6 per visit); an
-  answer runs until it is genuinely finished, however long that is.
+* Awake: 5 fps (FPS), and the boil re-rolls at its own 5 Hz (BOIL_FPS)
+  — two constants, never one, so raising the frame rate can never speed
+  up the hand. Nothing is smooth; everything is stop-motion. Jitter
+  <= 1.6 px (1.2–1.6 per visit), and 0.4 of that on a flying bird,
+  whose mark is small and moving and would otherwise shiver more than
+  it glides. An answer runs until it is genuinely finished.
+* Every answer must SHOW something within about a second of the tap.
+  An answer nobody can see is the same as no answer: verify with
+  zones.js, which taps down a column at every common phone size and
+  reports what each tap produced.
 * The opening is the ONE automatic waking: 4 s (OPEN_S), once per
   load, never on a resize or a returning tab. Nothing else is ever
   scheduled.
-* Gusts: 55 px/s from the touch, 3.5 s passage, dead by 900 px; gains
-  are ceilings: grass 1.3 px, canopy 2.4 px (scaled by distance from
-  the root), seed drift 2 px, bird bob 2.5 px; breath 0.15 while
-  awake; a shaken tree rings 0.9 Hz, 3 px, gone by ~5 s.
+* Gusts: 55 px/s from the touch, 3.5 s passage, dead by 900 px
+  (GUST_LIFE — the one lifetime pruneGusts and every wake use). They
+  SUM, so the field is clamped to ±1 and at most GUST_MAX 24 are kept:
+  the gains are then true ceilings however fast a visitor taps — grass
+  1.3 px, canopy 2.4 px (scaled by distance from the root), seed drift
+  2 px, bird bob 2.5 px; breath 0.15 while awake; a shaken tree rings
+  0.9 Hz, 3 px, gone by ~5 s.
 * Seeds fall at 82 px/s (DROP_V); a branch generation draws in 2.6 s
-  (GROW_S); a skein glides at 12 px/s (FLY_V — minutes per crossing),
-  wing-beats under 1 Hz, one at a time. These are the page's calm
-  speeds: nothing may be sped up to fit a clock.
+  (GROW_S), the first shoot in 0.35 of that (GEN0); a skein glides at
+  12 px/s (FLY_V), a crossing capped at 80 s (SKEIN_MAX). These are the
+  page's calm speeds: nothing may be sped up to fit a clock.
 * Strokes only — never clustered dots (hard rule; dot clusters read as
   trypophobia triggers). No fills, no arcs.
 * Ink alphas <= 0.85; night ground #181410; palette fixed to the six
@@ -304,7 +337,7 @@ change must keep all of it true):
   ceiling, or change the palette — verify with comp-audit.js and
   touch-test.js before touching any of them.
 * ONE clock read and ONE entropy read, both at init above the INIT-END
-  marker in ink.v12.js; no Math.random anywhere, no Date.now, nothing
+  marker in ink.v13.js; no Math.random anywhere, no Date.now, nothing
   below the marker reads the wall clock or entropy (performance.now
   deltas only). The PLACE is date-seeded, the WEATHER is visit-seeded.
   Zero network. One 2D canvas; while awake, one rAF loop scheduled by
@@ -313,8 +346,9 @@ change must keep all of it true):
   resize (a resize re-plants the place already grown; it never rerolls
   the weather and never re-opens).
 * Idle is not a state; nothing reacts to leaving; no listeners for the
-  pointer's position, keys, focus loss or page teardown (pagehide only
-  clears the frame timers — bfcache-friendly); document.title and the
+  pointer's position, keys, focus loss or page teardown (pagehide
+  settles the garden, so bfcache can never restore a skein parked
+  mid-sky — it stays bfcache-friendly); document.title and the
   favicon never change; NO state is persisted. A hidden tab settles
   the garden at once. A return after >= 480 s hidden adds only static
   day-replay blades (<= 12, continuing the DAY stream where the init
@@ -343,7 +377,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. ink.v12.js — the ink garden (see above): the opening, then a still
+2. ink.v13.js — the ink garden (see above): the opening, then a still
    drawing that answers taps. Progressive enhancement: with JS off, the
    page is simply the typography on the night ground.
 
@@ -395,20 +429,20 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-ink.v12.js, plus style.v8.css for cursors — never to this prose) fails
+ink.v13.js, plus style.v8.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
 sessionStorage handler in the JS; any clock or entropy read below
-ink.v12.js's INIT-END marker, Math.random anywhere, or a `new Date`
+ink.v13.js's INIT-END marker, Math.random anywhere, or a `new Date`
 count other than 1; any fill/arc call or globalAlpha literal above 0.85
-in ink.v12.js; any URL hook (location.search/hash/href, URLSearchParams
+in ink.v13.js; any URL hook (location.search/hash/href, URLSearchParams
 — the seed is never in the URL) or sound (Audio, AudioContext, <audio>,
 speechSynthesis) in the JS or HTML; and any `cursor:` rule in the
 stylesheet (OS cursors only).
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND ink.v12.js on every TT-enforcing browser (verified by
+site.js AND ink.v13.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types

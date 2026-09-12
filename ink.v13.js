@@ -5,8 +5,9 @@
    full bloom by evening, held through the small hours until dawn clears
    it — the same garden for every visitor, all day. It is ALREADY THERE
    as the door opens, drawn and still, except the youngest sprig, which
-   is finishing its last generation (born -10.4 s: it draws over 0–2.6 s
-   and its tips blossom at ~3.6 s — growth in progress, never an event).
+   is finishing its last generation (born YOUNG_BORN = -genStart(4): it
+   draws over 0–2.6 s and its tips blossom at 3.64 s — growth in progress,
+   never an event).
    By 4 s the ink has settled and nothing moves. Every stroke is a
    wobbly polyline; while the garden is awake it is redrawn with fresh
    jitter five times a second — the hand-drawn boil, and the page's only
@@ -16,7 +17,8 @@
    TOUCH is the only weather after that, and an answer takes as long as
    it takes — nothing is hurried to beat a clock:
    - tap open ground: a seed is pressed into it and a sprig draws itself
-     in there (children take symmetric coin-flip slots, so canopies
+     in there — the first shoot within a second (GEN0), then generation
+     by generation at 2.6 s each (children take symmetric coin-flip slots, so canopies
      settle toward binomial silhouettes; blossom inks come from the
      day's Polya urn)
    - tap a tree: it rings slowly (0.9 Hz, 3 px, gone by ~5 s) and a few
@@ -27,10 +29,14 @@
      under every shaken tree settles toward the bell (de Moivre-Laplace,
      drawn as meadow)
    - tap the sky: a skein of birds — marks in the hand's own zigzag —
-     MEANDERS across at 12 px/s (a crossing takes minutes, the way a
-     distant flock does): membership a coin-flip sum, the lead's
-     undulation echoed down the line, wing-beats detuned per bird under
-     1 Hz, altitude from a golden-ratio sequence, direction a Markov flip
+     MEANDERS across at 12 px/s, the lead bird already at the frame's
+     edge so it is visible within a second, a crossing bounded to 80 s so
+     it reads the same on a phone and on a wide screen: membership a
+     coin-flip sum, the lead's undulation echoed down the line, wing-beats
+     detuned per bird under 1 Hz, altitude from a golden-ratio sequence,
+     direction a Markov flip. The band is whichever is taller — the sky
+     above the name (desktop) or the open zone between the text and the
+     meadow (phones) — so a skein always has somewhere to fly
    - tap the meadow: a gust rolls out from the touch at 55 px/s through
      the whole garden — grass leans blade by blade as it passes, canopies
      shear, falling seeds drift, birds bob: one motion, many small marks
@@ -61,20 +67,30 @@
    - at rest: zero motion, zero CPU — no loop runs; the resting frame is
      drawn in the day's hand (jitter 1.6, offset 0): the day's garden
      plus whatever this visit has landed or planted
-   - awake: 5 frames a second — the boil IS the frame rate, so nothing is
-     smooth and everything is stop-motion; jitter <= 1.6 px (1.2–1.6 per
-     visit); an answer runs until it is genuinely finished
+   - awake: 5 frames a second, and the boil re-rolls at its own 5 Hz (two
+     constants, never one: raising the frame rate must not speed up the
+     hand); nothing is smooth, everything is stop-motion; jitter <= 1.6 px
+     (1.2–1.6 per visit, and 0.4 of that on a flying bird, whose mark is
+     small and moving); an answer runs until it is genuinely finished
    - the opening is the ONE automatic waking: 4 s, once per load, never
      on a resize or a returning tab. Nothing else is ever scheduled
    - gusts roll from the touch at 55 px/s, pass a point in 3.5 s and die
-     out by 900 px; gains are ceilings: grass 1.3 px, canopy 2.4 px
+     out by 900 px (GUST_LIFE, the one lifetime every wake uses); they SUM,
+     so the field is clamped to +/-1 and the gains below are true ceilings
+     however fast a visitor taps: grass 1.3 px, canopy 2.4 px
      (scaled by distance from the root), seed drift 2 px, bird bob
      2.5 px, breath 0.15; a shaken tree rings at 0.9 Hz, 3 px, gone by
      ~5 s
-   - seeds fall at 82 px/s; a branch generation draws in 2.6 s; a skein
-     glides at 12 px/s (minutes per crossing), wing-beats under 1 Hz,
-     one at a time — these are the page's calm speeds, and nothing may
-     be sped up to fit a clock
+   - seeds fall at 82 px/s; a whole sprig draws in in SPRIG_S ~13.9 s; a
+     skein glides at 12 px/s and a crossing is capped at SKEIN_MAX 80 s
+     (so a wide screen glides a little faster rather than running for
+     minutes), wing-beats under 1 Hz, one at a time — these are the
+     page's calm speeds, and nothing may be sped up to fit a clock
+   - every answer must SHOW something within about a second of the tap:
+     a bird at the frame's edge, a shoot from the planted seed, the
+     grass leaning where the finger landed. An answer nobody can see is
+     the same as no answer — that is how the skein came to be unusable
+     on phones (it entered 95 px off-frame and took 8-20 s to appear)
    - strokes only — never clustered dots (hard rule); no fills, no arcs;
      ink alphas <= 0.85; night ground #181410; palette fixed to the six
      inks
@@ -91,9 +107,9 @@
      marker; nothing below it reads the wall clock or unseeded randomness
      (performance.now deltas only); no state persisted at all
    - the tab title and the favicon never change; nothing listens for the
-     pointer's position, keys, idling, focus loss or leaving (pagehide
-     only clears the frame timers); a hidden tab settles the garden at
-     once; a return after >= 8 min shows only a statically fuller garden
+     pointer's position, keys, idling or focus loss; a hidden tab settles
+     the garden at once, and so does pagehide (bfcache must never restore
+     a skein parked mid-sky); a return after >= 8 min shows only a statically fuller garden
      (the day's own replay continued) — nothing animates on return
    - rejected: a parked flock, toasts, hints, a visible seed, sound,
      custom cursors, any URL hook; CI greps enforce the absences */
@@ -103,15 +119,33 @@
 
   /* ---------------- config ---------------- */
 
-  var FPS = 5;                 // frames a second while awake: the hand's own stop-motion
+  var FPS = 5;                 // frames a second while awake
+  var BOIL_FPS = 5;            // the hand's tremor re-rolls this often (independent of FPS:
+                               // raising the frame rate must never speed up the boil)
   var JITTER = 1.6;            // px, wobble ceiling (the resting hand)
   var GROW_S = 2.6;            // s per branch generation — a branch takes its time
+  var GEN0 = 0.35;             // the first shoot is quicker (0.35 * GROW_S), so a planted
+                               // seed shows something within a second; then it slows down
   var OPEN_S = 4.0;            // s, the opening: the one automatic motion
   var FLY_V = 12;              // px/s, a skein's glide — a distant, unhurried crossing
+  var SKEIN_MAX = 80;          // s, the longest a crossing may take: on a wide screen the
+                               // skein glides a little faster so a crossing reads the same
+                               // everywhere and a stray tap never commits minutes of motion
+  var SKEIN_EDGE = 10;         // px beyond the frame the lead bird starts: it must be
+                               // VISIBLE within a second of the tap, not 8 s later
   var DROP_V = 82;             // px/s, a seed's fall
   var GUST_V = 55;             // px/s, a gust's travel from the touch
   var GUST_T = 3.5;            // s, a gust's passage over a point
   var GUST_R = 900;            // px, where a gust has died out
+  var GUST_LIFE = GUST_T + GUST_R / GUST_V;   // s, when a gust is certainly over
+  var GUST_MAX = 24;           // live gusts kept; the sum is clamped below in any case
+
+  /* when generation `gen` starts drawing, and how long it takes */
+  function genStart(gen) { return gen ? (GEN0 + gen - 1) * GROW_S : 0; }
+  function genDur(gen) { return gen ? GROW_S : GEN0 * GROW_S; }
+  var SPRIG_S = genStart(5) + GROW_S;         // s for a whole sprig, blossoms included
+  var YOUNG_BORN = -genStart(4);              // the opening's youngest sprig: its last
+                                              // generation starts drawing exactly at t = 0
   var INK = {
     line:   '#d8d2c4',
     dim:    '#8f887b',
@@ -158,7 +192,7 @@
     return ((performance.now() * 1000) ^ daySeed) >>> 0;
   })();
   /* VISIT streams — the weather: 6 seeds let go, 9 skein, 11 weather
-     record, 12 wind, 13 opening state, 15 hand */
+     record, 12 wind, 15 hand */
   var vstream = function (n) { return sm32((visitSeed ^ daySeed ^ Math.imul(n + 1, 0x9E3779B9)) >>> 0); };
 
   /* the weather record: ONE front, four facets, quiet hours. A still
@@ -206,10 +240,15 @@
       u = t - g.t0 - d / GUST_V;
       if (u > 0 && u < GUST_T) w += g.dir * g.amp * (1 - d / GUST_R) * Math.sin(Math.PI * u / GUST_T);
     }
-    return w;
+    /* gusts SUM, so a fast tapper could stack them; the gains below are stated
+       as ceilings, so the field itself is clamped to one gust's worth */
+    return w < -1 ? -1 : (w > 1 ? 1 : w);
   }
-  function addGust(x0, t0, amp) { gusts.push({ x0: x0, t0: t0, amp: amp, dir: windDir }); }
-  function pruneGusts(t) { while (gusts.length && t > gusts[0].t0 + GUST_T + GUST_R / GUST_V) gusts.shift(); }
+  function addGust(x0, t0, amp) {
+    if (gusts.length >= GUST_MAX) gusts.shift();
+    gusts.push({ x0: x0, t0: t0, amp: amp, dir: windDir });
+  }
+  function pruneGusts(t) { while (gusts.length && t > gusts[0].t0 + GUST_LIFE) gusts.shift(); }
 
   /* ---------------- DOM ---------------- */
 
@@ -236,11 +275,14 @@
   var boilPhase = 0;
   var animatingNow = false;    // awake frames use this visit's hand; the resting frame the day's
 
-  function stroke(pts, color, width, alpha, t, key) {
+  /* jscale trims the hand's wobble for a mark that is small and moving: a bird
+     glides ~2-7 px a frame, so a full 1.6 px re-roll on every point reads as a
+     shiver rather than flight */
+  function stroke(pts, color, width, alpha, t, key, jscale) {
     var n = pts.length;
     if (n < 2) return;
     var upto = Math.max(2, Math.ceil(n * (t === undefined ? 1 : t)));
-    var jit = animatingNow ? handJitter : JITTER;
+    var jit = (animatingNow ? handJitter : JITTER) * (jscale === undefined ? 1 : jscale);
     var off = animatingNow ? tremorOff : 0;
     ctx.strokeStyle = color;
     ctx.globalAlpha = alpha === undefined ? 0.85 : alpha;
@@ -323,10 +365,11 @@
     var u = tNow - sprig.shakeT;
     /* a shaken tree rings slowly and dies away: 0.9 Hz, 3 px, gone by ~5 s */
     if (u > 0 && u < 5.5) wv += 3 * Math.sin(u * 5.65) * Math.exp(-u * 0.8);
+    var el = tNow - sprig.born;
     var i, s, g, t, j, d, pts2, tx, ty;
     for (i = 0; i < sprig.segs.length; i++) {
       s = sprig.segs[i];
-      g = (tNow - sprig.born) / GROW_S - s.gen;
+      g = (el - genStart(s.gen)) / genDur(s.gen);
       if (g <= 0) continue;
       t = Math.min(1, g);
       if (s.pts) {
@@ -422,8 +465,10 @@
 
   /* opening: the day's garden is already grown, except the youngest sprig,
      which is still drawing its last generation as the door opens (born
-     -10.4 s: that generation draws over 0–2.6 s and its tips blossom at
-     ~3.6 s — growth in progress, never an event). Otherwise: all grown. */
+     YOUNG_BORN = -genStart(4), so that generation draws over 0..GROW_S and
+     its tips blossom at genStart(5) + 0.4*GROW_S - genStart(4) = 3.64 s —
+     growth in progress, never an event, and inside OPEN_S). Otherwise: all
+     grown. daySprigs() is 2..6, so there is always a youngest to leave. */
   function plantDayGarden(opening) {
     sprigs.length = 0;
     dayCount = 0; dayPlanted = 0; gardenRng = null;
@@ -431,7 +476,7 @@
     gardenRng = stream(2);
     var total = daySprigs(), i;
     for (i = 0; i < total; i++) {
-      plantOne(i, gardenRng, (opening && i === total - 1 && total > 1) ? -10.4 : -100);
+      plantOne(i, gardenRng, (opening && i === total - 1) ? YOUNG_BORN : -100);
     }
   }
 
@@ -479,10 +524,14 @@
     if (!prevDir) prevDir = r() < 0.5 ? -1 : 1;
     var dir = r() < 0.72 ? -prevDir : prevDir;
     prevDir = dir;
-    var len = back + 30, dur = (W + len + 190) / FLY_V;   // a crossing takes as long as it takes
+    /* the lead bird starts just off the frame, so it is VISIBLE within a
+       second of the tap; the crossing is bounded so a wide screen reads the
+       same as a phone and a stray tap never commits minutes of motion */
+    var len = back + 30, span = W + len + 2 * SKEIN_EDGE;
+    var dur = Math.min(SKEIN_MAX, span / FLY_V);
     flight = {
       birds: birds, len: len, t0: t0, dur: dur, end: t0 + dur, dir: dir,
-      v: FLY_V,
+      span: span, v: span / dur,
       yj: 0.12 + 0.72 * ((skeinA0 + skeinK * 0.6180339887) % 1),
       yj2: 0.12 + 0.72 * r(),
       ph: r() * 6.283, ph2: r() * 6.283
@@ -490,19 +539,29 @@
     skeinK++;
   }
 
+  /* Where can a skein fly? Two bands are ever clear of the words: the sky
+     above the name, and the open zone between the text and the meadow. Take
+     whichever is taller — on a phone the sky above the name is a sliver (and
+     full of hanging sprigs), so the lower zone wins; on a desktop the sky
+     wins. Margins are thin on purpose: a 25 px band still carries a 14 px
+     bird, and a band that does not exist means a tap that does nothing. */
   function skeinBand() {
     if (!anchors || anchors.mode === 'rest') return null;
-    var sc = anchors.mode === 'hang' ? 0.62 : 0.85, glyphH = 22 * sc, yTop, yBot;
-    if (anchors.mode === 'hang') {
-      yTop = anchors.stackBottom + 26;
-      yBot = (fall.baseY || H - 60) - 26 - glyphH;
-      if (yBot - yTop < 24) return null;
-    } else {
-      yTop = 42;
-      yBot = anchors.nameTop - 40 - glyphH;
-      if (yBot < yTop) return null;
-    }
-    return { sc: sc, yTop: yTop, yBot: yBot };
+    var sc = anchors.mode === 'hang' ? 0.62 : 0.85, glyphH = 22 * sc;
+    var aTop = 10, aBot = anchors.nameTop - 16 - glyphH;
+    var bTop = anchors.stackBottom + 10, bBot = (fall.baseY || H - 60) - 10 - glyphH;
+    var a = aBot - aTop, b = bBot - bTop;
+    var top = { sc: sc, yTop: aTop, yBot: aBot }, low = { sc: sc, yTop: bTop, yBot: bBot };
+    /* the sky above the name is the classic band and wins whenever it is
+       both clear and tall enough; it is NOT clear when the garden hangs
+       from the top edge, and on a phone it is often a sliver, so those
+       visits get the open zone between the text and the meadow instead */
+    var topFree = !(anchors.mode === 'hang' && anchors.canopy);
+    if (topFree && a >= 24) return top;
+    if (b >= 20) return low;
+    if (topFree && a >= 6) return top;
+    if (b >= 6) return low;
+    return null;
   }
 
   function skeinWave(t, bandH) {
@@ -520,8 +579,8 @@
     var sc = band.sc, yTop = band.yTop, yBot = band.yBot;
     var sideMax = Math.max(5, Math.min(20, (yBot - yTop) * 0.35));
     var headX = flight.dir > 0
-      ? W + 95 - (W + flight.len + 190) * prog
-      : -95 - flight.len + (W + flight.len + 190) * prog;
+      ? W + SKEIN_EDGE - flight.span * prog
+      : -SKEIN_EDGE - flight.len + flight.span * prog;
     var drift = prog * prog * (3 - 2 * prog);
     var yBase = yTop + (yBot - yTop) * (flight.yj + (flight.yj2 - flight.yj) * drift);
     var b, i, p, bd, pts, px, py, amp, bx, by;
@@ -541,7 +600,7 @@
         if (flight.dir < 0) px = p.w - px;
         pts.push([bx + px * sc * bd.sc, by + py * sc * bd.sc]);
       }
-      stroke(pts, INK.line, 1.9, 0.78, 1, 9100 + b * 97 + (amp === 1 ? 0 : 13));
+      stroke(pts, INK.line, 1.9, 0.78, 1, 9100 + b * 97 + (amp === 1 ? 0 : 13), 0.4);
     }
   }
 
@@ -800,7 +859,7 @@
     var fr = Math.floor(t * FPS);
     if (fr !== lastFr) {
       lastFr = fr;
-      boilPhase = fr;               // the boil re-rolls on every frame
+      boilPhase = Math.floor(t * BOIL_FPS);   // the boil keeps its own rate
       render(t, true);
     }
     var wait = Math.max(4, ((fr + 1) / FPS - t) * 1000 + 1);
@@ -854,17 +913,21 @@
   function onMeadow(x, y) {
     return fall.baseY > 0 && Math.abs(y - fall.baseY + 8) <= 30 && x >= fall.lo - 30 && x <= fall.hi + 30;
   }
+  /* the sky is where the birds actually fly, generously padded so a thumb
+     finds it; above the name it also takes the whole margin */
   function inSky(y) {
     var band = skeinBand();
     if (!band) return false;
-    if (anchors.mode === 'hang') return y >= band.yTop - 10 && y <= band.yBot + 26;
-    return y > 8 && y < anchors.nameTop - 30;
+    if (y >= band.yTop - 24 && y <= band.yBot + 24) return true;
+    return band.yTop < anchors.stackTop && y > 4 && y < band.yBot + 24;
   }
   /* a seed pressed into open ground: the existing guards — never on or into
      the typography, scaled to the clearance near it, 60 px root spacing,
      a cap that evicts the oldest planted sprig and never a day sprig */
   function plantAt(x, y, born) {
     var sc2 = 0.55 + seedRng() * 0.35;
+    /* near the words the sprig is scaled to the clearance, so its canopy can
+       never reach the glyphs; too close and nothing is planted at all */
     if (x > anchors.stackLeft - 110 && x < anchors.stackRight + 110) {
       var vGap = (y > H * 0.4 ? y - anchors.stackBottom : anchors.stackTop - y) - 26;
       sc2 = Math.min(sc2, vGap / 185);
@@ -886,9 +949,15 @@
     if (!anchors || resting()) return;
     if (e.target.closest('a, button')) return;
     var x = e.clientX, y = e.clientY;
-    if (y > anchors.footerTop - 30 && x < anchors.footerRight + 40) return;   // the footer's words
-    if (y > anchors.stackTop - 40 && y < anchors.stackBottom + 40 &&
-        x > anchors.stackLeft - 70 && x < anchors.stackRight + 70) return;    // the typography
+    /* The words are for reading and selecting, so a tap ON them is never the
+       garden's. Keep that halo TIGHT: it used to be 40 px below the text and
+       70 px to the sides, which on a phone is the whole width and swallowed
+       the band the birds fly in — a tap that should have sent a skein did
+       nothing at all. Clearance from the glyphs is a PLANTING concern, and
+       plantAt() enforces it on its own. */
+    if (y > anchors.stackTop - 6 && y < anchors.stackBottom + 6 &&
+        x > anchors.stackLeft - 6 && x < anchors.stackRight + 6) return;
+    if (y > anchors.footerTop - 10 && x < anchors.footerRight + 12) return;
     var now = performance.now();
     if (now - lastClick < 250) return;
     lastClick = now;
@@ -899,7 +968,7 @@
     }
     var t = nowT();
     var small = 0.35 * (0.5 + 0.5 * breeze);
-    var gustEnd = t + GUST_R / GUST_V + GUST_T + 0.1;
+    var gustEnd = t + GUST_LIFE;
     var hit = hitSprig(x, y);
     if (hit) {                                  // the tree rings, its seeds fall
       var done = shake(hit, t);
@@ -907,20 +976,28 @@
       wake(Math.max(done, gustEnd));
       return;
     }
+    /* the sky is checked BEFORE the meadow: on a short phone the two bands
+       nearly touch, and the birds are the answer that is hard to find */
+    if (inSky(y)) {                             // a skein crosses, unhurried
+      if (!flight) startFlight(t + 0.15);
+      addGust(x, t, small);
+      wake(Math.max(flight ? flight.end : 0, gustEnd));
+      return;
+    }
     if (onMeadow(x, y)) {                       // a gust travels out through the garden
       addGust(x, t, 0.5 + 0.5 * breeze);
       wake(gustEnd);
       return;
     }
-    if (inSky(y)) {                             // a skein crosses, unhurried
-      if (!flight) { startFlight(t + 0.3); addGust(x, t, small); wake(flight.end); }
-      else { addGust(x, t, small); wake(gustEnd); }
-      return;
-    }
     if (plantAt(x, y, t)) {                     // a sprig draws itself in, generation by generation
       addGust(x, t, small);
-      wake(Math.max(t + 7 * GROW_S, gustEnd));
+      wake(Math.max(t + SPRIG_S + 0.3, gustEnd));
+      return;
     }
+    /* nowhere to plant (too near the words, too near another root): the
+       garden still answers — a tap is never simply swallowed */
+    addGust(x, t, small);
+    wake(gustEnd);
   });
 
   /* ---------------- lifecycle ---------------- */
@@ -950,7 +1027,10 @@
       } else if (hiddenFor >= 480e3 && anchors) { catchUp(); restFrame(); }
     }
   });
-  window.addEventListener('pagehide', stop);
+  /* bfcache: stop() alone would leave a skein parked mid-sky and a seed
+     hanging in the air if no visibilitychange follows (Safari back/forward),
+     so settle the garden outright — the restored page is then at rest */
+  window.addEventListener('pagehide', function () { if (aliveUntil) settle(); else stop(); });
 
   var rsTimer = 0;
   window.addEventListener('resize', function () {
