@@ -3,44 +3,50 @@
 
    THE PLACE is date-seeded and grows with the day: sparse at dawn, in
    full bloom by evening, held through the small hours until dawn clears
-   it — the same garden for every visitor, all day. It DRAWS ITSELF IN as
-   the door opens: trunks, then branches generation by generation, then
-   blossoms and the meadow's blades, all within 4.5 s — and then the ink
-   settles and nothing moves. Every stroke is a wobbly polyline; while
-   the garden is awake it is redrawn with fresh jitter five times a
-   second (the hand-drawn boil); at rest it is one still drawing in the
-   day's own hand — the same for every visitor until a visit adds to it
-   (a landed seed, a planted sprig).
+   it — the same garden for every visitor, all day. It is ALREADY THERE
+   as the door opens, drawn and still, except the youngest sprig, which
+   is finishing its last generation (born -10.4 s: it draws over 0–2.6 s
+   and its tips blossom at ~3.6 s — growth in progress, never an event).
+   By 4 s the ink has settled and nothing moves. Every stroke is a
+   wobbly polyline; while the garden is awake it is redrawn with fresh
+   jitter five times a second — the hand-drawn boil, and the page's only
+   frame rate, so everything moves in stop-motion, the way a flip-book
+   does. At rest it is one still drawing in the day's own hand.
 
-   TOUCH is the only weather after that. Every tap is answered within a
-   breath (<= 4.5 s), and then the ink settles again:
+   TOUCH is the only weather after that, and an answer takes as long as
+   it takes — nothing is hurried to beat a clock:
    - tap open ground: a seed is pressed into it and a sprig draws itself
      in there (children take symmetric coin-flip slots, so canopies
      settle toward binomial silhouettes; blossom inks come from the
      day's Polya urn)
-   - tap a tree: it shakes, and a few seeds let go and flutter down —
+   - tap a tree: it rings slowly (0.9 Hz, 3 px, gone by ~5 s) and a few
+     seeds let go and flutter down at 82 px/s —
      each air-row a coin-flip step mean-reverting to the release column
      (a discrete Ornstein-Uhlenbeck walk: pachinko with the pegs made of
      air) — and a grass blade takes root where each lands, so the stand
      under every shaken tree settles toward the bell (de Moivre-Laplace,
      drawn as meadow)
    - tap the sky: a skein of birds — marks in the hand's own zigzag —
-     crosses it in stop-motion: membership a coin-flip sum, the lead's
-     undulation echoed down the line, wing-beats detuned per bird,
-     altitude from a golden-ratio sequence, direction a Markov flip
-   - tap the meadow: a gust runs out from the touch through the whole
-     garden — grass leans blade by blade as it passes, canopies shear,
-     falling seeds drift, birds bob: one motion, many small marks
+     MEANDERS across at 12 px/s (a crossing takes minutes, the way a
+     distant flock does): membership a coin-flip sum, the lead's
+     undulation echoed down the line, wing-beats detuned per bird under
+     1 Hz, altitude from a golden-ratio sequence, direction a Markov flip
+   - tap the meadow: a gust rolls out from the touch at 55 px/s through
+     the whole garden — grass leans blade by blade as it passes, canopies
+     shear, falling seeds drift, birds bob: one motion, many small marks
    Every tap also sends a small gust. Nothing else ever moves by itself.
 
    WHY THERE IS NO PAUSE CONTROL: WCAG 2.2.2 asks for one only where
-   motion starts automatically AND lasts longer than five seconds. Here
-   the only automatic motion is the opening, over within 4.5 s of the
-   first frame (whatever was already underway as the door opened — a
-   skein mid-crossing, a seed mid-fall — ends inside it too); everything
-   after that is started by the visitor and over within 4.5 s. Under
-   prefers-reduced-motion nothing animates at all: the day's garden is
-   one still frame, and a tap on open ground plants a finished sprig.
+   motion (1) starts AUTOMATICALLY and (2) lasts longer than five
+   seconds. Only the opening starts by itself, and it is over within 4 s
+   of the first frame — nothing else is ever scheduled. Everything else
+   is started by the visitor, which the criterion does not cover at all,
+   so an answer is free to take its own slow time, and does. Keep the
+   OPENING under five seconds and keep nothing else automatic: that is
+   the whole reason the footer has no button, and it is NOT a reason to
+   hurry anything the visitor started. Under prefers-reduced-motion
+   nothing animates at all: the day's garden is one still frame, and a
+   tap on open ground plants a finished sprig.
 
    THE WEATHER is visit-seeded — the one =rand() cell on the page: ONE
    entropy read at init, layered over the day seed; never stored, never
@@ -48,24 +54,27 @@
    returning tab. It owns HOW the garden answers, never whether: the
    gust's strength (breeze), how many birds tend to fly (traffic), how
    many seeds a shake loosens (tempo), the hand's tremor while awake
-   (hand), the wind's lean and phase, and what is already underway as
-   the door opens (a skein mid-crossing 45 %, a seed mid-fall 20 %, a
-   quiet sky 35 %). The visitor's taps choose where and when.
+   (hand), and the wind's lean and phase. The visitor's taps choose
+   where and when.
 
    THE CALM ENVELOPE (any change must keep all of this true):
    - at rest: zero motion, zero CPU — no loop runs; the resting frame is
      drawn in the day's hand (jitter 1.6, offset 0): the day's garden
      plus whatever this visit has landed or planted
-   - awake: 24 frames a second for at most 4.5 s per answer, the boil at
-     5 fps, jitter <= 1.6 px (1.2–1.6 per visit); the opening is the one
-     automatic waking, 4.5 s, once per load, never on a resize or a
-     returning tab
-   - gusts travel from the touch at 340 px/s, pass a point in 1.4 s and
-     die out by 1000 px; gains are ceilings: grass 2.6 px, canopy
-     4.8 px (scaled by distance from the root), seed drift 3 px, bird
-     bob 3 px; a shaken tree rings at ~1.4 Hz, decaying within 2.5 s
-   - seeds fall so as to land within 3 s of letting go (>= 100 px/s);
-     a skein crosses in 4.3 s, wing-beats 1.6–2.3 Hz, one at a time
+   - awake: 5 frames a second — the boil IS the frame rate, so nothing is
+     smooth and everything is stop-motion; jitter <= 1.6 px (1.2–1.6 per
+     visit); an answer runs until it is genuinely finished
+   - the opening is the ONE automatic waking: 4 s, once per load, never
+     on a resize or a returning tab. Nothing else is ever scheduled
+   - gusts roll from the touch at 55 px/s, pass a point in 3.5 s and die
+     out by 900 px; gains are ceilings: grass 1.3 px, canopy 2.4 px
+     (scaled by distance from the root), seed drift 2 px, bird bob
+     2.5 px, breath 0.15; a shaken tree rings at 0.9 Hz, 3 px, gone by
+     ~5 s
+   - seeds fall at 82 px/s; a branch generation draws in 2.6 s; a skein
+     glides at 12 px/s (minutes per crossing), wing-beats under 1 Hz,
+     one at a time — these are the page's calm speeds, and nothing may
+     be sped up to fit a clock
    - strokes only — never clustered dots (hard rule); no fills, no arcs;
      ink alphas <= 0.85; night ground #181410; palette fixed to the six
      inks
@@ -94,15 +103,15 @@
 
   /* ---------------- config ---------------- */
 
-  var FPS = 24;                // frames per second while awake
-  var BOIL_FPS = 5;            // hand-tremor re-roll rate while awake
+  var FPS = 5;                 // frames a second while awake: the hand's own stop-motion
   var JITTER = 1.6;            // px, wobble ceiling (the resting hand)
-  var GROW_S = 0.62;           // s per branch generation
-  var OPEN_S = 4.5;            // s, the opening: the one automatic waking
-  var ANSWER_S = 4.5;          // s, ceiling for any answer to a tap
-  var GUST_V = 340;            // px/s, a gust's travel from the touch
-  var GUST_T = 1.4;            // s, a gust's passage over a point
-  var GUST_R = 1000;           // px, where a gust has died out
+  var GROW_S = 2.6;            // s per branch generation — a branch takes its time
+  var OPEN_S = 4.0;            // s, the opening: the one automatic motion
+  var FLY_V = 12;              // px/s, a skein's glide — a distant, unhurried crossing
+  var DROP_V = 82;             // px/s, a seed's fall
+  var GUST_V = 55;             // px/s, a gust's travel from the touch
+  var GUST_T = 3.5;            // s, a gust's passage over a point
+  var GUST_R = 900;            // px, where a gust has died out
   var INK = {
     line:   '#d8d2c4',
     dim:    '#8f887b',
@@ -168,12 +177,6 @@
   var wv = vstream(12);
   var windPhVisit = wv() * 6.283;
   var windDir = wv() < 0.5 ? -1 : 1;                                  // which way this visit's gusts lean
-
-  /* what is already underway as the door opens — exactly one thing */
-  var op = vstream(13);
-  var u0 = op();
-  var opening = u0 < 0.45 ? 'skein' : (u0 < 0.65 ? 'seed' : 'quiet');
-  var openU = op();
 
   var hv = vstream(15);
   var tremorOff = (hv() * 4096) | 0;
@@ -316,9 +319,10 @@
   function drawSprig(sprig, tNow) {
     /* the canopy shears with the wind — most at the far tips, nothing at
        the rooted base — and rings when shaken */
-    var wv = wind(sprig.ox, tNow) * 4.8;
+    var wv = wind(sprig.ox, tNow) * 2.4;
     var u = tNow - sprig.shakeT;
-    if (u > 0 && u < 3) wv += 5 * Math.sin(u * 9) * Math.exp(-u * 1.6);
+    /* a shaken tree rings slowly and dies away: 0.9 Hz, 3 px, gone by ~5 s */
+    if (u > 0 && u < 5.5) wv += 3 * Math.sin(u * 5.65) * Math.exp(-u * 0.8);
     var i, s, g, t, j, d, pts2, tx, ty;
     for (i = 0; i < sprig.segs.length; i++) {
       s = sprig.segs[i];
@@ -416,15 +420,19 @@
     dayCount++;
   }
 
-  /* bornBase 0: the opening — the sprigs draw themselves in, staggered a
-     little; bornBase far past: everything already drawn */
-  function plantDayGarden(bornBase) {
+  /* opening: the day's garden is already grown, except the youngest sprig,
+     which is still drawing its last generation as the door opens (born
+     -10.4 s: that generation draws over 0–2.6 s and its tips blossom at
+     ~3.6 s — growth in progress, never an event). Otherwise: all grown. */
+  function plantDayGarden(opening) {
     sprigs.length = 0;
     dayCount = 0; dayPlanted = 0; gardenRng = null;
     if (!anchors || anchors.mode === 'rest') return;
     gardenRng = stream(2);
     var total = daySprigs(), i;
-    for (i = 0; i < total; i++) plantOne(i, gardenRng, bornBase + 0.15 * i);
+    for (i = 0; i < total; i++) {
+      plantOne(i, gardenRng, (opening && i === total - 1 && total > 1) ? -10.4 : -100);
+    }
   }
 
   /* ---------------- the skein ---------------- */
@@ -464,17 +472,17 @@
         sc: 0.8 + r() * 0.35,
         back: back,
         side: (i % 2 ? 1 : -1) * (6 + r() * 15) * (i ? 1 : 0.3),
-        beatF: 1.6 + r() * 0.7,
+        beatF: 0.68 + r() * 0.27,
         beatPh: r() * 7
       });
     }
     if (!prevDir) prevDir = r() < 0.5 ? -1 : 1;
     var dir = r() < 0.72 ? -prevDir : prevDir;
     prevDir = dir;
-    var len = back + 30, dur = 4.3;
+    var len = back + 30, dur = (W + len + 190) / FLY_V;   // a crossing takes as long as it takes
     flight = {
       birds: birds, len: len, t0: t0, dur: dur, end: t0 + dur, dir: dir,
-      v: (W + len + 190) / dur,
+      v: FLY_V,
       yj: 0.12 + 0.72 * ((skeinA0 + skeinK * 0.6180339887) % 1),
       yj2: 0.12 + 0.72 * r(),
       ph: r() * 6.283, ph2: r() * 6.283
@@ -499,7 +507,7 @@
 
   function skeinWave(t, bandH) {
     var A = Math.min(14, bandH * 0.22);
-    return Math.sin(t * 1.6 + flight.ph) * A + Math.sin(t * 0.7 + flight.ph2) * A * 0.7;
+    return Math.sin(t * 0.20 + flight.ph) * A + Math.sin(t * 0.083 + flight.ph2) * A * 0.7;
   }
 
   function drawFlock(tNow) {
@@ -524,7 +532,7 @@
       bx = flight.dir < 0
         ? headX + flight.len - bd.back - p.w * sc * bd.sc
         : headX + bd.back;
-      by += wind(bx, tNow) * 3;
+      by += wind(bx, tNow) * 2.5;
       by = Math.max(yTop, Math.min(yBot, by));
       pts = [];
       for (i = 0; i < p.pts.length; i++) {
@@ -580,18 +588,18 @@
     if (dayS() < 5 * 3600) return 64;
     return Math.min(64, Math.floor(Math.max(0, dayS() - 6.5 * 3600) / 480));
   }
-  function replayLandings(count, bornBase) {
+  /* the day's landings are already there: the meadow never sweeps in */
+  function replayLandings(count) {
     var d, tip, p;
     for (d = 0; d < count; d++) {
       tip = fall.tips[(fall.rng() * fall.tips.length) | 0];
       p = fallPath(tip[0], tip[1], fall.x0, fall.rng);
-      /* in the opening the blades sweep in over 2.0–3.6 s */
-      addBlade(p[p.length - 1][0], bornBase + 2.0 + 1.6 * d / Math.max(1, count), fall.rng);
+      addBlade(p[p.length - 1][0], -10, fall.rng);
     }
     fall.replayed += count;
   }
 
-  function meadowInit(bornBase) {
+  function meadowInit() {
     fall.rng = stream(6);
     fall.vrng = vstream(6);
     fall.blades.length = 0;
@@ -621,7 +629,7 @@
     fall.baseY = fall.hang ? ((anchors ? anchors.footerTop : H - 46) - 28) : H - 6;
     fall.lo = fall.hang ? Math.max(18, W * 0.30) : Math.max(18, (anchors ? anchors.footerRight : 160) + 30);
     fall.hi = W - 22;
-    replayLandings(dayKept(), bornBase);
+    replayLandings(dayKept());
   }
 
   function upperHalf(tips) {
@@ -645,22 +653,28 @@
     return upperHalf(out);
   }
 
+  /* returns when the blade it plants has finished growing */
   function letGo(tip, aim, t0) {
     var pts = fallPath(tip[0], tip[1], aim, fall.vrng);
-    var dist = Math.max(20, fall.baseY - tip[1]);
-    fall.drops.push({ t0: t0, pts: pts, ry: tip[1], v: Math.max(100, dist / 3.0) });   // lands within 3 s
+    fall.drops.push({ t0: t0, pts: pts, ry: tip[1], v: DROP_V });
+    return t0 + Math.max(20, fall.baseY - tip[1]) / DROP_V + 0.6;
   }
 
+  /* returns when this answer is over: the ring has died away and the last
+     seed has landed and grown its blade */
   function shake(sprig, t) {
     sprig.shakeT = t;
-    var tips = releaseTips(sprig), i, k, tip;
-    if (!tips.length) return;
+    var done = t + 5.5;
+    var tips = releaseTips(sprig), i, k, tip, end;
+    if (!tips.length) return done;
     k = Math.min(seedsPerShake, tips.length);
     var aim = sprig.oy <= 4 ? fall.x0 : Math.max(fall.lo + 30, Math.min(fall.hi - 30, sprig.ox));
     for (i = 0; i < k; i++) {
       tip = tips[(fall.vrng() * tips.length) | 0];
-      letGo(tip, aim, t + 0.15 + 0.35 * i + 0.2 * fall.vrng());
+      end = letGo(tip, aim, t + 0.4 + 0.9 * i + 0.5 * fall.vrng());
+      if (end > done) done = end;
     }
+    return done;
   }
 
   function drawMeadow(tNow) {
@@ -669,7 +683,7 @@
       b = fall.blades[i];
       t = Math.min(1, (tNow - b.born) / 0.6);
       if (t <= 0) continue;
-      wv = wind(b.x, tNow) * 2.6;
+      wv = wind(b.x, tNow) * 1.3;
       by = fall.baseY + nz(i * 17) * 1.5;
       tx = b.x + b.lean * b.h * 0.45 + wv; ty = by - b.h;
       stroke([[b.x, by],
@@ -697,28 +711,12 @@
       }
       i0 = idx | 0; f = idx - i0;
       x = d.pts[i0][0] + (d.pts[i0 + 1][0] - d.pts[i0][0]) * f;
-      x += wind(x, tNow) * 3;
+      x += wind(x, tNow) * 2;
       a = Math.sin(yNow / 15) * 0.55 + 0.25;
       ca = Math.cos(a); sa = Math.sin(a);
       stroke([[x - 3.5 * ca, yNow - 3.5 * sa], [x + 3.5 * ca, yNow + 3.5 * sa]], INK.verm, 1.6, 0.85, 1, 7999 + i * 13);
       stroke([[x + 2 * ca, yNow + 2 * sa], [x + 2 * ca - 3 * sa, yNow + 2 * sa + 3 * ca]], INK.verm, 1.2, 0.7, 1, 7998 + i * 13);
       i++;
-    }
-  }
-
-  /* what is already underway as the door opens: a skein mid-crossing, or a
-     seed mid-fall (with >= 2.5 s of air left where the fall is long enough,
-     else letting go from the canopy at 2.2 s) — either way over by 4.5 s */
-  function openingInit() {
-    if (!anchors || anchors.mode === 'rest') return;
-    if (opening === 'skein' && skeinBand()) {
-      startFlight(0);
-      flight.t0 = -flight.dur * (0.2 + 0.4 * skeinRng());
-      flight.end = flight.t0 + flight.dur;
-    } else if (opening === 'seed' && fall.tips.length) {
-      var tip = fall.tips[(fall.vrng() * fall.tips.length) | 0];
-      var dur = Math.max(20, fall.baseY - tip[1]) / Math.max(100, Math.max(20, fall.baseY - tip[1]) / 3.0);
-      letGo(tip, fall.x0, dur >= 2.5 ? -openU * (dur - 2.5) : 2.2);
     }
   }
 
@@ -762,9 +760,8 @@
     anchors = a;
   }
 
-  /* plants the place; bornBase 0 is the opening (everything draws itself
-     in), a far-past bornBase draws it already grown */
-  function layout(bornBase) {
+  /* plants the place; `opening` leaves the youngest branch mid-draw */
+  function layout(opening) {
     W = window.innerWidth;
     H = window.innerHeight;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -772,8 +769,8 @@
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     measureAnchors();
-    plantDayGarden(bornBase);
-    meadowInit(bornBase);
+    plantDayGarden(opening);
+    meadowInit();
     flight = null;
     gusts.length = 0;
   }
@@ -785,7 +782,7 @@
 
   function render(tNow, live) {
     animatingNow = live;
-    breath = live ? 0.22 * Math.sin(tNow * 1.1 + windPhVisit) : 0;
+    breath = live ? 0.15 * Math.sin(tNow * 0.19 + windPhVisit) : 0;
     if (live) pruneGusts(tNow);
     ctx.clearRect(0, 0, W, H);
     drawFlock(tNow);
@@ -803,7 +800,7 @@
     var fr = Math.floor(t * FPS);
     if (fr !== lastFr) {
       lastFr = fr;
-      boilPhase = Math.floor(t * BOIL_FPS);
+      boilPhase = fr;               // the boil re-rolls on every frame
       render(t, true);
     }
     var wait = Math.max(4, ((fr + 1) / FPS - t) * 1000 + 1);
@@ -902,27 +899,27 @@
     }
     var t = nowT();
     var small = 0.35 * (0.5 + 0.5 * breeze);
+    var gustEnd = t + GUST_R / GUST_V + GUST_T + 0.1;
     var hit = hitSprig(x, y);
-    if (hit) {
-      shake(hit, t);
+    if (hit) {                                  // the tree rings, its seeds fall
+      var done = shake(hit, t);
       addGust(x, t, small);
-      wake(t + ANSWER_S);
+      wake(Math.max(done, gustEnd));
       return;
     }
-    if (onMeadow(x, y)) {
+    if (onMeadow(x, y)) {                       // a gust travels out through the garden
       addGust(x, t, 0.5 + 0.5 * breeze);
-      wake(t + Math.min(ANSWER_S, GUST_R / GUST_V + GUST_T + 0.1));
+      wake(gustEnd);
       return;
     }
-    if (inSky(y)) {
-      if (!flight) startFlight(t + 0.05);
-      addGust(x, t, small);
-      wake(t + ANSWER_S);
+    if (inSky(y)) {                             // a skein crosses, unhurried
+      if (!flight) { startFlight(t + 0.3); addGust(x, t, small); wake(flight.end); }
+      else { addGust(x, t, small); wake(gustEnd); }
       return;
     }
-    if (plantAt(x, y, t)) {
+    if (plantAt(x, y, t)) {                     // a sprig draws itself in, generation by generation
       addGust(x, t, small);
-      wake(t + ANSWER_S);
+      wake(Math.max(t + 7 * GROW_S, gustEnd));
     }
   });
 
@@ -931,7 +928,7 @@
   var hiddenAt = 0;
   var seen = !document.hidden;
   function catchUp() {
-    replayLandings(Math.max(0, Math.min(12, dayKept() - fall.replayed)), -100);
+    replayLandings(Math.max(0, Math.min(12, dayKept() - fall.replayed)));
     if (gardenRng && anchors && anchors.mode !== 'rest' && dayPlanted < 6 && daySprigs() > dayPlanted) {
       plantOne(dayPlanted, gardenRng, -100);
     }
@@ -961,7 +958,7 @@
     rsTimer = setTimeout(function () {
       if (!anchors) return;
       stop(); aliveUntil = 0;
-      layout(-100);                       // re-plants the place, already grown; never re-opens
+      layout(false);                      // re-plants the place, already grown; never re-opens
       restFrame();
     }, 150);
   });
@@ -980,11 +977,10 @@
     clock0 = tms;
     if (!seen) { awayS += (performance.now() - initNow) / 1000; seen = true; hiddenAt = 0; }
     if (still()) {
-      layout(-100);
+      layout(false);
       restFrame();
     } else {
-      layout(0);
-      openingInit();
+      layout(true);                 // the youngest branch finishes drawing
       wake(OPEN_S);
     }
     doc.classList.add('ink-ready');
