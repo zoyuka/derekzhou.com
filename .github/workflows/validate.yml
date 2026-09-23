@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v8.css
+            style.v9.css
             site.js
-            ink.v13.js
+            birds.v1.js
             robots.txt
             _headers
             _redirects
@@ -115,7 +115,7 @@ jobs:
           done
           # And the reverse: the versioned css/js the repo ships must be the
           # ones index.html loads.
-          for f in style.v*.css ink.v*.js; do
+          for f in style.v*.css birds.v*.js; do
             if [ -f "$f" ] && ! grep -q "\"/$f\"" index.html; then
               echo "::error::$f exists but index.html does not reference it"
               fail=1
@@ -138,8 +138,8 @@ jobs:
 
       - name: Absences are enforced
         run: |
-          INK=$(ls ink.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
-          echo "checking $INK and $CSS"
+          JS=$(ls birds.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
+          echo "checking $JS and $CSS"
           # The page has none of the internet's body language, and CI fails
           # (rather than remembers) if any of it comes back. Scoped to the
           # shipped files only — never to CLAUDE.md prose.
@@ -149,38 +149,19 @@ jobs:
             echo "::error::internet body language found in the HTML"
             fail=1
           fi
-          # (2) behaviour: no hush, exit, idle, pointer-position or title handlers
-          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage' site.js $INK; then
-            echo "::error::a needy behaviour (exit/idle/title/pointer handler) was reintroduced"
+          # (2) behaviour: no exit, idle, pointer-position, key or title handlers
+          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage|localStorage' site.js $JS; then
+            echo "::error::a needy behaviour (exit/idle/title/pointer handler or storage) was introduced"
             fail=1
           fi
-          # (3) render-path purity: ONE clock read and ONE entropy read, both above INIT-END
-          if [ "$(grep -c 'new Date' $INK)" != "1" ]; then
-            echo "::error::$INK must read the clock exactly once (new Date count != 1)"
+          # (3) the birds add no DOM: they are the three SVGs in index.html
+          if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS; then
+            echo "::error::$JS builds DOM — the birds live in index.html"
             fail=1
           fi
-          if grep -n 'Math\.random' $INK; then
-            echo "::error::Math.random in $INK — the only entropy is the visit seed at init"
-            fail=1
-          fi
-          if ! grep -q -- '---- INIT-END:' $INK; then
-            echo "::error::INIT-END marker missing from $INK"
-            fail=1
-          fi
-          bad=$(awk '/---- INIT-END:/{p=1;next} p && /new Date|Date\.now|Math\.random|getRandomValues/{print NR": "$0}' $INK)
-          if [ -n "$bad" ]; then
-            echo "$bad"
-            echo "::error::clock or entropy read below the INIT-END marker"
-            fail=1
-          fi
-          # (4) strokes only (no fills, no arcs) and ink alphas <= 0.85
-          if grep -nE '\.arc\(|\.fill\(|fillRect|globalAlpha *= *0\.(8[6-9]|9)' $INK; then
-            echo "::error::fill/arc or an alpha above 0.85 in $INK"
-            fail=1
-          fi
-          # (5) no URL hook (?seed=, #hash), no sound, no custom cursor
-          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $INK index.html 404.html; then
-            echo "::error::a URL hook or sound was introduced (the seed is never in the URL; the page is silent)"
+          # (4) no URL hook, no sound, no custom cursor
+          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS index.html 404.html; then
+            echo "::error::a URL hook or sound was introduced"
             fail=1
           fi
           if grep -nE 'cursor *:' $CSS; then
