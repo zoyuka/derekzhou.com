@@ -73,22 +73,22 @@
 }
 
 /* ------------------------------------------------
-   Tokens — ink on night paper.
-   Focus is the ochre ink (7.08:1 on the ground); selection is a dim-ink
-   ground under the text colour (6.11:1), never paper-white.
+   Tokens — black ink on Samara's cream (#f9f8f1).
+   Text 19.7:1, dimmed 6.3:1, focus (a dark ochre) 5.0:1 on the ground;
+   selection is a light warm grey under the black text (16.2:1).
    ------------------------------------------------ */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
-  --color-bg: #181410;
-  --color-text: #ece9e4;
-  --color-dimmed: #b8b4ac;
-  --color-focus: #c79a3d;
-  --color-selection: #5a554c;
+  --color-bg: #f9f8f1;
+  --color-text: #000000;
+  --color-dimmed: #5f5c56;
+  --color-focus: #8a6417;
+  --color-selection: #e6e2d6;
 }
 
 /* ------------------------------------------------
@@ -114,8 +114,6 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* taps answer at once: no double-tap zoom delay on touch screens */
-  touch-action: manipulation;
 }
 
 ::selection {
@@ -129,17 +127,35 @@ body {
 }
 
 /* ------------------------------------------------
-   The ink canvas — behind everything, inert. No fade: the type is dry
-   at first paint and the garden draws itself in on the canvas.
+   The birds — samara.com/jobs's dots (body > .dot), as birds: fixed to
+   the window, over the page like Samara's, fading in over a second when
+   each appears. birds.v1.js moves them; without it they never show.
+   They never take a click: links under a bird still work.
    ------------------------------------------------ */
 
-#ink {
+.bird {
+  display: none;
   position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: visible;
   pointer-events: none;
+  transform-origin: 50% 50%;
+  fill: none;
+  stroke: var(--color-text);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bird.on {
+  display: block;
+  animation: appear 1s;
+}
+
+@keyframes appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ------------------------------------------------
@@ -233,8 +249,12 @@ footer a, .back-link {
    Motion preferences and forced colors
    ------------------------------------------------ */
 
+@media (prefers-reduced-motion: reduce) {
+  .bird.on { animation: none; }
+}
+
 @media (forced-colors: active) {
-  #ink { display: none; }
+  .bird { stroke: CanvasText; }
 }
 
 /* ------------------------------------------------
@@ -242,7 +262,7 @@ footer a, .back-link {
    ------------------------------------------------ */
 
 @media print {
-  #ink,
+  .bird,
   footer {
     display: none;
   }
@@ -253,8 +273,6 @@ footer a, .back-link {
   }
 
   h1 { font-size: 2rem; }
-  /* .bio strong sets the screen text colour explicitly (near-white);
-     on paper it must print black, not vanish */
   h1, .bio strong { color: #000; }
   .dimmed, .credit { color: #555; }
 }
