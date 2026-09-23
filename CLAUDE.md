@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v9.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/birds.v1.js            The birds — Samara's jobs-page dots, as birds (see Birds)
+/birds.v2.js            The birds — Samara's jobs-page dots, as birds (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -87,40 +87,86 @@ Type is matte: no text-shadow, no glow. Links are plain underlined words
 cursors only. The type is present at first paint in its final place.
 Print hides the birds and the footer.
 
-## Birds (birds.v1.js)
+## Birds (birds.v2.js)
 
 Samara's jobs page (samara.com/jobs, read from its bundle: `body > .dot`
 in index.css and the /^\/jobs.*/ block in index.js) drops one 14 px black
 dot per opening onto the page; each appears at a random moment within
-count x 500 ms, fades in over 1 s (`@keyframes appear`), sets off in a
-random unit direction at 0.5 px per frame and bounces off the window's
-edges (reverse the component at an edge, then clamp inside) for as long
-as the page is open. Fixed to the window, over the page (z-index 0).
+count x 500 ms, fades in over 1 s (`@keyframes appear`) and drifts about
+the window at 0.5 px per frame for as long as the page is open.
 
-This site does exactly that with birds:
+KEPT FROM SAMARA: up to three birds (one per glyph), the staggered
+appearance and the 1 s fade, the pace (SPEED 30 px/s, time-based — a
+120 Hz screen does not fly them faster; each bird 0.9–1.1 of it), forever,
+never leaving the window. They are the three inline SVGs at the end of
+index.html, hidden until the script shows them (no JS: no birds);
+birds.v2.js sets their viewBox and polyline and moves them with a CSSOM
+transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
+pointer-events: none, so a link under a bird still takes the click.
 
-* Three birds, one of each tattoo glyph (GLYPHS — the three stepped-
-  zigzag marks are the alphabet, do not restyle them), black strokes
-  (1.9 px, round caps and joins), glyph units x 1.2 (23–31 px wide).
-* They are three inline SVGs at the end of index.html, hidden until the
-  script shows them (no JS: no birds). birds.v1.js sets each one's
-  viewBox and polyline and moves it with a CSSOM transform; it adds no
-  DOM (CI greps for createElement/innerHTML/appendChild).
-* Speed is time-based, SPEED 30 px/s (Samara's 0.5 px/frame at 60 fps),
-  so a 120 Hz screen does not fly them twice as fast. The step is capped
-  at 50 ms, so a returning tab never jumps them across the window;
-  requestAnimationFrame pauses them while the tab is hidden.
-* A bird faces the way it flies (the glyphs face left; flying right
-  mirrors it with scaleX(-1)) and beats its wings in stop-motion
-  (0.68–0.95 Hz per bird, the wings half-folding toward the body line).
-* pointer-events: none: a bird over a link never takes the click.
-* prefers-reduced-motion: the birds are placed at once, fully visible,
-  and stay still (live listener both ways). forced-colors: CanvasText.
+THE HAND (the ink garden's birds, restored — this is what makes them
+alive; v1 dropped it and they read as frozen icons):
+* the tattoo glyphs (GLYPHS — the three stepped-zigzag marks are the
+  alphabet, do not restyle them: no tilt, no rotation), 1.9 px round
+  strokes, each bird its own size (x1.2 x 0.85–1.15)
+* the BOIL: every vertex re-jittered BOIL_FPS (5) times a second by the
+  visit's hand (1.2–1.6 px, x0.4 on a bird in flight)
+* the stop-motion WING-BEAT: wings half-fold toward the body line and
+  open again, detuned per bird (0.68–0.95 Hz)
+* the drawing (tremor, wings, facing) changes only on the hand's frames;
+  the position glides smoothly between them. A bird faces the way it flies
+  (the glyphs face left; flying right mirrors them), with hysteresis, and
+  the flip lands on a hand frame.
+
+THE FLIGHT (feng shui: nothing ruled straight, nothing sharp, the words
+left clear, the space in balance):
+* level-ish cruising, the climb a slow mean-reverting wander (PITCH_TAU
+  6 s, width by the visit's breeze, at most PITCH_MAX 28°)
+* at a wall, the words, a bird, or a gap too narrow to turn in ahead, ONE
+  smooth turnaround loop: the widest turning circle (LOOP_R 18–120 px)
+  that fits the open space whole — clear of every edge and word by the
+  bird's own radius — over the top or under, keeping to the side it last
+  turned while that side has room (narrow columns are climbed in
+  switchbacks, like a thermal) and away from other birds. Samara's
+  instant bounce survives only as a fail-safe (never fires in normal
+  flight — see the simulator below)
+* THE WORDS ARE NEVER CROSSED: the .stack box (+WORDS 12 px) and each
+  footer link (+LINKS 12 px), grown by the bird's radius, are obstacles;
+  a bird near a face above or below (or diving at a corner) is held off
+  it by a floor/ceiling on its climb (EASE_V 60 px)
+* birds part in height to pass, the one behind eases its pace, a loop
+  avoids another bird's patch of sky
+* balance: each appears at the best of 32 R2 (low-discrepancy) spots —
+  clear of the words, with room to turn round, far from the birds already
+  out — facing alternately (a Markov flip, 72 % alternate)
+* a small sky holds fewer birds: one per TERRITORY (25 000 px²) of open
+  sky, at least one wherever one can fly (ONE_BIRD 5 000 px²), none where
+  the words fill the screen (a 320x480 phone). Measured phones: 390x844,
+  412x720, 430x740 three; 393x664 two; 360x640, 375x548 one.
+* a resize, rotation, scroll or font swap re-measures; a bird the words
+  moved onto goes and re-appears in balance (with the fade)
+
+THE WEATHER (=rand()): ONE crypto.getRandomValues at init, above the
+INIT-END marker, and no clock read at all; splitmix32 streams from it:
+one front and four facets (hand, tempo, breeze, pace: a still visit is
+still everywhere) and each bird's own stream. Never Math.random (CI).
+
+prefers-reduced-motion: the birds are placed at once (in balance, clear
+of the words) and stay still, the hand at rest, live both ways.
+forced-colors: CanvasText. A hidden tab pauses with
+requestAnimationFrame; a step is capped at 50 ms.
 
 The birds move for as long as the page is open, as Samara's dots do. That
 is automatic motion over five seconds beside content, which WCAG 2.2.2
 (AA) answers with a pause control; the owner chose Samara's behaviour
 without one. prefers-reduced-motion is the only stop.
+
+VERIFY before changing the flight: a node simulator flies the real file
+against a fake DOM with the real page layouts (12 viewports, rotations,
+scrolls) for simulated minutes and checks: the drawn strokes never touch
+the words or leave the window, no fail-safe bounces, turns under ~170°/s,
+pace 27–33 px/s, no long overlaps; then a browser pass checks the same
+live plus the hand (~5 redraws/s), the wing-beat and the facing.
 
 ## CSS
 
@@ -139,7 +185,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v1.js — the birds (see above). Progressive enhancement: with JS
+2. birds.v2.js — the birds (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
 ## Fonts + performance
@@ -190,17 +236,19 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v1.js, plus style.v9.css for cursors — never to this prose) fails
+birds.v2.js, plus style.v9.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v1.js; any URL hook
+storage handler in the JS; any DOM building in birds.v2.js; more or
+fewer than one getRandomValues in it, or one below its INIT-END marker;
+any Math.random or clock read (Date) in it; any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
 AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 `cursor:` rule in the stylesheet (OS cursors only).
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v1.js on every TT-enforcing browser (verified by
+site.js AND birds.v2.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types

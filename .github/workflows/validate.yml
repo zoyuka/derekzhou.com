@@ -18,7 +18,7 @@ jobs:
             index.html
             style.v9.css
             site.js
-            birds.v1.js
+            birds.v2.js
             robots.txt
             _headers
             _redirects
@@ -159,7 +159,26 @@ jobs:
             echo "::error::$JS builds DOM — the birds live in index.html"
             fail=1
           fi
-          # (4) no URL hook, no sound, no custom cursor
+          # (4) the weather (=rand()): ONE entropy read, above INIT-END; no clock; never Math.random
+          if [ "$(grep -c 'getRandomValues(' $JS)" != "1" ]; then
+            echo "::error::$JS must draw entropy exactly once (getRandomValues( count != 1)"
+            fail=1
+          fi
+          if grep -nE 'Math\.random|new Date|Date\.now' $JS; then
+            echo "::error::Math.random or a clock read in $JS — the only randomness is the visit seed"
+            fail=1
+          fi
+          if ! grep -q -- '---- INIT-END:' $JS; then
+            echo "::error::INIT-END marker missing from $JS"
+            fail=1
+          fi
+          bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date/{print NR": "$0}' $JS)
+          if [ -n "$bad" ]; then
+            echo "$bad"
+            echo "::error::an entropy or clock read below the INIT-END marker"
+            fail=1
+          fi
+          # (5) no URL hook, no sound, no custom cursor
           if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS index.html 404.html; then
             echo "::error::a URL hook or sound was introduced"
             fail=1
