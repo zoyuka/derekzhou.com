@@ -270,11 +270,13 @@
   function soft(v, top) { var k = KNEE * top; return v <= k ? v : k + (top - k) * (1 - Math.exp(-(v - k) / (top - k))); }
   function maxFlights() { return W >= WIDE ? FLIGHTS[1] : FLIGHTS[0]; }
 
-  /* the ink box (x ± hw, y ± hh) keeps its margin from every word box */
+  /* the ink box (x ± hw, y ± hh) keeps its margin from every word box
+     (a flight already flying, when the page moves, half of it) */
+  var held = 1;
   function clearOfWords(x, y, hw, hh) {
-    for (var i = 0, o; i < words.length; i++) {
-      o = words[i];
-      if (x + hw > o.l - o.m && x - hw < o.r + o.m && y + hh > o.t - o.m && y - hh < o.b + o.m) return false;
+    for (var i = 0, o, m; i < words.length; i++) {
+      o = words[i]; m = o.m * held;
+      if (x + hw > o.l - m && x - hw < o.r + m && y + hh > o.t - m && y - hh < o.b + m) return false;
     }
     return true;
   }
@@ -1268,17 +1270,24 @@
     raf = 0; last = 0;
   }
 
-  /* the window resized or the words moved: a new sky if the window changed
-     shape; otherwise every flight still clear of the words flies on, and a
-     flight the words have moved onto goes */
+  /* the window resized or the words moved (on a phone, the browser's bar
+     coming and going as the page loads): a new sky if the window changed
+     shape; otherwise every flight still clear of the words (by half its
+     margin) flies on, and a flight the words have moved onto goes; and its
+     place is not kept waiting: into a sky left empty the next flight comes
+     as the first did, within a second or two, never a long empty spell */
   function relayout() {
-    var w0 = W, h0 = H, i, F;
+    var w0 = W, h0 = H, gone = 0, i, F;
     measure();
     if (W !== w0 || Math.abs(H - h0) > 120) { begin(); return; }
+    held = 0.5;
     for (i = flights.length - 1; i >= 0; i--) {
       F = flights[i];
-      if (trial(F, t - F.t0) < 0) land(F);
+      if (trial(F, t - F.t0) < 0) { land(F); gone++; }
     }
+    held = 1;
+    if (gone && !flights.length) { job = null; stills = 0; if (!startJob(still.matches ? 'still' : 'first')) tNext = t; }
+    else if (gone) tNext = Math.min(tNext, t);
     if (job) resetJob();
   }
   function begin() {
