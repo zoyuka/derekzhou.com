@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v9.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/birds.v5.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
+/birds.v6.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -95,7 +95,7 @@ Type is matte: no text-shadow, no glow. Links are plain underlined words
 cursors only. The type is present at first paint in its final place.
 Print hides the birds and the footer.
 
-## Birds (birds.v5.js)
+## Birds (birds.v6.js)
 
 The page is a sky. Birds cross it the way birds cross a real sky, built
 from field data (RESEARCH below) and nothing like v1/v2's dots, which
@@ -225,7 +225,7 @@ visit is still everywhere), the season, and each flight's own stream
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v5.js sets each one's viewBox, size, polyline, stroke
+birds); birds.v6.js sets each one's viewBox, size, polyline, stroke
 width and stroke opacity (attributes), and moves it with a CSSOM
 transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
 pointer-events: none, so a link under a bird still takes the click.
@@ -235,8 +235,13 @@ sky 900 px or wider; a skein, a pair or a lone bird) placed mid-lane in
 the roomiest open field, every bird caught at its own point in the beat,
 the hand at rest, live both ways. forced-colors: CanvasText, full ink. A
 hidden tab pauses with requestAnimationFrame; a step is capped at 50 ms.
-A resize or rotation starts a new sky; a scroll or font swap re-checks
-every flight, and a flight the words moved onto goes.
+A resize or rotation starts a new sky. A scroll, a font swap or a small
+change of height (on a phone, the browser's bar coming and going, as it
+does while the page loads) re-checks every flight, holding it to half its
+margin: a flight the words moved onto goes, and its place is not kept
+waiting. Into a sky left empty the next flight comes as the first did,
+within a second or two (v5 held it back as if the lost flight were still
+crossing: on an iPhone the sky stayed empty for ten seconds and more).
 
 The birds fly for as long as the page is open. That is automatic motion
 over five seconds beside content, which WCAG 2.2.2 (Level A) answers
@@ -263,7 +268,8 @@ tradition (few birds, empty sky: liubai, ma).
 
 VERIFY before changing the flight: a node simulator flies the real file
 against a fake DOM with the real page layouts (12 viewports, rotations,
-scrolls, reduced motion both ways) for simulated minutes and checks: ink
+scrolls, a phone's browser bar changing the height at load, reduced
+motion both ways) for simulated minutes and checks: ink
 never within 12 px of the words (in practice 22 px or more), birds enter
 and leave only across an edge (never popping in or out mid-sky), no
 reversal and no turn over 25 degrees a second outside a thermal or a
@@ -272,7 +278,9 @@ never overlapping (through their events), two flights never within 30 px
 and never in one band, 10-72 px/s, birds beating their wings most of the
 time and a flock never in lockstep, the facing, no four birds, at most 2
 flights (3 on a wide sky), the sky seldom empty, the first bird within a
-few seconds, short frames; then a browser pass checks the same live, and
+few seconds (within 3 s after the bar at load), short frames; then a
+browser pass checks the same live (in WebKit, Safari's engine, too, with
+the window's height changed as the page loads), and
 film strips (16 drawings, 1/12 s apart), a time-lapse of a gathering and
 whole-page sheets across seeds are looked at by eye.
 
@@ -293,7 +301,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v5.js — the sky (see above). Progressive enhancement: with JS
+2. birds.v6.js — the sky (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
 ## Fonts + performance
@@ -344,10 +352,10 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v5.js, plus style.v9.css for cursors — never to this prose) fails
+birds.v6.js, plus style.v9.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v5.js; more or
+storage handler in the JS; any DOM building in birds.v6.js; more or
 fewer than one getRandomValues in it, or one below its INIT-END marker;
 any Math.random or clock read (Date) in it; any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
@@ -356,7 +364,7 @@ AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v5.js on every TT-enforcing browser (verified by
+site.js AND birds.v6.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
