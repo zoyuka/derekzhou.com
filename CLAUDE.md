@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v9.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/birds.v3.js            The birds — a sky: flights crossing it in patterns (see Birds)
+/birds.v4.js            The birds — a sky: flights crossing it in patterns (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -81,7 +81,9 @@ Except instead of dots use birds and don't use dark background should be
 light."; then, of Samara's dots drifting and bouncing inside the window:
 "That's not at all how birds move tho. The page should be a sky so like
 they're flying across/in patterns/etc. it should feel calm - not
-bouncing off the walls." and, of the number of birds, "should b rand".
+bouncing off the walls." and, of the number of birds, "should b rand";
+then, of v3's slow, rigid rows: "Are you sure this is how birds movement
+is flying?!"
 
 Light only (color-scheme: light). Tokens: bg #f9f8f1 (Samara's cream),
 text #000 (19.7:1), dimmed #5f5c56 (6.3:1), focus #8a6417 (a dark
@@ -91,11 +93,12 @@ Type is matte: no text-shadow, no glow. Links are plain underlined words
 cursors only. The type is present at first paint in its final place.
 Print hides the birds and the footer.
 
-## Birds (birds.v3.js)
+## Birds (birds.v4.js)
 
 The page is a sky. Birds cross it the way birds cross a real sky, built
 from field data (RESEARCH below) and nothing like v1/v2's dots, which
-lived inside the window and turned back at its walls.
+lived inside the window and turned back at its walls, or v3's slow rigid
+rows, which barely beat their wings and read as a dashed line.
 
 THE SKY: every flight enters from beyond one edge already flying and
 leaves beyond the far edge, on one gentle lane (a cubic curve: slope at
@@ -105,51 +108,64 @@ view: motion onset and sudden reversals are what pull the eye off text
 (Abrams & Christ 2003; Howard & Holcombe 2010). Samara's 1 s fade
 (`appear`) softens each bird's entry at the edge. A lane is planned
 whole before its first bird enters: the planner flies the flight forward
-in thought (STEP 0.3 s) and every bird's ink box must stay WORDS 24 px
-from the .stack box and LINKS 20 px from each footer link, EDGE 10 px
-inside the edges the flight does not cross, and APART 48 px from every
-other flight, for the whole crossing. The roomiest of TRIES (16) lanes
-wins; level lanes are drawn (R2 low-discrepancy) only from the open
-bands, the heights where the whole flight clears the words. Planning is
-spread over frames (QUOTA 500 bird-steps a frame), so no frame is long.
+in thought (STEP 0.3 s) and every bird's ink box (with room for its bob)
+must stay WORDS 24 px from the .stack box and LINKS 20 px from each
+footer link, EDGE 10 px inside the edges the flight does not cross, and
+APART 48 px from every other flight, for the whole crossing; and one
+flight to a band (BAND_GAP 24 px between the heights two flights keep:
+two flights in one band read as one long train). The roomiest of TRIES
+(16) lanes wins; level lanes are drawn (R2 low-discrepancy) only from
+the open bands. Planning is spread over frames (QUOTA 500 bird-steps a
+frame), so no frame is long.
+
+THE WINGS (what makes a mark read as a bird): birds beat their wings
+visibly, 2.1–3.1 beats a second (BEAT_HZ; gulls, crows and geese ~3 in
+life), the bigger bird the slower, each at its own rate (DETUNE ±6%) and
+its own point in the beat, never in lockstep. The hand draws every mark
+DRAW_FPS (12) times a second, on twos: through a beat the front riser —
+the wing — swings down past the body line and up again (WINGS, per-vertex
+drops per glyph) while the body and the tail hold still, and the body
+lifts BOB (0.05 span) on each downstroke. Wings up is the glyph exactly
+as drawn, and a gliding bird holds them so. Each kind its own rhythm
+(FLAPS): geese beat on with a short glide now and then; lines beat and
+glide, the glide passing back down the line; gulls and crows flap, flap,
+glide; soaring birds hold their wings out but for a few beats.
 
 THE PATTERNS (kinematic, never boids: a scripted leader track, every
-other bird in a slot behind it, following the same track):
+other bird in a slot behind it, following the same track), none of them
+ruled: every slot is off where a ruler would put it (JITTER 20%), every
+bird sways about its slot (SWAY_A/SWAY_L, 6–12 s, each on its own) and
+is a little its own size (SIZE_VAR ±6%):
 * skeins: a V, a J or an echelon (J's and echelons are the commoner in
-  the wild), ARM_X 1.5–1.85 spans back and ARM_Y 0.85–1.05 aside per
-  place; slots breathe along their arm (BREATH, x1.1 per place back);
-  the wing-beat is spatially in phase, a bird beating where the one
-  ahead beat (delay = lag / speed; Portugal 2014), long bursts with
-  short glide spells passing back down the arms; one bird in three
-  detuned; now and then a straggler catching up at +6–10%
-* lines: single file (FILE 1.6–2.1 spans, a slight slant) through a slow
-  wave in the track (WANDER/WAVE) that every bird flies through; birds in
-  line beat half a beat apart, glide spells passing down the line
+  the wild), ARM_X 1.6–2.0 spans back and ARM_Y 0.95–1.15 aside per
+  place; the wing-beat is spatially in phase, a bird beating where the
+  one ahead beat (delay = lag / speed; Portugal 2014); now and then a
+  straggler catching up at +6–10%
+* lines: single file (FILE 1.7–2.3 spans, gaps uneven), wandering up and
+  down (FILE_Y) through a slow wave in the track that every bird flies
+  through; birds in line beat half a beat apart
 * pairs: the second 0.9–1.4 spans behind and 0.95–1.2 aside, now and then
   changing sides (SWAP_T 16–24 s)
-* loose flocks and lone birds: flap-gliding (BURST 2–3 beats, glides
-  1.2–2.6x as long), a lone bird sinking up to SINK 9 px on a glide and
-  climbing back on its beats
+* loose flocks and lone birds: flap-gliding, a lone bird sinking up to
+  SINK 5 px on a glide and climbing back on its beats
 * soaring kettles, on a sky at least SOAR_W 700 px wide and in a roomy
   field only (in a phone's band a circle looks trapped): a glide in, a
   thermal seen from below (a flattened ellipse SOAR_K 0.33–0.44 as tall
-  as wide, LAP 15–21 s, 1–2 laps, drifting DRIFT 3–6 px/s downwind, one
-  way round), and away one by one on the tangent, a little downhill;
-  wings held open but for a few beats reaching and leaving the thermal
+  as wide, LAP 15–21 s, 1–2 laps, drifting WIND 3–6 px/s downwind, one
+  way round), and away one by one on the tangent, a little downhill
 * how many (1–9 by COUNT: 3, 5 and 7 favoured; never a flight of four,
-  and never four birds in the sky: feng shui), which pattern, which lane:
-  all random, from the visit's weather. If the pattern does not fit, the
-  same birds fly as a line, then fewer, then one, then (a strip of sky)
-  one in still air. Measured: a 390x844 phone flies V's of up to 5–7 in
-  the bands above the name and below the credit; 375x548 has room only
-  for single birds above the footer; 320x480 has no open sky, no birds.
+  and never four birds in the sky: feng shui), which pattern (skeins 60%,
+  lines 18%, loose 22% of the larger flights), which lane: all random,
+  from the visit's weather. If the pattern does not fit, the same birds
+  fly as a line, then fewer, then one, then (a strip of sky) one in still
+  air. Measured: a 390x844 phone flies V's of up to 5–7 in the bands
+  above the name and below the credit; 375x548 has room only for single
+  birds above the footer; 320x480 has no open sky, no birds.
 
-THE PACE (=calm): speed by crossing time, as a distant flight crosses a
-real sky: a mid-depth flight crosses a 1440 px sky in CROSS 58–74 s,
-scaled by (width / 1440)^0.5 (a phone's in ~35–40 s), nearer birds
-drawn larger and flying faster (depth 0.82–1.15), within SPEED 9–28
-px/s. The wing-beat follows the travel (STRIDE 2.3–2.9 spans a beat,
-BEAT 0.25–0.5 Hz), so a slow bird beats slowly. Gusts (HEAVE, two slow
+THE PACE (=calm): a bird is carried PACE 1.2–1.5 of its own spans a
+second (by the visit's pace), within SPEED 16–31 px/s: nearer birds are
+drawn larger and fly faster (depth 0.82–1.15). A phone's sky is crossed
+in ~15–20 s, a 1440 px desktop's in ~45–55 s. Gusts (HEAVE, two slow
 sines over 10–16 s) and the track's wander keep turns near 5°/s.
 
 THE RHYTHM: at most FLIGHTS (2) at once, never two in one band (APART);
@@ -162,17 +178,15 @@ against it comes only into an empty sky; the sky thins over a long visit
 
 THE HAND (what makes them alive — v1 dropped it and they read as frozen
 icons):
-* the tattoo glyphs (GLYPHS — the three stepped-zigzag marks are the
-  alphabet, do not restyle them: no tilt, no rotation), 1.9 px round
-  strokes at x1.2 and the flight's depth
-* the BOIL: every vertex re-jittered BOIL_FPS (5) times a second by the
+* the tattoo glyphs (GLYPHS — Derek's tattoo trio, the three
+  stepped-zigzag marks, the alphabet: do not restyle them, no tilt, no
+  rotation), 1.9 px round strokes at x1.2 and the flight's depth
+* the BOIL: every vertex re-jittered BOIL_FPS (6) times a second by the
   visit's hand (1.2–1.6 px, x0.4 on a bird in flight)
-* the stop-motion WING-BEAT: open (as drawn, and held so to glide) and
-  half-folded toward the body line
-* the drawing (tremor, wings, facing) changes only on the hand's frames;
-  the position glides smoothly between them. A bird faces the way it
-  flies (the glyphs face left; flying right mirrors them), with
-  hysteresis, the flip landing on a hand frame.
+* the drawing (wings, bob, tremor, facing) changes only on the hand's
+  frames (DRAW_FPS 12); the position glides smoothly between them. A bird
+  faces the way it flies (the glyphs face left; flying right mirrors
+  them), with hysteresis, the flip landing on a hand frame.
 
 THE WEATHER (=rand()): ONE crypto.getRandomValues at init, above the
 INIT-END marker, and no clock read at all; splitmix32 streams from it:
@@ -182,14 +196,15 @@ Never Math.random (CI).
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v3.js sets each one's viewBox and polyline and moves it
+birds); birds.v4.js sets each one's viewBox and polyline and moves it
 with a CSSOM transform. It adds no DOM (CI greps
 createElement/innerHTML/appendChild). pointer-events: none, so a link
 under a bird still takes the click.
 
-prefers-reduced-motion: a still sky, composed: one flight (a skein, a
-pair or a lone bird) placed mid-lane in the roomiest open field, the
-hand at rest, live both ways. forced-colors: CanvasText. A hidden tab
+prefers-reduced-motion: a still sky, a photograph: one flight (a skein,
+a pair or a lone bird) placed mid-lane in the roomiest open field, every
+bird caught at its own point in the beat, the hand at rest, live both
+ways. forced-colors: CanvasText. A hidden tab
 pauses with requestAnimationFrame; a step is capped at 50 ms. A resize
 or rotation starts a new sky; a scroll or font swap re-checks every
 flight, and a flight the words moved onto goes.
@@ -215,10 +230,13 @@ against a fake DOM with the real page layouts (12 viewports, rotations,
 scrolls, reduced motion both ways) for simulated minutes and checks: ink
 never within 12 px of the words (in practice 22 px or more), birds enter
 and leave only across an edge (never popping in or out mid-sky), no
-reversal and no turn over 25°/s outside a thermal, birds of a flight
-never overlap, two flights never within 30 px, 9–30 px/s, the facing,
-never four birds, the sky seldom empty, the first bird within a few
-seconds, short frames; then a browser pass checks the same live.
+reversal and no turn over 25°/s outside a thermal (the path measured
+without the bob), birds of a flight never overlap, two flights never
+within 30 px and never in one band, 12–37 px/s, birds beating their
+wings at least 45% of the time and a flock never in lockstep, the
+facing, never four birds, the sky seldom empty, the first bird within a
+few seconds, short frames; then a browser pass checks the same live, and
+a film strip (16 drawings, 1/12 s apart) is looked at by eye.
 
 ## CSS
 
@@ -237,7 +255,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v3.js — the sky (see above). Progressive enhancement: with JS
+2. birds.v4.js — the sky (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
 ## Fonts + performance
@@ -288,10 +306,10 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v3.js, plus style.v9.css for cursors — never to this prose) fails
+birds.v4.js, plus style.v9.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v3.js; more or
+storage handler in the JS; any DOM building in birds.v4.js; more or
 fewer than one getRandomValues in it, or one below its INIT-END marker;
 any Math.random or clock read (Date) in it; any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
@@ -300,7 +318,7 @@ AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v3.js on every TT-enforcing browser (verified by
+site.js AND birds.v4.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types

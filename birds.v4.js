@@ -2,47 +2,49 @@
 
    The owner, verbatim: "The page should be a sky so like they're flying
    across/in patterns/etc. it should feel calm - not bouncing off the
-   walls." ... "should b rand".
+   walls." ... "should b rand". And, of v3's slow, rigid rows: "Are you
+   sure this is how birds movement is flying?!"
 
    THE SKY. Birds cross the window as birds cross a sky: every flight
    enters from beyond one edge, already flying (Samara's 1 s fade-in
    softening the entry), crosses on one long, gentle lane, and leaves
    beyond the far edge. Nothing starts, stops, loops or turns back in
-   view: onset and reversal are what pull the eye off the words. A lane
-   is planned whole before its first bird enters: clear of the name, bio
-   and credit and of the footer links for the whole crossing, clear of
-   every other flight, and inside the window's top and bottom.
+   view. A lane is planned whole before its first bird enters: clear of
+   the name, bio and credit and of the footer links for the whole
+   crossing, clear of every other flight, one flight to a band.
+
+   THE WINGS (what makes a mark read as a bird). Birds beat their wings,
+   visibly and on and on: 2-3 beats a second (gulls, crows and geese beat
+   ~3 in life), the bigger bird the slower, each bird at its own rate and
+   its own point in the beat, never in lockstep. The hand draws each mark
+   12 times a second (on twos): through a beat the front riser, the wing,
+   swings down past the body line and up again (WINGS) while the body and
+   tail hold still, and the body lifts a little on every downstroke. Each
+   kind keeps its own rhythm: geese beat on with a short glide now and
+   then; ibis and pelicans beat and glide, the glide passing back down the
+   line; gulls and crows flap, flap, glide; soaring birds hold their wings
+   out but for a few beats.
 
    THE PATTERNS (field data: Portugal 2014 and Voelkl 2015 on ibis,
-   Hainsworth and Cutts & Speakman on geese, Nagy 2018 and Weinzierl
-   2016 on storks in thermals):
-   - skeins: a V, a J or an echelon, every bird following the leader's
-     track at its slot, the slots breathing a little, the wing-beats
-     running back down the arms (a bird beats where the one ahead beat,
-     in the same air), a straggler now and then catching up
-   - lines: single file, a slow wave in the track that every bird flies
-     through, glide spells passing back down the line
-   - pairs (now and then changing sides), loose flocks and lone birds,
-     flapping in short bursts and gliding, sinking a little on a glide
-   - on a wide sky, soaring birds: a glide in, a thermal (a flattened
-     ellipse, 15-21 s a lap, drifting downwind), and away one by one
-   How many birds, which pattern, where: all random, from the visit's
-   weather (1-9 birds a flight, and never four).
+   Hainsworth and Cutts & Speakman on geese, Nagy 2018 and Weinzierl 2016
+   on storks in thermals), none of them ruled: V's, J's and echelons,
+   wandering lines, pairs, loose flocks and loners, every slot off where a
+   ruler would put it, every bird swaying about its slot and a little its
+   own size; on a wide sky, soaring birds circling a drifting thermal. How
+   many birds, which pattern, where: all random, from the visit's weather
+   (1-9 birds a flight, and never four).
 
-   THE PACE (=calm). Speed is set by crossing time, as a distant flight
-   crosses a real sky (about a minute on a desktop, less on a phone),
-   and by drawn size (nearer = larger = faster), within 9-28 px/s; the
-   wing-beat follows the travel (a beat per ~2.6 spans), so a slow bird
-   beats slowly. At most two flights at once, never two in one band; a
-   bird or pair flying against the season comes only into an empty sky;
-   the sky empties between flights and thins over a long visit.
+   THE PACE (=calm): a bird is carried about its own length and a half a
+   second (16-31 px/s; nearer = larger = faster). At most two flights at
+   once, never two in one band; a bird or pair flying against the season
+   comes only into an empty sky; the sky empties between flights and thins
+   over a long visit.
 
-   THE HAND: the three tattoo glyphs (GLYPHS — the alphabet; do not
-   restyle them) in 1.9 px round strokes, never rotated; the BOIL, every
-   vertex re-jittered BOIL_FPS times a second by the visit's hand; the
-   stop-motion wing-beat (open, as drawn, and half-folded). The drawing
-   changes only on the hand's frames (tremor, wings, facing) while the
-   bird glides smoothly between them.
+   THE HAND: the three tattoo glyphs (GLYPHS — Derek's tattoo trio, the
+   alphabet; do not restyle them) in 1.9 px round strokes, never rotated;
+   the BOIL, every vertex re-jittered BOIL_FPS times a second by the
+   visit's hand. The drawing changes only on the hand's frames (wings,
+   bob, tremor, facing) while the bird glides smoothly between them.
 
    THE WEATHER (=rand()): ONE crypto draw at init, above INIT-END, and no
    clock at all; it seeds splitmix32 streams: the front and its facets
@@ -50,11 +52,12 @@
    everywhere), the season (the way most flights go today) and every
    flight's own stream. There is no other randomness.
 
-   prefers-reduced-motion: a still sky, composed: one skein in the
-   roomiest open field, the hand at rest (live, both ways). A hidden tab
-   pauses with requestAnimationFrame; a step is capped at STEP_MAX. No
-   DOM is built: the twelve SVGs are in index.html; this draws their
-   strokes and moves them. */
+   prefers-reduced-motion: a still sky, a photograph: one flight in the
+   roomiest open field, every bird caught at its own point in the beat,
+   the hand at rest (live, both ways). A hidden tab pauses with
+   requestAnimationFrame; a step is capped at STEP_MAX. No DOM is built:
+   the twelve SVGs are in index.html; this draws their strokes and moves
+   them. */
 (function () {
   'use strict';
 
@@ -69,10 +72,11 @@
   var SCALE = 1.2;             // glyph units to css px, at mid depth
   var LINE = 1.9;              // stroke width, css px
   var PAD = 3;                 // px around the glyph: the stroke's cap and the boil
-  var BOIL_FPS = 5;            // the hand redraws the marks this often
+  var DRAW_FPS = 12;           // the hand draws each mark afresh this often (on twos): wings, bob, facing ...
+  var BOIL_FPS = 6;            // ... its tremor re-rolled every other drawing
   var HAND = [1.2, 1.6];       // px: the visit's tremor ...
   var JSCALE = 0.4;            // ... trimmed for a small mark in flight
-  var OPEN = 1, FOLD = 0.5;    // wing poses: open (as drawn, and held so to glide), half-folded
+  var BOB = 0.05;              // spans: the body rises this much on each downstroke and sinks on the upstroke
   var FACE_HYST = 0.2;         // |cos heading| past this before a bird turns to face the other way
 
   /* the sky */
@@ -90,11 +94,11 @@
   var STEP_MAX = 0.05;         // s: the longest step a frame may take
 
   /* the pace */
-  var CROSS = [58, 74];        // s: a mid-depth flight crossing a 1440 px sky, by the visit's pace
-  var CROSS_W = 1440, CROSS_EXP = 0.5;   // a narrower sky is crossed sooner, though not as fast in px
-  var SPEED = [9, 28];         // px/s: never slower, never faster (with its gusts, a bird stays under 30)
-  var STRIDE = [2.9, 2.3];     // spans travelled per wing-beat, by the visit's tempo (field data: 1.8-3.7)
-  var BEAT = [0.25, 0.5];      // Hz: a whole wing-beat (down and up), held within this
+  var PACE = [1.2, 1.5];       // spans a second, by the visit's pace: a bird is carried about its own length and a half a second
+  var SPEED = [16, 31];        // px/s: never slower, never faster (with sway and gusts, under ~35)
+  var BEAT_HZ = [2.1, 3.1];    // wing-beats a second (gull, crow, goose: 2.9-3.8 in life), the bigger bird the slower ...
+  var BEAT_REF = 2.6;          // ... this at a 20 px span
+  var DETUNE = 0.06;           // each bird beats its own share faster or slower than its flight (never in lockstep)
   var GAP = [0.35, 0.8];       // the next flight comes after this share of the last one's crossing in view ...
   var THIN = 360;              // s: ... and the sky thins, the gaps a crossing longer for every THIN s on the page ...
   var THIN_MAX = 2;            // ... up to this many crossings longer
@@ -109,21 +113,31 @@
   var WAVE = [260, 480];       // px: ... its wavelength
   var HEAVE = [2, 5];          // px: a gust lifting or dropping the whole flight, by the breeze ...
   var HEAVE_T = [10, 16];      // s: ... this slowly (a gentle heave, never a jolt: its turn stays under ~5°/s)
-  var SINK = 9;                // px: a flap-gliding bird sinks this far on a long glide and climbs back on its beats
+  var SINK = 5;                // px: a bird sinks this far on a long glide and climbs back on its beats
 
   /* the patterns */
   var COUNT = [11, 19, 22, 0, 18, 5, 14, 4, 7];   // % of flights of 1, 2 ... 9 birds (never four)
-  var ARM_X = [1.5, 1.85];     // spans back, per place along an arm of a V, a J or an echelon
-  var ARM_Y = [0.85, 1.05];    // spans aside, per place (an arm's spread reads as height on the page)
-  var BREATH = 0.1;            // spans: a slot breathes along its arm by this, x1.1 per place back, to x1.5
-  var FILE = [1.6, 2.1];       // spans between birds in a line ...
-  var FILE_Y = [0.25, 0.45];   // ... each this far aside the one ahead (a slight slant)
+  var ARM_X = [1.6, 2.0];      // spans back, per place along an arm of a V, a J or an echelon
+  var ARM_Y = [0.95, 1.15];    // spans aside, per place (an arm's spread reads as height on the page)
+  var JITTER = 0.2;            // no slot is where a ruler would put it: each is off by up to this share
+  var FILE = [1.7, 2.3];       // spans between birds in a line ...
+  var FILE_Y = 0.55;           // ... the line wandering up or down by up to this many spans a bird
   var PAIR_X = [0.9, 1.4], PAIR_Y = [0.95, 1.2];  // spans: the second of a pair, behind and aside
   var LOOSE = [1.5, 2.6];      // spans: a loose flock's spacing
+  var SWAY_A = 0.2, SWAY_L = 0.14;   // spans: every bird drifts about its slot, forward and back, up and down ...
+  var SWAY_T = [6, 12];        // s: ... this slowly, each on its own (a flock is never rigid)
+  var SIZE_VAR = 0.06;         // birds of one flight differ in size by up to this share
   var SPACE = 4;               // px: the least ink-to-ink gap between two birds of a flight
-  var DETUNE = 0.03;           // Hz: one bird in three drifts in and out of step by up to this
-  var BURST = [2, 3];          // wing-beats in a flap-glider's burst ...
-  var GLIDE = [1.2, 2.6];      // ... and a glide this many times as long
+  var BAND_GAP = 24;           // px between the heights two flights keep: one flight to a band
+  /* how each kind flies: wing-beats in a burst, and the glide between (s) */
+  var FLAPS = {
+    skein: [[10, 26], [0.8, 1.8]],     // geese: beating on and on, a short glide now and then
+    line: [[5, 9], [1.2, 2.8]],        // ibis, pelicans: beats and glides passing back down the line
+    pair: [[4, 8], [0.8, 2.4]],
+    single: [[3, 8], [0.8, 3.2]],      // gull, crow: flap, flap, glide
+    loose: [[3, 7], [0.6, 2.4]],       // each on its own wings
+    soar: [[3, 5], [0, 0]]             // soaring birds hold their wings out: a few beats reaching and leaving the thermal
+  };
   var STRAGGLE = [0.06, 0.1];  // a straggler catches up at this much over the flight's speed ...
   var STRAGGLE_T = [14, 22];   // ... over this many seconds
   var SWAP_T = [16, 24];       // s: a pair changing sides
@@ -134,7 +148,7 @@
   var SOAR_K = [0.33, 0.44];   // the circle seen from below: its height over its width
   var LAP = [15, 21];          // s a lap (storks: 13.6 s median, 18 s at most; a little slower on a page)
   var LAPS = [1, 2];           // laps each, before gliding away
-  var DRIFT = [3, 6];          // px/s: the thermal drifting downwind
+  var WIND = [3, 6];           // px/s: the thermal drifting downwind
   var GLIDE_V = 1.3;           // they glide in and out this much faster than they circle, easing over ...
   var EASE_T = 2.5;            // ... this many seconds
   var DESCENT = [2 * DEG, 4 * DEG];   // the glide away, a little downhill
@@ -143,6 +157,16 @@
     [[0, 0], [2, 6], [9, 5], [11, 12], [19, 11]],
     [[0, 0], [2, 5], [8, 4], [9, 10], [16, 9]],
     [[0, 0], [2, 5], [8, 4], [10, 10], [15, 9], [26, 20]]   // long tail
+  ];
+  /* the wing-beat, per glyph: how far each vertex swings on the downstroke
+     (glyph units). The front riser is the wing (tip, wrist, shoulder); the
+     body and the tail hold still. Wings up is the glyph as drawn, and a
+     gliding bird holds them so; mid-downstroke the wrist leads and the tip
+     swings down past the body line. */
+  var WINGS = [
+    [10, 5.5, 1, 0, 0],
+    [8.5, 4.7, 0.85, 0, 0],
+    [9, 5, 0.9, 0, 0, 0]
   ];
 
   /* ---------------- the weather (=rand()) ---------------- */
@@ -178,8 +202,8 @@
   /* ---- INIT-END: no clock or entropy reads below this line ---- */
 
   var hand = (HAND[0] + (HAND[1] - HAND[0]) * fHand) * JSCALE;       // px
-  var crossRef = mix(fPace, CROSS[1], CROSS[0]);                     // a lively visit crosses sooner
-  var stride = mix(fTempo, STRIDE[0], STRIDE[1]);                    // ... and beats its wings a little faster
+  var pace = mix(fPace, PACE[0], PACE[1]);                           // a lively visit flies a little faster ...
+  var tempo = mix(fTempo, 0.92, 1.08);                               // ... and beats its wings a little faster
 
   var NOISE_N = 4096;
   var noise = new Float32Array(NOISE_N);
@@ -243,9 +267,10 @@
      less every word box's height (grown by its margin), as a list of
      [from, to] intervals */
   function openBands(lo, hi) {
-    var out = [[EDGE + lo, H - EDGE - hi]], i, j, o, a, b, next;
-    for (i = 0; i < words.length; i++) {
-      o = words[i]; a = o.t - o.m - hi; b = o.b + o.m + lo;   // a centre in (a, b) puts the flight on the words' line
+    var out = [[EDGE + lo, H - EDGE - hi]], i, j, o, a, b, next, cut = words.map(function (o) { return [o.t - o.m, o.b + o.m]; });
+    for (i = 0; i < flights.length; i++) cut.push([flights[i].yLo - BAND_GAP, flights[i].yHi + BAND_GAP]);   // one flight to a band
+    for (i = 0; i < cut.length; i++) {
+      o = cut[i]; a = o[0] - hi; b = o[1] + lo;           // a centre in (a, b) puts the flight on the words' line, or in another's band
       next = [];
       for (j = 0; j < out.length; j++) {
         if (out[j][1] <= a || out[j][0] >= b) next.push(out[j]);
@@ -329,14 +354,14 @@
 
   /* ---------------- the wings ---------------- */
 
-  /* a flap-glider's day: bursts of beats [start, end, start, end ...],
-     each followed by a glide, from well before the flight to its end */
-  function bursts(r, f, beats, glide, from, to) {
-    var out = [], t = from - r() * 20, b;
+  /* a bird's day on the wing: bursts of beats [start, end, start, end ...],
+     each followed by a glide (s), from well before the flight to its end */
+  function bursts(r, f, how, from, to) {
+    var out = [], t = from - r() * 10, b;
     while (t < to) {
-      b = Math.round(pick(r, beats)) / f;
+      b = Math.round(pick(r, how[0])) / f;
       out.push(t, t + b);
-      t += b + b * pick(r, glide);
+      t += b + pick(r, how[1]);
     }
     return out;
   }
@@ -347,18 +372,19 @@
     while (hi - lo > 1) { m = (lo + hi) >> 1; if (segs[2 * m] <= t) lo = m; else hi = m; }
     return 2 * lo;
   }
-  /* the wings at time t: a bird beats where the one ahead of it beat (its
-     delay), half a beat out when it flies in line behind (half) */
-  function wing(m, t) {
+  /* where a bird is in its wing-beat at time t: its phase in [0, 1) (0 the
+     wings up, as drawn; 0.5 down), or -1 while it glides. A bird beats where
+     the one ahead of it beat (its delay), half a beat out when it flies in
+     line behind, and each at its own rate (never in lockstep) */
+  function beat(m, t) {
     var w = m.w, c, k;
     t -= m.delay;
-    if (!w) return OPEN;
-    if (w.segs) {
-      k = burstAt(w.segs, t);
-      if (k < 0 || t >= w.segs[k + 1]) return OPEN;       // gliding, wings held open
-      c = m.f * (t - w.segs[k]) + m.half;
-    } else c = m.f * t + m.ph + m.half;
-    return c - Math.floor(c) < 0.5 ? FOLD : OPEN;
+    if (!w) return -1;
+    k = burstAt(w.segs, t);
+    if (k < 0) return -1;
+    c = m.f * (t - w.segs[k]) - m.half;                   // its own beats, begun a touch late ...
+    if (c < 0 || c >= Math.round((w.segs[k + 1] - w.segs[k]) * w.f)) return -1;   // ... and all of them finished: gliding
+    return c - Math.floor(c);
   }
   /* a flap-glider sinks a little through each glide and climbs back through the next burst */
   function sink(m, t) {
@@ -380,18 +406,22 @@
   /* ---------------- a flight's shape ---------------- */
 
   function member(F, lag, lat, rank) {
-    var r = F.r, g = Math.min(1.5, 1 + 0.1 * rank);
+    var r = F.r, sp = F.d.span;
     return {
-      lag: lag, lat: lat, rank: rank, gain: g,
-      bA: 0, bL: 0, bP: 0, bKey: Math.floor(r() * NOISE_N), bT: pick(r, [10, 20]),
-      w: F.w, f: F.f, ph: F.ph, delay: 0, half: 0,
-      stragL: 0, stragT0: 0, stragT: 1, swapT0: 0, swapT: 0, s: null, d: F.d
+      lag: lag, lat: lat, rank: rank, gain: Math.min(1.5, 1 + 0.1 * rank),
+      /* its own sway about its slot, its own size, its own wing-beat */
+      bA: SWAY_A * sp, bL: 0, bP: SWAY_L * sp, bKey: Math.floor(r() * NOISE_N), bT: pick(r, SWAY_T),
+      d: measureGlyph(F.g, F.d.sc * (1 + SIZE_VAR * (r() * 2 - 1))),
+      w: F.w, f: F.f * (1 + DETUNE * (r() * 2 - 1)), delay: 0, half: 0.15 * r(), rest: r(), bob: 0,
+      stragL: 0, stragT0: 0, stragT: 1, swapT0: 0, swapT: 0, s: null
     };
   }
 
-  /* the birds of a flight on a lane, in their slots behind the leader */
+  /* the birds of a flight on a lane, in their slots behind the leader:
+     never where a ruler would put them, and never still in them */
   function formation(F) {
     var r = F.r, n = F.n, sp = F.d.span, M = [], k, a, b, arm, dx, dy, u, rank, lag, lat, m, bow;
+    function jit() { return r() * 2 - 1; }
     M.push(member(F, 0, 0, 0));
     if (F.kind === 'skein') {
       u = r();                                            // echelon, J or V (J's and echelons are the commoner in the wild)
@@ -399,51 +429,45 @@
       else if (u < 0.65 && n >= 4) { a = Math.ceil((n - 1) / 2) + 1; b = n - 1 - a; }
       else { a = Math.ceil((n - 1) / 2); b = n - 1 - a; }
       arm = r() < 0.5 ? 1 : -1;
-      dx = pick(r, ARM_X) * sp; dy = pick(r, ARM_Y) * sp;
+      dx = pick(r, ARM_X) * sp * (2 - F.flat); dy = pick(r, ARM_Y) * sp * F.flat;   // (a narrow band: a flatter V)
       bow = r() < 0.3;                                    // a U: the ranks near the apex closer in
+      u = mix(r(), 0.3, 0.7);                             // the second arm a part of a place behind the first (no V is symmetric)
       for (k = 1; k < n; k++) {
         rank = k <= a ? k : k - a;
-        lag = rank * dx * (bow ? 0.85 + 0.075 * rank : 1);
-        lat = (k <= a ? arm : -arm) * rank * dy;
-        m = member(F, lag, lat, rank);
-        m.bA = BREATH * sp * m.gain;                      // breathing along the arm line: depth and spread together
-        m.bL = m.bA * lat / lag;
-        m.bP = 0.04 * sp * m.gain;
-        M.push(m);
+        lag = (rank + (k > a ? u : 0)) * dx * (bow ? 0.85 + 0.075 * rank : 1) * (1 + JITTER * jit());
+        lat = (k <= a ? arm : -arm) * (rank * dy * (1 + JITTER * jit()) + 0.5 * JITTER * sp * jit());
+        M.push(member(F, lag, lat, rank));
       }
     } else if (F.kind === 'line') {
-      dx = pick(r, FILE) * sp; dy = (r() < 0.5 ? 1 : -1) * pick(r, FILE_Y) * sp;
+      dx = pick(r, FILE) * sp; lag = 0; lat = 0;
       for (k = 1; k < n; k++) {
-        m = member(F, k * dx, k * dy, k);
+        lag += dx * (1 + 1.5 * JITTER * jit());           // uneven gaps ...
+        lat += FILE_Y * sp * jit();                       // ... and the line wanders up and down
+        m = member(F, lag, lat, k);
         m.gain = Math.min(1.5, 1 + 0.07 * k);
-        m.bA = 0.08 * sp * m.gain; m.bP = 0.04 * sp * m.gain;
-        m.half = (k % 2) * 0.5;                           // in line behind: half a beat out
+        m.half += (k % 2) * 0.5;                          // in line behind: half a beat out
         M.push(m);
       }
     } else if (F.kind === 'pair') {
       m = member(F, pick(r, PAIR_X) * sp, (r() < 0.5 ? 1 : -1) * pick(r, PAIR_Y) * sp, 1);
       m.gain = 1;
-      m.bA = 0.2 * sp; m.bP = 0.06 * sp; m.bT = pick(r, [10, 20]);
       if (r() < 0.4) { m.swapT = pick(r, SWAP_T); m.swapT0 = -1; }   // placed on the lane, once the crossing is known
       M.push(m);
     } else if (F.kind === 'loose') {
-      M[0].w = { segs: bursts(r, F.f, BURST, GLIDE, -200, 400), sinks: false };  // each on its own wings
+      M[0].w = { segs: bursts(r, M[0].f, FLAPS.loose, -200, 400), sinks: true, f: M[0].f };   // each on its own wings
       for (k = 1; k < n; k++) {
         for (u = 0; u < 80; u++) {
           lag = mix(r(), 0.8, 2 * Math.sqrt(n)) * sp;     // scattered behind and beside the leader, wider than deep
-          lat = (r() * 2 - 1) * 1.15 * Math.sqrt(n) * sp;
+          lat = jit() * 1.15 * Math.sqrt(n) * sp;
           m = member(F, lag, lat, k);
           m.gain = 1;
-          m.bA = 0.2 * sp; m.bP = 0.25 * sp; m.bT = pick(r, [10, 25]);
-          m.w = { segs: bursts(r, F.f, BURST, GLIDE, -200, 400), sinks: false };
+          m.bA = 0.3 * sp; m.bP = 0.22 * sp;              // a loose flock sways more
+          m.w = { segs: bursts(r, m.f, FLAPS.loose, -200, 400), sinks: true, f: m.f };
           if (fits(F, M, m, u < 40 ? pick(r, LOOSE) * sp - sp : 0)) break;
         }
-        m.f = F.f * pick(r, [0.9, 1.1]);
         M.push(m);
       }
     }
-    /* one bird in three, in a skein or a line, drifts in and out of step */
-    if (F.kind === 'skein' || F.kind === 'line') for (k = 1; k < M.length; k++) if (r() < 0.33) M[k].f = F.f + (r() * 2 - 1) * DETUNE;
     /* a straggler, now and then: the tail of a skein of five or more, catching up */
     if (F.kind === 'skein' && n >= 5 && r() < 0.33) {
       m = M[0];
@@ -460,9 +484,10 @@
     return true;
   }
   function pairFits(F, a, b, extra) {
-    var d = F.d, v = F.v, dl = Math.abs(a.lag - b.lag),
-        gx = dl - 2 * d.hw - Math.abs(a.bA) - Math.abs(b.bA),
-        gy = Math.abs(a.lat - b.lat) - 2 * d.hh - Math.abs(a.bL) - Math.abs(b.bL) - Math.abs(a.bP) - Math.abs(b.bP) -
+    var v = F.v, dl = Math.abs(a.lag - b.lag),
+        gx = dl - a.d.hw - b.d.hw - Math.abs(a.bA) - Math.abs(b.bA),
+        gy = Math.abs(a.lat - b.lat) - a.d.hh - b.d.hh - Math.abs(a.bL) - Math.abs(b.bL) - Math.abs(a.bP) - Math.abs(b.bP) -
+             BOB * Math.max(a.d.span, b.d.span) -
              F.wAmp * (Math.abs(a.gain - b.gain) + 2 * Math.max(a.gain, b.gain) * Math.min(1, TAU * dl / F.wLam)) -
              2 * F.hAmp * Math.min(1, TAU * dl / (v * F.hT)) -
              (a.w && a.w.sinks ? (a.w === b.w ? SINK * Math.min(1, dl / (v * 2)) : SINK) : 0);
@@ -474,7 +499,7 @@
     for (tries = 0; tries < 8; tries++) {
       for (i = 0, k = true; i < M.length && k; i++) for (j = i + 1; j < M.length && k; j++) if (!pairFits(F, M[i], M[j], 0)) k = false;
       if (k) return true;
-      for (i = 1; i < M.length; i++) { M[i].lag *= 1.12; M[i].bL = M[i].lat && M[i].lag ? M[i].bA * M[i].lat / M[i].lag : M[i].bL; }
+      for (i = 1; i < M.length; i++) M[i].lag *= 1.12;
     }
     return false;
   }
@@ -532,30 +557,26 @@
     return o;
   }
 
-  function vMid() { return (W + 2 * OUT) / (crossRef * Math.pow(W / CROSS_W, CROSS_EXP)); }
-
-  var KINDS = { single: 1.05, pair: 1, loose: 1, line: 0.95, skein: 0.95 };
+  var KINDS = { single: 1.08, pair: 1.03, loose: 1, line: 0.96, skein: 0.95 };
   var DEPTH = { single: [0.95, 1.15], pair: [0.9, 1.08], loose: [0.9, 1.05], line: [0.82, 0.98], skein: [0.82, 0.98], soar: [0.9, 1.05] };
 
-  function newFlight(kind, n, dir, r, calm) {
+  function newFlight(kind, n, dir, r, calm, flat) {
     var d = pick(r, DEPTH[kind]), F = {
-      kind: kind, n: n, dir: dir, r: r, soar: null, m: null, lane: null,
+      kind: kind, n: n, dir: dir, r: r, soar: null, m: null, lane: null, flat: flat ? 0.6 : 1,
       g: Math.floor(r() * GLYPHS.length), t0: 0, s0: 0, dur: 0, edges: 3,
       wKey: Math.floor(r() * NOISE_N), wLam: pick(r, WAVE),
       wAmp: mix(fBreeze, WANDER[0], WANDER[1]) * (kind === 'line' ? 1.3 : 1) * pick(r, [0.7, 1.1]),
       hKey: Math.floor(r() * NOISE_N), hT: pick(r, HEAVE_T), hAmp: mix(fBreeze, HEAVE[0], HEAVE[1]) * pick(r, [0.7, 1.1])
     };
     if (calm) { F.wAmp *= 0.3; F.hAmp *= 0.3; }          // a narrow strip of sky: still air
-    F.d = measureGlyph(F.g, SCALE * d);
-    F.v = clamp(vMid() * d * (KINDS[kind] || 1) * pick(r, [0.96, 1.04]), SPEED[0], SPEED[1]);
-    F.f = clamp(F.v / (stride * F.d.span), BEAT[0], BEAT[1]);
-    F.ph = r();
-    /* the wings: skeins beat on and on with a glide spell now and then, lines
-       and pairs flap and glide together (the spell passing back down the
-       line), loners and loose flocks each on their own */
-    if (kind === 'skein') F.w = { segs: bursts(r, F.f, [4, 7], [0.4, 0.9], -200, 400), sinks: false };
-    else if (kind === 'line' || kind === 'pair' || kind === 'single') F.w = { segs: bursts(r, F.f, BURST, GLIDE, -200, 400), sinks: kind !== 'line' && !calm };
-    else F.w = null;
+    F.d = measureGlyph(F.g, SCALE * d);                  // the flight's typical bird (each its own size about it)
+    F.v = clamp(F.d.span * pace * (KINDS[kind] || 1) * pick(r, [0.95, 1.05]), SPEED[0], SPEED[1]);   // nearer = larger = faster
+    F.f = clamp(BEAT_REF * Math.pow(20 / F.d.span, 0.35) * tempo, BEAT_HZ[0], BEAT_HZ[1]);            // the bigger, the slower
+    /* the wings: skeins beat on and on with a short glide now and then,
+       lines and pairs beat and glide together (the glide passing back down
+       the line), loners flap and glide, loose flocks each on their own */
+    F.w = kind === 'loose' || kind === 'soar' ? null :
+      { segs: bursts(r, F.f, FLAPS[kind], -200, 400), sinks: (kind === 'single' || kind === 'pair') && !calm, f: F.f };
     if (kind === 'soar') return soarFlight(F);
     F.m = formation(F);
     F.m.forEach(function (m) { m.delay = m.lag / F.v; });  // spatially in phase: a bird beats where the one ahead beat
@@ -571,12 +592,11 @@
     for (i = 0; i < F.m.length; i++) {
       m = F.m[i];
       y = m.lat * F.dir;
-      b = Math.abs(m.bL) + Math.abs(m.bP) + F.wAmp * m.gain + (m.swapT ? 0 : 0);
+      b = Math.abs(m.bL) + Math.abs(m.bP) + F.wAmp * m.gain + m.d.hh + BOB * m.d.span + (m.w && m.w.sinks ? SINK : 0);
       lo = Math.max(lo, -(y - b)); hi = Math.max(hi, y + b);
       if (m.swapT) { lo = Math.max(lo, Math.abs(m.lat) + b); hi = Math.max(hi, Math.abs(m.lat) + b); }
     }
-    b = F.hAmp + F.d.hh + (F.w && F.w.sinks ? SINK : 0);
-    F.lo = lo + b; F.hi = hi + b;
+    F.lo = lo + F.hAmp; F.hi = hi + F.hAmp;
   }
   /* the birds that bound a formation (its leader, its tail, its outermost
      on either side): a lane is tried on these first, then on them all */
@@ -622,7 +642,7 @@
     T = pick(r, LAP);
     if (TAU * R / T > SPEED[1]) R = SPEED[1] * T / TAU;
     S = F.soar = {
-      R: R, k: pick(r, SOAR_K), om: (r() < 0.5 ? 1 : -1) * TAU / T, T: T, drift: pick(r, DRIFT),
+      R: R, k: pick(r, SOAR_K), om: (r() < 0.5 ? 1 : -1) * TAU / T, T: T, drift: pick(r, WIND),
       laps: Math.round(pick(r, LAPS)), dirIn: F.dir, dirOut: r() < 0.55 ? F.dir : -F.dir,
       descent: pick(r, DESCENT), cx: 0, cy: 0, tj0: 0, thj: 0, thx: 0
     };
@@ -633,13 +653,13 @@
       m = member(F, 0, 0, i);
       m.R = R * (i === 1 ? 0.88 : i === 2 ? 1.1 : 1);
       m.gap = i ? (i * T / n) * pick(r, [0.94, 1.06]) : 0;       // they join the thermal a share of a lap apart ...
-      m.w = { segs: [], sinks: false };                          // ... and hold their wings open, but for a few beats
+      m.w = { segs: [], sinks: false, f: m.f };                  // ... and hold their wings out, but for a few beats
       M.push(m);
     }
     F.m = M;
     F.edges = 3;
     F.probe = M.map(function (m, i) { return i; });
-    F.lo = F.hi = S.k * R * 1.1 + F.d.hh;
+    F.lo = F.hi = S.k * R * 1.1 + F.d.hh * (1 + SIZE_VAR) + BOB * F.d.span;
     return F;
   }
   /* put a soaring flight's thermal at (cx, cy) and time its birds' glides, laps and leaving */
@@ -670,8 +690,7 @@
       m.tx = m.tj + (S.laps * TAU + turn) / Math.abs(S.om);
       m.xx = cx + S.dirIn * S.drift * (m.tx - S.tj0) + m.R * Math.cos(S.thx);
       m.xy = cy + S.k * m.R * Math.sin(S.thx);
-      m.f = clamp(m.vj / (stride * F.d.span), BEAT[0], BEAT[1]);
-      m.w.segs = [m.tj - 6, m.tj - 6 + 2 / m.f, m.tx + 0.5, m.tx + 0.5 + 2 / m.f];   // a few beats reaching the thermal, a few leaving it
+      m.w.segs = [m.tj - 6, m.tj - 6 + 4 / m.f, m.tx + 0.5, m.tx + 0.5 + 4 / m.f];   // a few beats reaching the thermal, a few leaving it
       m.delay = 0;
       lo = 0; hi = 600;
       d = Math.abs(exit - m.xx) + F.d.hw;
@@ -696,7 +715,7 @@
       for (j = 0; j < G.m.length; j++) {
         spot(G, G.m[j], tau, tmp2);
         A.cost++;
-        if (inView(tmp2.x, tmp2.y, G.d.hw, G.d.hh)) row.push(tmp2.x, tmp2.y, G.d.hw, G.d.hh);
+        if (inView(tmp2.x, tmp2.y, G.m[j].d.hw, G.m[j].d.hh)) row.push(tmp2.x, tmp2.y, G.m[j].d.hw, G.m[j].d.hh);
       }
     }
     return row;
@@ -708,8 +727,8 @@
      flights. Worked in slices of `budget` bird-steps: 0 while unfinished,
      1 when clear all the way (it.near its room: the more, the calmer), -1 */
   function trialRun(F, it, A, budget) {
-    var M = F.m, hw = F.d.hw, hh = F.d.hh, probe = it.probe ? F.probe : null, cnt = probe ? probe.length : M.length,
-        c0 = A ? A.cost : 0, i, j, m, row, g, gx, gy, e, tau;
+    var M = F.m, probe = it.probe ? F.probe : null, cnt = probe ? probe.length : M.length,
+        c0 = A ? A.cost : 0, i, j, m, row, g, gx, gy, e, tau, hw, hh;
     it.spent = 0;
     for (;;) {
       tau = it.from + it.k * STEP;
@@ -720,10 +739,12 @@
         m = M[probe ? probe[i] : i];
         spot(F, m, tau, tmp);
         if (tmp.x !== tmp.x || tmp.y !== tmp.y) return -1;
+        hw = m.d.hw; hh = m.d.hh + BOB * m.d.span;        // its ink, and the room its bob takes
         e = F.soar && tau >= m.tj && tau < m.tx ? 0 : F.edges;   // a soaring bird circles wholly inside the window
         if (!inView(tmp.x, tmp.y, hw, hh)) { if (!e) return -1; continue; }
         if (!clearOfWords(tmp.x, tmp.y, hw, hh) || !withinEdges(tmp.x, tmp.y, hw, hh, e)) return -1;
         it.near = Math.min(it.near, room(tmp.x, tmp.y, hw, hh, e));
+        it.yLo = Math.min(it.yLo, tmp.y - hh); it.yHi = Math.max(it.yHi, tmp.y + hh);   // the band it flies in
         if (row) for (j = 0; j < row.length; j += 4) {
           gx = Math.abs(tmp.x - row[j]) - hw - row[j + 2];
           gy = Math.abs(tmp.y - row[j + 1]) - hh - row[j + 3];
@@ -737,7 +758,7 @@
       c0 = A ? A.cost : 0;
     }
   }
-  function trialIt(from, probe) { return { from: from, k: 0, near: ROOMY, apart: 200, probe: probe, spent: 0 }; }
+  function trialIt(from, probe) { return { from: from, k: 0, near: ROOMY, apart: 200, probe: probe, spent: 0, yLo: Infinity, yHi: -Infinity }; }
   /* the whole trial at once (a flight re-checked after the page moved) */
   function trial(F, from) {
     var it = trialIt(from, false);
@@ -774,10 +795,10 @@
   function snapshot(F, from) {
     return { lane: F.lane, s0: F.s0, dur: F.dur, edges: F.edges, from: from,
              soar: F.soar ? JSON.parse(JSON.stringify(F.soar)) : null,
-             m: F.m.map(function (m) { var c = {}, k; for (k in m) if (k !== 'w' && k !== 's' && k !== 'd') c[k] = m[k]; c.w = m.w && m.w.segs ? { segs: m.w.segs.slice(), sinks: m.w.sinks } : m.w; return c; }) };
+             m: F.m.map(function (m) { var c = {}, k; for (k in m) if (k !== 'w' && k !== 's') c[k] = m[k]; c.w = m.w && m.w.segs ? { segs: m.w.segs.slice(), sinks: m.w.sinks, f: m.w.f } : m.w; return c; }) };
   }
   function restore(F, k) {
-    F.lane = k.lane; F.s0 = k.s0; F.dur = k.dur; F.edges = k.edges; F.from = k.from;
+    F.lane = k.lane; F.s0 = k.s0; F.dur = k.dur; F.edges = k.edges; F.from = k.from; F.yLo = k.yLo; F.yHi = k.yHi;
     if (k.soar) F.soar = k.soar;
     F.m.forEach(function (m, i) { var c = k.m[i], p; for (p in c) m[p] = c[p]; });
   }
@@ -800,8 +821,8 @@
     if (n === 1) return wide && u < 0.35 ? 'soar' : 'single';
     if (n === 2) return wide && u < 0.25 ? 'soar' : 'pair';
     if (n === 3 && wide && u < 0.15) return 'soar';
-    if (u < 0.58) return 'skein';
-    if (u < 0.84 || n > 6) return 'line';
+    if (u < 0.6) return 'skein';                          // V's, J's and echelons: the flight everyone knows
+    if (u < 0.78 || n > 6) return 'line';
     return 'loose';
   }
 
@@ -821,11 +842,16 @@
     dir = season;
     /* against the season: only a lone bird or a pair, and only into an empty sky */
     if (!flights.length && n <= 2 && kind !== 'soar' && r() > faithful) dir = -season;
-    /* if the pattern finds no room: the same birds in a line, then fewer,
-       then one; and last, in a narrow strip of sky, in still air */
+    /* if the pattern finds no room: a flatter V, then a smaller one, then
+       the same birds in a line, then fewer, then one; and last, in a narrow
+       strip of sky, in still air */
     order = [[kind, n]];
     if (kind === 'soar') order.push([n === 1 ? 'single' : n === 2 ? 'pair' : 'skein', n]);
-    if (n >= 3 && kind !== 'line') order.push(['line', n]);
+    if (n >= 3 && kind !== 'line') {
+      order.push(['skein', n, 0, 1]);
+      for (i = n - 2; i >= 3; i -= 2) order.push(['skein', i === 4 ? 3 : i, 0, 1]);
+      order.push(['line', n]);
+    }
     if (n >= 5) order.push(['line', n - 2 === 4 ? 3 : n - 2]);
     if (n >= 2) order.push(['single', 1]);
     if (n >= 3) order.push(['line', Math.min(n, 5) === 4 ? 3 : Math.min(n, 5), 1]);
@@ -875,11 +901,15 @@
   }
   /* a trial passed: keep the roomiest lane */
   function judge(J) {
-    var F = J.F, sc = J.it.near;
+    var F = J.F, sc = J.it.near, i, G;
     if (J.mode === 'still' && !allInView(F, 0)) return;
     if (F.soar && sc < 40) return;                        // a thermal only in a roomy field: in a narrow band a circle looks trapped
+    for (i = 0; i < flights.length; i++) {                // one flight to a band: two in one band read as one long train
+      G = flights[i];
+      if (J.it.yLo < G.yHi + BAND_GAP && J.it.yHi > G.yLo - BAND_GAP) return;
+    }
     sc += 0.25 * J.it.apart + (J.diag ? 0 : 40) + 8 * F.r();
-    if (sc > J.best) { J.best = sc; J.keep = snapshot(F, 0); }
+    if (sc > J.best) { J.best = sc; J.keep = snapshot(F, 0); J.keep.yLo = J.it.yLo; J.keep.yHi = J.it.yHi; }
   }
 
   /* work on the job, `quota` bird-steps' worth; the flight once it is in the
@@ -891,13 +921,13 @@
         if (J.oi >= J.order.length) { job = null; return null; }
         o = J.order[J.oi++];
         if (o[1] + J.busy === 4 || o[1] > freeSlots()) continue;
-        J.F = newFlight(o[0], o[1], J.dir, J.r, o[2]);
+        J.F = newFlight(o[0], o[1], J.dir, J.r, o[2], o[3]);
         J.c = 0; J.a = 0; J.best = -1; J.keep = null; J.it = null; J.bands = null;
         quota -= 20;
         continue;
       }
       if (!J.it) {
-        if (J.c >= (J.mode === 'first' ? TRIES / 2 : TRIES) || J.a >= 3 * TRIES) {   // (... planned in fewer tries: birds soon)
+        if (J.c >= (J.mode === 'first' || J.oi > 1 ? TRIES / 2 : TRIES) || J.a >= 3 * TRIES) {   // (the first flight, and a second choice, in fewer tries)
           if (J.keep) {
             F = J.F; restore(F, J.keep); job = null;
             if (J.mode === 'next' && t > J.t && seen(F, t - J.t)) return null;   // planning overran and it would appear mid-sky: not this one
@@ -928,7 +958,7 @@
       if (slots[i].busy) continue;
       slots[i].busy = true;
       F.m[j].s = slots[i];
-      dress(slots[i], F.d);
+      dress(slots[i], F.m[j].d);
       j++;
     }
     flights.push(F);
@@ -946,9 +976,18 @@
   function show(s) { if (!s.on) { s.on = true; s.el.classList.add('on'); } }
   function hide(s) { if (s.on) { s.on = false; s.el.classList.remove('on'); } }
 
-  /* the drawing, on the hand's frames only: facing, wings, tremor */
+  /* the drawing, on the hand's frames only: facing, wings, bob, tremor.
+     Through a wing-beat the front riser (the wing) swings down past the
+     body line and up again (WINGS), the body rising on the downstroke and
+     sinking on the upstroke; on a glide the wings are held up and out, as
+     drawn. A still sky is a photograph: every bird caught at its own point
+     in the beat */
   function pose(F, m, tau, boil, rest) {
-    var s = m.s, d = s.d, i, p, k, out = [], jit = rest ? 0 : hand, amp = rest ? OPEN : wing(m, tau), c;
+    var s = m.s, d = s.d, i, p, k, c, out = [], jit = rest ? 0 : hand, ph = rest ? m.rest : beat(m, tau), down = 0, sw = WINGS[d.g];
+    if (ph >= 0) {
+      down = (1 - Math.cos(TAU * ph)) / 2;                // 0 wings up (as drawn) .. 1 wings down
+      m.bob = rest ? 0 : -BOB * d.span * down;            // the body lifts on the downstroke
+    } else m.bob = 0;                                     // gliding: wings held up and out, as drawn
     spot(F, m, tau + 0.25, tmp2);                          // the way it is going
     c = tmp2.x - m.x;
     c = c / (Math.sqrt(c * c + (tmp2.y - m.y) * (tmp2.y - m.y)) || 1);
@@ -958,17 +997,17 @@
       p = d.pts[i];
       k = s.key + i * 7 + boil * 131;
       out.push(((p[0] - d.x0) * d.sc + PAD + nz(k) * jit).toFixed(2) + ',' +
-               ((d.mid + (p[1] - d.mid) * amp - d.y0) * d.sc + PAD + nz(k + 61) * jit).toFixed(2));
+               ((p[1] + sw[i] * down - d.y0) * d.sc + PAD + nz(k + 61) * jit).toFixed(2));
     }
     s.line.setAttribute('points', out.join(' '));
   }
   function put(m) {
     var s = m.s;
-    s.el.style.transform = 'translate3d(' + (m.x - s.d.w / 2).toFixed(2) + 'px,' + (m.y - s.d.h / 2).toFixed(2) + 'px,0)' +
+    s.el.style.transform = 'translate3d(' + (m.x - s.d.w / 2).toFixed(2) + 'px,' + (m.y + m.bob - s.d.h / 2).toFixed(2) + 'px,0)' +
       (s.face < 0 ? ' scaleX(-1)' : '');
   }
 
-  /* every bird where it is now; drawn afresh on the hand's frames */
+  /* every bird where it is now, gliding smoothly; drawn afresh on the hand's frames */
   function draw(fresh, boil, rest) {
     var i, j, F, m, tau;
     for (i = flights.length - 1; i >= 0; i--) {
@@ -978,7 +1017,7 @@
         m = F.m[j];
         spot(F, m, tau, tmp);
         m.x = tmp.x; m.y = tmp.y;
-        if (!inView(m.x, m.y, F.d.hw, F.d.hh)) { hide(m.s); continue; }
+        if (!inView(m.x, m.y, m.d.hw, m.d.hh)) { hide(m.s); continue; }
         if (!m.s.on || fresh) {
           if (!m.s.on) { spot(F, m, tau + 0.25, tmp2); m.s.face = tmp2.x > m.x ? -1 : 1; }
           pose(F, m, tau, boil, rest);
@@ -1007,20 +1046,20 @@
 
   function frame(now) {
     raf = 0;
-    var moving = !still.matches, dt = last ? Math.min(STEP_MAX, (now - last) / 1000) : 0, boil, F, mode;
+    var moving = !still.matches, dt = last ? Math.min(STEP_MAX, (now - last) / 1000) : 0, k, F, mode;
     last = now;
     if (moving) t += dt;
     if (dirty) relayout();
     if (!job && moving && t >= tNext && flights.length < FLIGHTS && !startJob('next')) planned(null, 'next');
     if (job) {
       mode = job.mode;
-      F = workJob(mode === 'first' ? 3 * QUOTA : QUOTA);
+      F = workJob(mode === 'first' ? 2 * QUOTA : QUOTA);
       if (F || !job) planned(F, moving ? mode : 'still');
     }
     if (moving) {
-      boil = Math.floor(t * BOIL_FPS);
-      draw(boil !== phase, boil, false);
-      phase = boil;
+      k = Math.floor(t * DRAW_FPS);                       // the hand's drawing, 12 a second ...
+      draw(k !== phase, Math.floor(t * BOIL_FPS), false); // ... its tremor re-rolled every other one
+      phase = k;
     }
     run();
   }
