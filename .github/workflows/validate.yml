@@ -18,7 +18,7 @@ jobs:
             index.html
             style.v9.css
             site.js
-            birds.v2.js
+            birds.v3.js
             robots.txt
             _headers
             _redirects
@@ -154,7 +154,7 @@ jobs:
             echo "::error::a needy behaviour (exit/idle/title/pointer handler or storage) was introduced"
             fail=1
           fi
-          # (3) the birds add no DOM: they are the three SVGs in index.html
+          # (3) the birds add no DOM: they are the SVGs in index.html
           if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS; then
             echo "::error::$JS builds DOM — the birds live in index.html"
             fail=1
