@@ -105,8 +105,12 @@
   var PACE = [0.94, 1.06];     // the visit's pace, on every kind's own
   var TEMPO = [0.95, 1.05];    // the visit's wing-beat, on every kind's own
   var SPEED = [14, 64];        // px/s: never slower, never faster ...
-  var CROSS = [9.5, 24];       // s: ... nor across the window quicker than this (a phone's .. a desktop's) ...
-  var KNEE = 0.6;              // ... easing toward that from this share of it, so a quick kind stays quicker than a slow one
+  var CALM = [22, 52];         // s: a mid bird crosses the window in about this long (a phone's .. 1440 px and up):
+                               // the page's calm, slower than the wild, every kind slowed alike, so each keeps its pace ...
+  var REF = 2.04;              // ... (a mid bird: its distance, 0.85, times its 2.4 spans a second) ...
+  var CROSS = [15, 36];        // s: ... and no bird across it quicker than this ...
+  var KNEE = 0.75;             // ... easing toward that from this share of it, so a quick kind stays quicker than a slow one
+  var HOLD = 2.2;              // a bird slowed from its wild pace glides the longer between bursts: by the root of how far, up to this
   var DETUNE = 0.05;           // each bird beats its own share faster or slower than its flight
   var GAP = [0.3, 0.7];        // the next flight comes after this share of the last one's crossing in view ...
   var THIN = 360;              // s: ... and the sky thins, the gaps a crossing longer for every THIN s on the page ...
@@ -187,10 +191,10 @@
   /* which kinds fly which patterns, and how often */
   var SORT_OF = {
     skein: [['goose', 75], ['ibis', 25]],
-    line: [['ibis', 50], ['goose', 30], ['gull', 20]],
-    pair: [['gull', 30], ['crow', 25], ['swallow', 15], ['finch', 15], ['goose', 15]],
-    single: [['gull', 30], ['crow', 25], ['heron', 20], ['swallow', 15], ['finch', 10]],
-    loose: [['finch', 45], ['crow', 25], ['swallow', 20], ['gull', 10]],
+    line: [['ibis', 40], ['goose', 35], ['gull', 25]],
+    pair: [['gull', 40], ['goose', 20], ['crow', 20], ['swallow', 10], ['finch', 10]],
+    single: [['gull', 35], ['heron', 30], ['crow', 20], ['swallow', 10], ['finch', 5]],   // mostly the big, slow-beating kinds:
+    loose: [['crow', 35], ['gull', 30], ['finch', 20], ['swallow', 15]],                 // the small quick ones now and then
     soar: [['stork', 1]]
   };
 
@@ -265,7 +269,10 @@
     dirty = false;
   }
   function keep(r, m) { if (r.right > r.left && r.bottom > r.top) words.push({ l: r.left, t: r.top, r: r.right, b: r.bottom, m: m }); }
-  function topSpeed() { return Math.min(SPEED[1], W / clamp(CROSS[0] + (W - 390) * (CROSS[1] - CROSS[0]) / 1050, CROSS[0], CROSS[1])); }
+  function across(A) { return clamp(A[0] + (W - 390) * (A[1] - A[0]) / 1050, A[0], A[1]); }
+  function topSpeed() { return Math.min(SPEED[1], W / across(CROSS)); }
+  /* the page's calm: a bird's wild pace (px/s) times this */
+  function calmOf() { return W / across(CALM) / (SPAN * view * REF); }
   /* a speed eased under a ceiling: as it is below KNEE of it, and ever closer to it above */
   function soft(v, top) { var k = KNEE * top; return v <= k ? v : k + (top - k) * (1 - Math.exp(-(v - k) / (top - k))); }
   function maxFlights() { return W >= WIDE ? FLIGHTS[1] : FLIGHTS[0]; }
@@ -508,7 +515,7 @@
       lag: lag, lat: lat, rank: rank, gain: Math.min(1.5, 1 + 0.1 * rank),
       d: measureBird(drawBird(r, S), F.span * (1 + SIZE_VAR * (r() * 2 - 1)), F.tone),   // its own drawing, its own size
       /* its own drift about its place, its own wing-beat and glide */
-      aL: pick(r, DRIFT_L) * F.span * F.loose, aP: pick(r, DRIFT_P) * F.span * F.loose, bKey: Math.floor(r() * NOISE_N), bT: pick(r, DRIFT_T) * F.loose,   // (a loose flock drifts wider, and as gently)
+      aL: pick(r, DRIFT_L) * F.span * F.loose, aP: pick(r, DRIFT_P) * F.span * F.loose * F.air, bKey: Math.floor(r() * NOISE_N), bT: pick(r, DRIFT_T) * F.loose,   // (a loose flock drifts wider, and as gently)
       f: F.f * (1 + DETUNE * (r() * 2 - 1)), delay: 0, half: (S.bound ? 0.3 : 1) * r(), rest: r(), glide: pick(r, S.glide), bob: 0,
       w: null, stragL: 0, stragT0: 0, stragT: 1, swapT0: 0, swapT: 0, gT: 0, gT0: 0, lx: 0, ly: 0, s: null
     };
@@ -518,7 +525,7 @@
   /* a bird's own bursts and glides (or bounds), after its kind */
   function wingsOf(F, m) {
     if (!F.flaps) return { segs: [], f: m.f, sinks: false, amp: 0, bound: false, bAmp: 0 };   // (soaring: set by the thermal)
-    return { segs: bursts(F.r, m.f, F.flaps, -12, 320), f: m.f, sinks: !!F.S.sink && !F.calm, amp: (F.S.sink || 0) * F.span,
+    return { segs: bursts(F.r, m.f, F.flaps, -12, 320), f: m.f, sinks: !!F.S.sink && !F.calm, amp: (F.S.sink || 0) * F.span * F.air,
              bound: !!F.S.bound, bAmp: F.S.bound ? pick(F.r, F.S.bound) * F.span : 0 };
   }
 
@@ -739,18 +746,23 @@
       wAmp: mix(fBreeze, WANDER[0], WANDER[1]) * (kind === 'line' ? 1.3 : 1) * (S.wander || 1) * pick(r, [0.7, 1.1]),
       hKey: Math.floor(r() * NOISE_N), hT: pick(r, HEAVE_T), hAmp: mix(fBreeze, HEAVE[0], HEAVE[1]) * pick(r, [0.7, 1.1])
     };
+    var v, g;
     if (calm) { F.wAmp *= 0.3; F.hAmp *= 0.3; }          // a narrow strip of sky: still air
     F.span = Math.max(SPAN_MIN, SPAN * view * S.size * depth);        // near or far, and its kind's size
     F.tone = mix(ease((depth - 0.6) / 0.6), TONE[0], TONE[1]);        // and the air between
-    F.v = pace * F.span * pick(r, S.pace);                            // spans a second: about a span a beat ...
-    F.v = clamp(soft(F.v, topSpeed()), SPEED[0], SPEED[1]);          // ... eased under the window's calm
+    v = pace * F.span * pick(r, S.pace);                              // in the wild: spans a second, about a span a beat ...
+    F.v = clamp(soft(v * calmOf(), topSpeed()), SPEED[0], SPEED[1]); // ... on the page slowed to its calm
     F.f = pick(r, S.hz) * tempo;
-    F.flaps = S.flaps && S.flaps[0][0] > 8 && F.v < 0.8 * F.span * F.f ? FLAPS_SLOW : S.flaps;   // held back: it glides between bursts
+    F.flaps = S.flaps && S.flaps[0][0] > 8 && F.v < 0.8 * F.span * F.f ? FLAPS_SLOW : S.flaps;   // held back: it glides between bursts ...
+    g = Math.sqrt(clamp(v / F.v, 1, HOLD));                          // ... and every kind glides the longer, the more it is slowed
+    if (F.flaps && !S.bound) F.flaps = [F.flaps[0], [F.flaps[1][0] * g, F.flaps[1][1] * g]];   // (not a finch's bound: its wings shut)
+    F.air = Math.sqrt(Math.min(1, F.v / v));            // what moves it in seconds (a gust, its drift, a glide's sink) gentled
+    F.hAmp *= F.air;                                     // as it is slowed, so its path turns no sharper for the slower pace
     F.climb = (kind === 'single' || kind === 'pair') && (sort === 'gull' || sort === 'crow' || sort === 'swallow') && W >= SOAR_W && r() < 0.22;
     /* a line (and a skein of ibis) beats and glides together, the beat
        passing back down it; every other flight's birds each on their own */
     if (kind === 'line' || (kind === 'skein' && sort === 'ibis'))
-      F.w = { segs: bursts(r, F.f, F.flaps, -12, 320), f: F.f, sinks: !!S.sink && !calm, amp: (S.sink || 0) * F.span, bound: false, bAmp: 0 };
+      F.w = { segs: bursts(r, F.f, F.flaps, -12, 320), f: F.f, sinks: !!S.sink && !calm, amp: (S.sink || 0) * F.span * F.air, bound: false, bAmp: 0 };
     if (kind === 'soar') return soarFlight(F);
     F.m = formation(F);
     F.d = F.m[0].d;
@@ -1018,8 +1030,8 @@
     if (n === 1) return wide && u < 0.25 ? 'soar' : 'single';
     if (n === 2) return wide && u < 0.15 ? 'soar' : 'pair';
     if (n === 3 && wide && u < 0.1) return 'soar';
-    if (u < 0.5) return 'skein';                          // V's, J's and echelons: the flight everyone knows
-    if (u < 0.72 || n > 6) return 'line';
+    if (u < 0.55) return 'skein';                         // V's, J's and echelons: the flight everyone knows
+    if (u < 0.8 || n > 6) return 'line';
     return 'loose';
   }
 
