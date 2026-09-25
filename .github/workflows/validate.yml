@@ -18,7 +18,7 @@ jobs:
             index.html
             style.v9.css
             site.js
-            birds.v6.js
+            birds.v7.js
             robots.txt
             _headers
             _redirects

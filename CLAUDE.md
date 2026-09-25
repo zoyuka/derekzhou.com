@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v9.css           All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/birds.v6.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
+/birds.v7.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -85,7 +85,8 @@ bouncing off the walls." and, of the number of birds, "should b rand";
 then, of v3's slow, rigid rows: "Are you sure this is how birds movement
 is flying?!"; then, of v4's flights of one identical mark: "Y they all
 look same and move all the same? Did you even understand what we're
-trying to do?"
+trying to do?"; then, of v5's pace (a phone's sky crossed in 10-17 s):
+"Are you sure everything should be moving this fast tho?"
 
 Light only (color-scheme: light). Tokens: bg #f9f8f1 (Samara's cream),
 text #000 (19.7:1), dimmed #5f5c56 (6.3:1), focus #8a6417 (a dark
@@ -95,7 +96,7 @@ Type is matte: no text-shadow, no glow. Links are plain underlined words
 cursors only. The type is present at first paint in its final place.
 Print hides the birds and the footer.
 
-## Birds (birds.v6.js)
+## Birds (birds.v7.js)
 
 The page is a sky. Birds cross it the way birds cross a real sky, built
 from field data (RESEARCH below) and nothing like v1/v2's dots, which
@@ -125,7 +126,11 @@ lines), ibis (lines, skeins), gulls (pairs, lone, lines), herons (lone:
 near, large, legs trailing), crows (pairs, lone, loose), finches (loose,
 pairs: small, bounding), swallows (loose, pairs, lone: tails, lazy S's),
 storks (soaring). Each has its size and distance, pace, wing-beat,
-flapping and lanes (TILT 3-8 degrees, bow, wander).
+flapping and lanes (TILT 3-8 degrees, bow, wander). Most of the sky is
+the big, slow-beating kinds: of the flights of three or more, skeins
+55%, lines 25%, loose 20%; a lone bird is a gull, heron or crow 85% of
+the time, a pair a gull, goose or crow 80%; the small quick finches and
+swallows come now and then.
 
 THE WINGS: through a beat the wrists swing down toward the bird's own
 line and back up (WRIST 1.15 to 0.2: the steps always show, never a
@@ -142,16 +147,24 @@ glides; storks hold their wings out. Each bird beats at its own rate
 (DETUNE +-5%) from its own point in the beat, on its own schedule (but
 for a line's shared wave).
 
-THE PACE: speed is in spans a second, by kind (geese 2.4-2.8, gulls
-1.9-2.3, herons 1.8-2.1, crows 2.7-3.1, finches 3.2-3.8, swallows 3-3.6),
-so a flapping bird covers about its own span a beat: flapping that goes
-nowhere reads as treading air. It is eased (soft, from KNEE 0.6 of it)
-under the window's calm ceiling, never across the window quicker than
-CROSS 9.5 s (a phone) to 24 s (1440 px and up), within SPEED 14-64 px/s,
-so a quick kind stays quicker than a slow one; a kind that beats on and
-on, held back by that ceiling, glides between bursts instead
-(FLAPS_SLOW). The calm comes from glides, few birds and empty sky, never
-from slow wings.
+THE PACE (calm): each kind's pace in the wild is in spans a second
+(geese 2.4-2.8, gulls 1.9-2.3, herons 1.8-2.1, crows 2.7-3.1, finches
+3.2-3.8, swallows 3-3.6), and the page slows every kind alike to its
+calm (CALM: a mid bird, REF, crosses the window in about 22 s on a phone
+to 52 s at 1440 px and up), so each keeps its place in the order and
+nearer, larger birds still fly faster; a soft ceiling (from KNEE 0.75 of
+it) keeps any bird from crossing quicker than CROSS 15-36 s, within
+SPEED 14-64 px/s. Measured: a phone's sky crossed in about 23-25 s
+(17-34), a 1024 px one in 40 s, a 1440 px one in 52 s (36-64); v5-v6
+took 14 s and 31 s. The wings keep their real rates, never slow motion:
+the slower pace comes from gliding. A kind that beats on and on glides
+between bursts (FLAPS_SLOW), and every kind's glides are the longer by
+the root of how far it is slowed (up to HOLD 2.2; not a finch's bound),
+so a bird beats a little over half the time. What moves a bird in
+seconds rather than along its lane (a gust, its drift, a glide's sink)
+is gentled by the root of the slowdown too (air), so the slower path
+turns no sharper. The calm comes from glides, few birds and empty sky,
+never from slow wings.
 
 THE PATTERNS (kinematic, never boids: a scripted leader track, every
 other bird in a place behind it, following the same track): skeins (a V,
@@ -225,7 +238,7 @@ visit is still everywhere), the season, and each flight's own stream
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v6.js sets each one's viewBox, size, polyline, stroke
+birds); birds.v7.js sets each one's viewBox, size, polyline, stroke
 width and stroke opacity (attributes), and moves it with a CSSOM
 transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
 pointer-events: none, so a link under a bird still takes the click.
@@ -301,7 +314,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v6.js — the sky (see above). Progressive enhancement: with JS
+2. birds.v7.js — the sky (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
 ## Fonts + performance
@@ -352,10 +365,10 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v6.js, plus style.v9.css for cursors — never to this prose) fails
+birds.v7.js, plus style.v9.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v6.js; more or
+storage handler in the JS; any DOM building in birds.v7.js; more or
 fewer than one getRandomValues in it, or one below its INIT-END marker;
 any Math.random or clock read (Date) in it; any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
@@ -364,7 +377,7 @@ AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v6.js on every TT-enforcing browser (verified by
+site.js AND birds.v7.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
