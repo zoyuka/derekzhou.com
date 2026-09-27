@@ -16,7 +16,7 @@ jobs:
         run: |
           files=(
             index.html
-            style.v9.css
+            style.v10.css
             site.js
             birds.v7.js
             robots.txt
@@ -26,9 +26,9 @@ jobs:
             assets/favicon.png
             assets/favicon.svg
             assets/apple-touch-icon.png
-            assets/fonts/Newsreader-Regular.sub2.woff2
-            assets/fonts/Newsreader-Bold.sub2.woff2
-            assets/fonts/DMSans-Regular.sub2.woff2
+            assets/fonts/Geist-400-500.sub2.woff2
+            assets/fonts/GeistMono-Regular.sub2.woff2
+            assets/fonts/OFL.txt
             .well-known/security.txt
           )
           missing=0

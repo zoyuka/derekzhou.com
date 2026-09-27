@@ -5,7 +5,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v9.css           All styles (versioned name — see Caching)
+/style.v10.css          All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
 /birds.v7.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
@@ -14,8 +14,8 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /assets/favicon.svg     Adaptive circle favicon (dark in light mode, inverse in dark)
 /assets/favicon.png     PNG fallback favicon (32x32)
 /assets/apple-touch-icon.png  180x180 iOS icon
-/assets/fonts/          Self-hosted WOFF2: full faces (sources) + three .sub2 subsets
-                        (served; DM Sans Medium is unused and not subset)
+/assets/fonts/          Self-hosted WOFF2: Geist and Geist Mono, full faces (sources)
+                        + two .sub2 subsets (served), and OFL.txt (their licence)
 /robots.txt             Allow search engines, block AI crawlers
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security + caching + Early Hints headers
@@ -60,7 +60,7 @@ Experience (one line, the .credit row):
 * Team Lead · Accenture Song · 2022 – Now
 
 Job title, company, and dates only. No per-role project or client lists.
-The credit row is a serif caption (Newsreader 400, .9375rem, dimmed) —
+The credit row is a mono caption (Geist Mono 400, .8125rem, dimmed) —
 no uppercase, no tracking; the text is unchanged.
 
 Links:
@@ -299,7 +299,7 @@ whole-page sheets across seeds are looked at by eye.
 
 ## CSS
 
-One file: style.v9.css. Plain CSS. Custom properties for theming.
+One file: style.v10.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
 WCAG AA contrast on all dimmed text over the light ground.
@@ -317,19 +317,56 @@ Two files, one job each:
 2. birds.v7.js — the sky (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
+## Type
+
+Two families, three roles. The owner asked for a grotesk and a mono
+(Diatype, Neue Haas Grotesk, Monument Grotesk Mono named); Geist and
+Geist Mono (Vercel with basement.studio, SIL Open Font License 1.1) are
+the free, licensed stand-ins, until a web licence for the Dinamo faces
+is bought:
+
+* the name (h1): Geist 500, clamp(2.75rem, 1.9rem + 4vw, 4.75rem), line
+  height 1, tracked in -0.045em
+* the words (the bio, the links, every paragraph to come): Geist 400,
+  1.0625rem, line height 1.55, -0.006em, a 22.5em measure; the bio's
+  first sentence 500 in full black, the rest dimmed
+* the facts (the credit row; to come: dates, roles, labels, captions,
+  code): Geist Mono 400, .8125rem, dimmed; no uppercase, no tracking
+
+As the site grows, new pages reuse these roles and nothing else: two
+weights only (400, 500), emphasis made by black against the dimmed
+grey rather than by weight; a handful of sizes on the same clamp()s;
+long reading at about 65 characters a line. A serif may come back for
+long-form writing only, never for the name or the page's frame.
+
+Fonts must be licensed for the web: open-licensed (OFL, like Geist) or
+a bought web licence. Never unlicensed copies, and never a desktop
+font file: its own terms forbid what a site does to it (Dinamo's:
+no modifying, no storing on publicly available servers). To move to
+Diatype and Monument Grotesk Mono once licensed: swap the two
+@font-face sources, recompute the fallbacks (below), keep the roles.
+
 ## Fonts + performance
 
-Served fonts are ASCII subsets (.sub2, ~46% smaller; regenerate with
-./subset-fonts.sh). The full faces stay in the repo as sources. The home
-page uses no glyph outside the subsets (the arrows are gone; both subsets
-carry · and –); do not add glyphs. font-display: optional + the
-metric-matched fallbacks give CLS = 0 by construction. The three served
-subsets (Newsreader 400, Newsreader 500–700, DM Sans 400) are preloaded
-in index.html and Early-Hinted via Link headers on / in \_headers.
-DM Sans Medium is neither declared, subset, preloaded nor hinted —
-nothing on the home page sets DM Sans at 500 (the credit row is
-Newsreader 400); its full face stays only as a source. Never preload a
-font no rule uses (Chrome warns, and every first visit pays for it).
+Served fonts are ASCII subsets (.sub2: Latin basic, · – — ‘ ’ “ ” …).
+./download-fonts.sh fetches the sources from Vercel's own geist package
+(pinned); ./subset-fonts.sh cuts the subsets. Geist is one variable file
+cut to the two weights the site sets, wght 400-500 (10.9 KB, smaller
+than a single static weight); Geist Mono Regular is 9.3 KB: 20 KB of
+fonts in all (Newsreader and DM Sans were 32 KB). The subsets keep the
+copyright and the OFL notice in their name tables (IDs 0, 13, 14), and
+assets/fonts/OFL.txt ships beside them. The home page uses no glyph
+outside the subsets; do not add glyphs. font-display: optional + the
+metric-matched fallbacks give CLS = 0 by construction: 'Geist Fallback'
+(Arial) and 'Geist Fallback Android' (Roboto), 400 and 500 apart, their
+size-adjust the page's own text set in Geist over the same text in the
+system face and their ascent and descent Geist's (1.005, 0.295) over
+it; 'Geist Mono Fallback' (Menlo, Courier New) by the advance, 0.6 em.
+Checked: with Arial's metric twin standing in, the fallback wraps the
+bio in the same lines as Geist, the name within 1%. Both subsets are
+preloaded in index.html and Early-Hinted via Link headers on / in
+\_headers. Never preload a font no rule uses (Chrome warns, and every
+first visit pays for it).
 
 Single light theme-color (#f9f8f1). The favicon is SVG-first
 with PNG fallback.
@@ -365,7 +402,7 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v7.js, plus style.v9.css for cursors — never to this prose) fails
+birds.v7.js, plus style.v10.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
 storage handler in the JS; any DOM building in birds.v7.js; more or

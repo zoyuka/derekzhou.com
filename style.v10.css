@@ -1,28 +1,23 @@
 /* ------------------------------------------------
    @font-face — self-hosted WOFF2, ASCII subsets
    (regenerate with ./subset-fonts.sh; bump .subN
-   filenames on change — assets are immutable-cached)
+   filenames on change — assets are immutable-cached).
+   Geist and Geist Mono: SIL Open Font License 1.1
+   (assets/fonts/OFL.txt). Geist is one variable file
+   cut to the two weights the site sets, 400 and 500.
    ------------------------------------------------ */
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Regular.sub2.woff2') format('woff2');
-  font-weight: 400;
+  font-family: 'Geist';
+  src: url('/assets/fonts/Geist-400-500.sub2.woff2') format('woff2');
+  font-weight: 400 500;
   font-style: normal;
   font-display: optional;
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader-Bold.sub2.woff2') format('woff2');
-  font-weight: 500 700;
-  font-style: normal;
-  font-display: optional;
-}
-
-@font-face {
-  font-family: 'DM Sans';
-  src: url('/assets/fonts/DMSans-Regular.sub2.woff2') format('woff2');
+  font-family: 'Geist Mono';
+  src: url('/assets/fonts/GeistMono-Regular.sub2.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: optional;
@@ -30,45 +25,59 @@
 
 /* Metric-matched fallbacks: if the webfont misses first paint,
    the system face renders at the webfont's exact metrics.
-   Values computed from the font tables — see CLAUDE.md. */
+   size-adjust is the page's own text set in Geist over the same
+   text in the system face; the overrides are Geist's ascent
+   (1.005) and descent (0.295) over it. See CLAUDE.md. */
 
 @font-face {
-  font-family: 'Newsreader Fallback';
-  src: local('Georgia');
-  font-weight: 400;
-  size-adjust: 96.88%;
-  ascent-override: 75.87%;
-  descent-override: 27.35%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'Newsreader Fallback';
-  src: local('Georgia Bold'), local('Georgia');
-  font-weight: 500 700;
-  size-adjust: 99.42%;
-  ascent-override: 73.93%;
-  descent-override: 26.66%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'DM Sans Fallback';
+  font-family: 'Geist Fallback';
   src: local('Arial');
   font-weight: 400;
-  size-adjust: 113.91%;
-  ascent-override: 87.09%;
-  descent-override: 27.21%;
+  size-adjust: 104.70%;
+  ascent-override: 95.99%;
+  descent-override: 28.18%;
   line-gap-override: 0%;
 }
 
 @font-face {
-  font-family: 'DM Sans Fallback Android';
+  font-family: 'Geist Fallback';
+  src: local('Arial');
+  font-weight: 500;
+  size-adjust: 105.80%;
+  ascent-override: 94.99%;
+  descent-override: 27.88%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Geist Fallback Android';
   src: local('Roboto');
   font-weight: 400;
-  size-adjust: 112.12%;
-  ascent-override: 88.48%;
-  descent-override: 27.65%;
+  size-adjust: 104.77%;
+  ascent-override: 95.92%;
+  descent-override: 28.16%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Geist Fallback Android';
+  src: local('Roboto Medium'), local('Roboto-Medium');
+  font-weight: 500;
+  size-adjust: 106.60%;
+  ascent-override: 94.28%;
+  descent-override: 27.67%;
+  line-gap-override: 0%;
+}
+
+/* Every glyph of a mono is one advance: Geist Mono's 0.6 em over
+   Menlo's and Courier New's (0.602, 0.600) */
+@font-face {
+  font-family: 'Geist Mono Fallback';
+  src: local('Menlo'), local('Courier New');
+  font-weight: 400;
+  size-adjust: 99.82%;
+  ascent-override: 100.68%;
+  descent-override: 29.55%;
   line-gap-override: 0%;
 }
 
@@ -81,8 +90,10 @@
 :root {
   color-scheme: light;
 
-  --font-serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', serif;
-  --font-sans: 'DM Sans', 'DM Sans Fallback', 'DM Sans Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  /* Two families, three roles (see CLAUDE.md, Type): Geist for the
+     name, the words and the links; Geist Mono for the facts */
+  --font-sans: 'Geist', 'Geist Fallback', 'Geist Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
 
   --color-bg: #f9f8f1;
   --color-text: #000000;
@@ -175,20 +186,17 @@ main {
 }
 
 h1 {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(3rem, 2rem + 4.5vw, 5.25rem);
-  font-optical-sizing: auto;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
+  font-weight: 500;
+  font-size: clamp(2.75rem, 1.9rem + 4vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .bio {
-  font-family: var(--font-serif);
-  font-size: 1.125rem;
-  line-height: 1.62;
-  letter-spacing: 0.005em;
-  max-width: 38ch;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  letter-spacing: -0.006em;
+  max-width: 22.5em;
   margin-top: 2rem;
 }
 
@@ -201,12 +209,12 @@ h1 {
   color: var(--color-dimmed);
 }
 
-/* A serif caption, in the bio's own voice — no uppercase, no tracking. */
+/* The facts (role, company, dates) in mono — no uppercase, no tracking. */
 .credit {
-  margin-top: 2.25rem;
-  font-family: var(--font-serif);
+  margin-top: 2rem;
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: .9375rem;
+  font-size: .8125rem;
   color: var(--color-dimmed);
 }
 
@@ -223,7 +231,6 @@ footer {
 }
 
 footer a {
-  font-family: var(--font-sans);
   font-size: 0.875rem;
   color: var(--color-text);
 }
@@ -240,7 +247,6 @@ footer a, .back-link {
 }
 
 .noscript-email {
-  font-family: var(--font-sans);
   font-size: 0.875rem;
   color: var(--color-dimmed);
 }
