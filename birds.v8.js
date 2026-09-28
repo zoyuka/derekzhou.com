@@ -119,6 +119,7 @@
   var UP_V = 0.06;             // spans: a V lies level in the air, give or take this
   var SPACE_SEEN = 2;          // px: two birds of a flight never closer than this on the window (a near one passing a far one)
   var SLOWEST = 5;             // px/s: nor slower than this anywhere in view (far off, going away)
+  var TURN_SEEN = 18;          // degrees a second: nor turning faster than this on the window (a turn seen heading away sweeps round)
 
   /* the sky */
   var OUT = 70;                // px beyond the window where a path begins and ends
@@ -686,7 +687,7 @@
     for (i = n - 1; i > 0; i--) { j = Math.floor(F.r() * (i + 1)); k = order[i]; order[i] = order[j]; order[j] = k; }
     for (i = 0; i < n; i++) {
       k = M[order[i]];
-      k.f = F.f * (1 + DETUNE * (2 * (i + 0.5) / n - 1));
+      k.f = F.f * (1 + DETUNE * (2 * i / (n - 1) - 1));   // (the whole of DETUNE either way: a chance meeting in the beat soon passes)
       k.half = (F.S.bound ? 0.3 : 1) * ((i + 0.3 + 0.4 * F.r()) / n);
       k.w = wingsOf(F, k);
     }
@@ -1099,16 +1100,18 @@
      shrinking (coming nearer, going away) faster than GROW or SHRINK a
      second; a path that would slow it by more than half: not this one */
   function paced(F) {
-    var a = entering(F), b = leaving(F), ds = Math.max(4, (b - a) / 24), s, e, sig = 0, slow = Infinity, gr = 0, sh = 0, x0, y0, n0, d;
+    var a = entering(F), b = leaving(F), ds = Math.max(4, (b - a) / 24), s, e, sig = 0, slow = Infinity, gr = 0, sh = 0, tr = 0, x0, y0, n0, d, g, g0 = NaN;
     path3(F, F.sa + a, wp); proj(wp.x, wp.y, wp.z, pp); x0 = pp.x; y0 = pp.y; n0 = pp.n;
     for (s = a + ds; s <= b + 1e-6; s += ds) {
       path3(F, F.sa + s, wp); proj(wp.x, wp.y, wp.z, pp);
       d = Math.sqrt((pp.x - x0) * (pp.x - x0) + (pp.y - y0) * (pp.y - y0)) / ds;   // px on the window a unit of path
       sig = Math.max(sig, d); slow = Math.min(slow, d);
       e = Math.log(pp.n / n0) / ds; gr = Math.max(gr, e); sh = Math.max(sh, -e);
-      x0 = pp.x; y0 = pp.y; n0 = pp.n;
+      g = Math.atan2(pp.y - y0, pp.x - x0);                // the way it runs on the window, and how fast that turns a unit of path
+      if (g0 === g0) { g0 = g - g0; tr = Math.max(tr, Math.abs(Math.atan2(Math.sin(g0), Math.cos(g0))) / ds); }
+      g0 = g; x0 = pp.x; y0 = pp.y; n0 = pp.n;
     }
-    F.v = Math.min(F.vw, 0.92 * topSpeed() / (sig || 1), gr > 0 ? 0.9 * GROW / gr : Infinity, sh > 0 ? 0.9 * SHRINK / sh : Infinity);
+    F.v = Math.min(F.vw, 0.92 * topSpeed() / (sig || 1), gr > 0 ? 0.9 * GROW / gr : Infinity, sh > 0 ? 0.9 * SHRINK / sh : Infinity, tr > 0 ? TURN_SEEN * DEG / tr : Infinity);
     F.q = F.v / F.vw * Math.min(1, slow / F.n0);          // what moves it in seconds, gentled as far again, and as far as it is seen slower where it heads away: its path turns no sharper
     return F.v >= 0.45 * F.vw && F.v * slow >= SLOWEST;   // (and never so far off and slow that it seems to hang still)
   }
