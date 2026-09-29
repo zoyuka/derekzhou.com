@@ -7,7 +7,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /index.html             Home page
 /style.v10.css          All styles (versioned name — see Caching)
 /site.js                Email obfuscation only
-/birds.v7.js            The birds — a sky: every bird drawn afresh in the tattoo's hand, many kinds crossing it (see Birds)
+/birds.v8.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -86,7 +86,10 @@ then, of v3's slow, rigid rows: "Are you sure this is how birds movement
 is flying?!"; then, of v4's flights of one identical mark: "Y they all
 look same and move all the same? Did you even understand what we're
 trying to do?"; then, of v5's pace (a phone's sky crossed in 10-17 s):
-"Are you sure everything should be moving this fast tho?"
+"Are you sure everything should be moving this fast tho?"; then, of v7's
+flat sky, every lane drawn on the window's plane: "Y is the movement so 2D
+though. Did you even research as comprehensively as possible? Test using
+the most complex tools etc."
 
 Light only (color-scheme: light). Tokens: bg #f9f8f1 (Samara's cream),
 text #000 (19.7:1), dimmed #5f5c56 (6.3:1), focus #8a6417 (a dark
@@ -96,13 +99,53 @@ Type is matte: no text-shadow, no glow. Links are plain underlined words
 cursors only. The type is present at first paint in its final place.
 Print hides the birds and the footer.
 
-## Birds (birds.v7.js)
+## Birds (birds.v8.js)
 
-The page is a sky. Birds cross it the way birds cross a real sky, built
-from field data (RESEARCH below) and nothing like v1/v2's dots, which
-lived inside the window and turned back at its walls, v3's slow rigid
-rows, which read as a dashed line, or v4's flights of one identical mark
-all moving alike ("Y they all look same and move all the same?").
+The page is a sky, seen in depth. Birds cross it the way birds cross a
+real sky, built from field data (RESEARCH below) and nothing like v1/v2's
+dots, which lived inside the window and turned back at its walls, v3's
+slow rigid rows, which read as a dashed line, v4's flights of one
+identical mark all moving alike ("Y they all look same and move all the
+same?"), or v5-v7's flat sky, every lane drawn on the window's own plane
+("Y is the movement so 2D though.").
+
+THE SKY IN DEPTH (v8): the window is a camera looking out and up at the
+sky (FOV 60 degrees across its longer side, pitched up so the horizon lies
+HORIZON 0.08 of its height below its bottom edge), and every flight flies
+a path in the air in front of it (x right, y up from the eye's level, z out
+along the ground, in px at nearness 1); all that is seen is that air in
+perspective (proj: nearness n = f / depth, px on the window a unit in the
+air). The camera is aimed when a sky begins and held through small changes
+of height (a phone's bar). A path is straight, or (TURNING 40%, gulls and
+swallows x1.6 and x1.8) wheels through TURN 20-60 degrees over TURN_T 3-6
+s near the middle of the crossing, climbing or sinking a little (its
+kind's tilt); it heads across the window (HEAD 0-25 degrees off its plane,
+55% of paths), angling away (25-60, 32%) or coming nearer (12-30, 13%),
+never more than HEAD_MAX 72 off it, never turning back across it. Depth is
+drawn, afresh on every drawing: a bird's size is its span at its nearness,
+its pen (LINE) and its ink (TONE) follow; a flight going away shrinks,
+slows on the window and sinks toward the horizon, and far off (nearness
+FADE 0.54 down to FAR 0.42) fades into the air instead of popping out;
+none comes nearer than NEAR_MAX 1.7 in view. A V lies level in the air
+(UP_V 0.06 spans up or down), so its arms are nearer and farther:
+foreshortened, the near arm larger and higher on the window; a pair flies
+one nearer, one farther; a loose flock is a cloud (1.15 root-n spans
+aside, 0.45 root-n up and down); a line undulates in the air (FILE_Y up, a
+third of it aside). A turning bird banks: its inner wrist drawn lower and
+its outer higher (BANK 0.3 at BANK_AT 40 degrees a second of turn on the
+window), never a rotation. Storks circle a thermal: a ring in the air
+(an ellipse seen from below, no longer drawn flat), drifting downwind and
+climbing RISE 1.5-3 px/s, about half its radius a lap. A flight's pace
+is its kind's, held (paced) where it passes nearest so it never rushes
+across the window, never grows by more than GROW 1.2% of its size a
+second (looming captures attention) nor shrinks by more than SHRINK 3%
+(receding does not), never turns faster than TURN_SEEN 18 degrees a second
+on the window (a turn seen heading away sweeps round), and never crawls
+under SLOWEST 5 px/s; a path that would slow it below 0.45 of its pace is
+not flown. What moves a bird in seconds (its drift, a gust, a glide's
+sink) is gentled as far again, and as far as it is seen slower where it
+heads away (q). Two birds of one flight are never closer than SPACE_SEEN 2
+px on the window (a near one passing a far one) nor SPACE 4 px in the air.
 
 THE DRAWING (every bird its own): the tattoo is the hand, not a stamp.
 Traced from the photo, each of its three birds is an "M" gull stood on a
@@ -116,17 +159,18 @@ about its drops' angle (LEAN -14..+5 degrees: some read more as steps,
 some more as gulls). As drawn a bird faces right, rising the way the
 tattoo's birds do; flying left mirrors it; never rotated or tilted.
 (v2-v4 drew a digitization of the three marks that was the photo upside
-down.) Size and ink are distance: SPAN 22 px for a mid bird at middle
-distance on a large window (x0.72-1.12 by the window, never under
-SPAN_MIN 9), a stroke of LINE 1.5-2.5 px by size, ink TONE 0.62-1 (the
-polyline's stroke-opacity; 1 under forced colors).
+down.) Size and ink are distance: SPAN 22 px for a mid bird at nearness 1
+on a large window (x0.72-1.12 by the window), each kind crossing at its own
+nearness (SORTS depth, 0.6-1.3); a stroke of LINE 1.5-2.5 px by its size on
+the window, ink TONE 0.62-1 by its nearness, times its fade (the polyline's
+stroke-opacity; 1 under forced colors).
 
 THE KINDS (SORTS, and which patterns each flies: SORT_OF): geese (skeins,
 lines), ibis (lines, skeins), gulls (pairs, lone, lines), herons (lone:
 near, large, legs trailing), crows (pairs, lone, loose), finches (loose,
-pairs: small, bounding), swallows (loose, pairs, lone: tails, lazy S's),
+pairs: small, bounding), swallows (loose, pairs, lone: tails, wheeling),
 storks (soaring). Each has its size and distance, pace, wing-beat,
-flapping and lanes (TILT 3-8 degrees, bow, wander). Most of the sky is
+flapping and paths (tilt 3-8 degrees, wheel, wander). Most of the sky is
 the big, slow-beating kinds: of the flights of three or more, skeins
 55%, lines 25%, loose 20%; a lone bird is a gull, heron or crow 85% of
 the time, a pair a gull, goose or crow 80%; the small quick finches and
@@ -139,13 +183,15 @@ span on it; a gliding bird holds its wrists at its own set, near the
 drawing; a bounding finch folds its wings shut between bursts. By kind
 (Pennycuick 2001): geese 2.3-2.7 Hz beating on and on; ibis 2.6-3 flap
 and glide, the beat passing back down a line (WAVE_DELAY 0.35-0.8 s a
-bird) or, in a V, spatially in phase; gulls 2.2-2.6, a few beats and long
-glides, sinking a little on each; herons 1.9-2.2, slow and deep; crows
-2.8-3.2, rowing; finches 5-6 in short bursts, rising through the beats
-and falling wings-shut (bounding); swallows 3.8-4.6 in flickers between
-glides; storks hold their wings out. Each bird beats at its own rate
-(DETUNE +-5%) from its own point in the beat, on its own schedule (but
-for a line's shared wave).
+bird, never a whole number of beats) or, in a V, spatially in phase;
+gulls 2.2-2.6, a few beats and long glides, sinking a little on each;
+herons 1.9-2.2, slow and deep; crows 2.8-3.2, rowing; finches 5-6 in
+short bursts, rising through the beats and falling wings-shut (bounding);
+swallows 3.8-4.6 in flickers between glides; storks hold their wings out.
+Birds beating each on their own have their rates spread evenly over the
+whole of DETUNE (+-5%) and their starting points in the beat spread too,
+each on its own schedule of bursts and glides, so a chance meeting in the
+beat soon passes (a line keeps its shared wave).
 
 THE PACE (calm): each kind's pace in the wild is in spans a second
 (geese 2.4-2.8, gulls 1.9-2.3, herons 1.8-2.1, crows 2.7-3.1, finches
@@ -154,81 +200,85 @@ calm (CALM: a mid bird, REF, crosses the window in about 22 s on a phone
 to 52 s at 1440 px and up), so each keeps its place in the order and
 nearer, larger birds still fly faster; a soft ceiling (from KNEE 0.75 of
 it) keeps any bird from crossing quicker than CROSS 15-36 s, within
-SPEED 14-64 px/s. Measured: a phone's sky crossed in about 23-25 s
-(17-34), a 1024 px one in 40 s, a 1440 px one in 52 s (36-64); v5-v6
-took 14 s and 31 s. The wings keep their real rates, never slow motion:
-the slower pace comes from gliding. A kind that beats on and on glides
-between bursts (FLAPS_SLOW), and every kind's glides are the longer by
-the root of how far it is slowed (up to HOLD 2.2; not a finch's bound),
-so a bird beats a little over half the time. What moves a bird in
-seconds rather than along its lane (a gust, its drift, a glide's sink)
-is gentled by the root of the slowdown too (air), so the slower path
-turns no sharper. The calm comes from glides, few birds and empty sky,
-never from slow wings.
+SPEED 14-64 px/s where it crosses; then each path holds it as above.
+Measured on the window (median, and 2-98%): a phone's birds 16-18 px/s
+(10-25), a 1024 px window's 21-25 (9-34), a 1440 px one's 24-25 (15-36);
+v7's crossed a 1440 px sky in 52 s. The wings keep their real rates,
+never slow motion: the slower pace comes from gliding. A kind that beats
+on and on glides between bursts (FLAPS_SLOW), and every kind's glides are
+the longer by the root of how far it is slowed (up to HOLD 2.2; not a
+finch's bound), so a bird beats a little over half the time. The calm
+comes from glides, few birds and empty sky, never from slow wings.
 
-THE PATTERNS (kinematic, never boids: a scripted leader track, every
-other bird in a place behind it, following the same track): skeins (a V,
-a J or an echelon: ARM_X 1.5-1.9 spans back and ARM_Y 0.9-1.1 aside per
+THE PATTERNS (kinematic, never boids: a scripted leader path, every other
+bird in a place behind it in the air, following the same path): skeins (a
+V, a J or an echelon: ARM_X 1.5-1.9 spans back and ARM_Y 0.9-1.1 aside per
 place, JITTER 30%, the arms unequal), lines (FILE 1.6-2.2 spans, uneven,
-wandering FILE_Y), pairs (now and then changing sides, SWAP_T 16-24 s),
-loose flocks, lone birds, and soaring kettles on a sky at least SOAR_W
-700 px wide in a roomy field (a thermal seen from below: SOAR_K 0.33-0.44
-as tall as wide, LAP 15-21 s, 1-2 laps, drifting WIND 3-6 px/s, one way
-round; away one by one on the tangent). Every bird drifts about its place
-on its own (DRIFT_L 0.08-0.18 and DRIFT_P 0.15-0.3 spans, over DRIFT_T
-3-6.5 s). Events, on the flight's own clock from ev0 (a little after its
-leader comes into view): now and then (GATHER 40% of skeins and lines) a
-skein crosses as a ragged file (FILE_G 2-2.4 spans) that fans out into
-its V, sideways first and then closing up, the front birds first
-(GATHER_AT 0.4-0.9 s apart, GATHER_T 6-10 s each), and a line as a bunch
-that strings out into single file; or (LOOSEN 15%) the reverse, a V
-stringing out into a file; a straggler catching up (+6-10%); a pair
-changing sides. Spacing is checked through every event (fitsAll: every
-pair, every 0.5 s of it); a gathering that cannot keep its birds apart
-does not happen. How many (1-9 by COUNT: 3, 5 and 7 favoured; never a
-flight of four, and no group of the flights in the sky ever four birds,
-so none can leave four behind), which kind, which pattern, which lane:
-all random, from the visit's weather. If the pattern does not fit, a
-flatter V, a smaller one, the same birds as a line, fewer, one, then (a
-strip of sky) one in still air.
+undulating FILE_Y), pairs (now and then changing sides, SWAP_T 16-24 s),
+loose flocks, lone birds, and soaring kettles on a sky at least SOAR_W 700
+px wide in a roomy field (LAP 15-21 s, 1-2 laps, drifting WIND 3-6 px/s,
+one way round; away one by one on the tangent). Every bird drifts about
+its place on its own (DRIFT_L 0.08-0.18 spans along, DRIFT_P 0.15-0.3
+aside and up and down, over DRIFT_T 3-6.5 s). Events, on the flight's own
+clock from ev0 (a little after its leader comes into view): now and then
+(GATHER 40% of skeins and lines) a skein crosses as a ragged file (FILE_G
+2-2.4 spans) that fans out into its V, sideways first and then closing
+up, the front birds first (GATHER_AT 0.4-0.9 s apart, GATHER_T 6-10 s
+each), and a line as a bunch that strings out into single file; or
+(LOOSEN 15%) the reverse, a V stringing out into a file; a straggler
+catching up (+6-10%); a pair changing sides. Spacing is checked through
+every event (fitsAll: every pair, every 0.5 s of it); a gathering that
+cannot keep its birds apart does not happen. How many (1-9 by COUNT: 3, 5
+and 7 favoured; never a flight of four, and no group of the flights in
+the sky ever four birds, so none can leave four behind), which kind,
+which pattern, which path: all random, from the visit's weather. If the
+pattern does not fit, a flatter V, a smaller one, the same birds as a
+line, fewer, one, then (a strip of sky) one in still air.
 
-THE SKY: every flight enters from beyond one edge already flying and
-leaves beyond the far edge, on one gentle lane (a cubic curve: its
-kind's TILT, a bow of up to 5% of the width by the breeze, more for gulls
-and swallows, in toward the words and on past them); now and then (22%)
-a gull, crow or swallow alone or in a pair climbs away or comes down
-(CLIMB 10-20 degrees) on a sky 700 px or wider. Nothing starts, stops,
-loops, bounces or turns back in view: motion onset and sudden reversals
-are what pull the eye off text (Abrams & Christ 2003; Howard & Holcombe
-2010). Samara's 1 s fade (`appear`) softens each bird's entry at the
-edge. A lane is planned whole before its first bird enters: the planner
-flies the flight forward in thought (STEP 0.3 s) and every bird's ink box
-(with room for its bob) must stay WORDS 24 px from the .stack box and
-LINKS 20 px from each footer link, EDGE 10 px inside the edges the
-flight does not cross, and APART 48 px from every other flight, for the
-whole crossing; and one flight to a band (BAND_GAP 24 px between the
-heights two flights keep). The roomiest of TRIES (16) lanes wins; level
-lanes are drawn (R2 low-discrepancy) only from the open bands. Planning
-is spread over frames (QUOTA 500 bird-steps a frame), so no frame is
-long.
+THE SKY: every flight enters from beyond an edge already flying, or out of
+the distance, and leaves beyond an edge, below the window's sill or into
+the distance, on one path; now and then (22%) a gull, crow or swallow
+alone or in a pair climbs away or comes down (CLIMB 10-20 degrees) on a
+sky 700 px or wider. Nothing starts, stops, loops, bounces or turns back
+in view: motion onset and sudden reversals are what pull the eye off text
+(Abrams & Christ 2003; Howard & Holcombe 2010). Samara's 1 s fade
+(`appear`) softens each bird's entry at the edge. A path is planned whole
+before its first bird enters: the planner flies the flight forward in
+thought (STEP 0.3 s) and every bird's ink box at its nearness (with room
+for its bob) must stay WORDS 24 px from the .stack box and LINKS 20 px
+from each footer link, EDGE 10 px inside the edges the flight does not
+cross, and APART 48 px from every other flight, for the whole crossing;
+and one flight to a band (BAND_GAP 24 px between the heights two flights
+keep), unless the words stand between them wherever they share heights.
+The roomiest of TRIES (16) paths wins; its point in the window is drawn
+(R2 low-discrepancy) from the open sky, a level crossing's from the open
+bands. On a sky with no open band (a phone turned sideways: the words
+stand across it) the planner tries paths in the open sky beside them:
+angling away into the distance, coming nearer, and steeper paths across
+the window (DIAG 20-60 degrees on the window, solved for their heading
+and climb, never over 45 degrees of climb, going away or coming nearer at
+up to DIAG_N 0.85 of SHRINK or GROW). Planning is spread over frames
+(QUOTA 500 bird-steps a frame, the working-out of each path counted), so
+no frame is long.
 
 THE RHYTHM: at most FLIGHTS 2 at once (3 on a sky WIDE 900 px or wider),
-never two in one band; the first enters within about 1-2 s of load
-(FIRST, from beyond the edge), the second a few seconds after it (12-25%
-of the first's crossing), then GAP 0.3-0.7 of a crossing between
-flights; with no room (the bands taken) the sky looks again in RETRY
-3-6 s; the season (65% of visits left to right, the way the words read)
-sends 65-80% of flights that way, and any flight may go the other; the
-sky thins over a long visit (THIN: the gaps a crossing longer every 6
-minutes, up to two).
+never two in one band (but for the words between them); the first enters
+within about 1-2 s of load (FIRST, from beyond the edge; on a small sky
+three birds at most), the second a few seconds after it (12-25% of the
+first's crossing), then GAP 0.3-0.7 of a crossing between flights; with
+no room (the bands taken) the sky looks again in RETRY 3-6 s; the season
+(65% of visits left to right, the way the words read) sends 65-80% of
+flights that way, and any flight may go the other; the sky thins over a
+long visit (THIN: the gaps a crossing longer every 6 minutes, up to two).
 
 THE HAND (what makes them alive; v1 dropped it and they read as frozen
 icons): the round-capped stroke; the BOIL, every vertex re-jittered
 BOIL_FPS (6) times a second by the visit's hand (1.2-1.6 px, x0.4 on a
-bird in flight); the drawing (wings, bob, tremor, facing) changes only
-on the hand's frames (DRAW_FPS 12, on twos) while the bird glides
-smoothly between them; a bird faces the way it flies, with hysteresis,
-the flip landing on a hand frame.
+bird in flight); the drawing (wings, bank, bob, tremor, facing, and the
+size, pen and ink of its distance) changes only on the hand's frames
+(DRAW_FPS 12, on twos) while the bird glides smoothly between them; a
+bird faces the way it flies, with hysteresis, the flip landing on a hand
+frame.
 
 THE WEATHER (=rand()): ONE crypto.getRandomValues at init, above the
 INIT-END marker, and no clock read at all; splitmix32 streams from it:
@@ -238,23 +288,25 @@ visit is still everywhere), the season, and each flight's own stream
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v7.js sets each one's viewBox, size, polyline, stroke
-width and stroke opacity (attributes), and moves it with a CSSOM
+birds); birds.v8.js sets each one's viewBox and size (room for the bird
+at its nearest), polyline, stroke width and stroke opacity (attributes,
+the last two only when they change), and moves it with a CSSOM
 transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
 pointer-events: none, so a link under a bird still takes the click.
 
 prefers-reduced-motion: a still sky, a photograph: one flight (two on a
-sky 900 px or wider; a skein, a pair or a lone bird) placed mid-lane in
+sky 900 px or wider; a skein, a pair or a lone bird) placed mid-path in
 the roomiest open field, every bird caught at its own point in the beat,
 the hand at rest, live both ways. forced-colors: CanvasText, full ink. A
 hidden tab pauses with requestAnimationFrame; a step is capped at 50 ms.
-A resize or rotation starts a new sky. A scroll, a font swap or a small
-change of height (on a phone, the browser's bar coming and going, as it
-does while the page loads) re-checks every flight, holding it to half its
-margin: a flight the words moved onto goes, and its place is not kept
-waiting. Into a sky left empty the next flight comes as the first did,
-within a second or two (v5 held it back as if the lost flight were still
-crossing: on an iPhone the sky stayed empty for ten seconds and more).
+A resize or rotation starts a new sky (and aims the camera anew). A
+scroll, a font swap or a small change of height (on a phone, the
+browser's bar coming and going, as it does while the page loads)
+re-checks every flight, holding it to half its margin: a flight the words
+moved onto goes, and its place is not kept waiting. Into a sky left empty
+the next flight comes as the first did, within a second or two (v5 held
+it back as if the lost flight were still crossing: on an iPhone the sky
+stayed empty for ten seconds and more).
 
 The birds fly for as long as the page is open. That is automatic motion
 over five seconds beside content, which WCAG 2.2.2 (Level A) answers
@@ -272,30 +324,43 @@ spatially in-phase flapping); Hainsworth 1987-89, Speakman & Banks 1998,
 Cutts & Speakman 1994, Newbolt 2024 (geese, cranes and pelicans: uneven
 spacing, unlocked wing-beats, no fixed order in lines); Nagy 2010 and
 2018, Weinzierl 2016, Akos 2008 (storks in thermals: 13.6 s median lap,
-one way round); Whitaker & Halas, Preston Blair, Muybridge (animation:
-4-8 drawings a beat, a pose held over ~0.15 s reads as posing; M, flat,
-W); Reynolds 1987 and the animators' "twinning" (identical, in-step
-motion looks mechanical); Abrams & Christ 2003, Howard & Holcombe 2010,
-Bartram 2003 (what motion captures attention); the ink-painting
-tradition (few birds, empty sky: liubai, ma).
+one way round, climbing as they circle); Whitaker & Halas, Preston Blair,
+Muybridge (animation: 4-8 drawings a beat, a pose held over ~0.15 s reads
+as posing; M, flat, W); Reynolds 1987 and the animators' "twinning"
+(identical, in-step motion looks mechanical); Abrams & Christ 2003,
+Howard & Holcombe 2010, Bartram 2003 (what motion captures attention);
+and for depth (v8): Wallach & O'Connell 1953 (the kinetic depth effect:
+shape and depth read from a changing projection), Cutting & Vishton 1995
+(which cues give depth at a distance: relative size, height toward the
+horizon, motion perspective; occlusion, which the birds never use, as
+they never overlap), Franconeri & Simons 2003 (looming captures
+attention, receding does not: approaches rare, slow, GROW well under
+SHRINK); the ink-painting tradition (few birds, empty sky: liubai, ma).
 
 VERIFY before changing the flight: a node simulator flies the real file
 against a fake DOM with the real page layouts (12 viewports, rotations,
 scrolls, a phone's browser bar changing the height at load, reduced
-motion both ways) for simulated minutes and checks: ink
-never within 12 px of the words (in practice 22 px or more), birds enter
-and leave only across an edge (never popping in or out mid-sky), no
-reversal and no turn over 25 degrees a second outside a thermal or a
-finch's bounding (the path measured without the bob), birds of a flight
-never overlapping (through their events), two flights never within 30 px
-and never in one band, 10-72 px/s, birds beating their wings most of the
-time and a flock never in lockstep, the facing, no four birds, at most 2
-flights (3 on a wide sky), the sky seldom empty, the first bird within a
-few seconds (within 3 s after the bar at load), short frames; then a
-browser pass checks the same live (in WebKit, Safari's engine, too, with
-the window's height changed as the page loads), and
-film strips (16 drawings, 1/12 s apart), a time-lapse of a gathering and
-whole-page sheets across seeds are looked at by eye.
+motion both ways) for 10 simulated minutes a run and checks: ink never
+within 12 px of the words (in practice 21 px or more), birds enter and
+leave only across an edge or out of and into the distance (never popping
+in or out mid-sky), no reversal and no turn over 25 degrees a second
+outside a thermal or a finch's bounding (the path measured without the
+bob), birds of a flight never overlapping (through their events), two
+flights never within 30 px and never in one band (but for the words
+between them), birds beating their wings most of the time and a flock
+never in lockstep, the facing, no four birds, at most 2 flights (3 on a
+wide sky), the sky seldom empty, the first bird within a few seconds
+(within 3 s after the bar at load), short frames. The projection is
+checked against three.js's own PerspectiveCamera (every bird's position
+in the air re-projected, thermals too: 147,000 positions, worst error
+1e-12 px); the depth is measured from the drawn marks alone (size and
+speed over a crossing, paths toward the horizon; v7 against v8) and, on
+frames rendered in Chromium with the page's clock stepped exactly
+(Playwright's fake clock), by OpenCV's dense optical flow (Farneback);
+then a browser pass checks the same live (in WebKit, Safari's engine,
+too, with the window's height changed as the page loads), and film
+strips, time-lapses and whole-page sheets across seeds are looked at by
+eye.
 
 ## CSS
 
@@ -314,7 +379,7 @@ Two files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v7.js — the sky (see above). Progressive enhancement: with JS
+2. birds.v8.js — the sky (see above). Progressive enhancement: with JS
    off, the page is simply the typography on the light ground.
 
 ## Type
@@ -402,10 +467,10 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v7.js, plus style.v10.css for cursors — never to this prose) fails
+birds.v8.js, plus style.v10.css for cursors — never to this prose) fails
 on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
 HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v7.js; more or
+storage handler in the JS; any DOM building in birds.v8.js; more or
 fewer than one getRandomValues in it, or one below its INIT-END marker;
 any Math.random or clock read (Date) in it; any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
@@ -414,7 +479,7 @@ AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v7.js on every TT-enforcing browser (verified by
+site.js AND birds.v8.js on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
