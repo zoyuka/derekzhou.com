@@ -122,6 +122,10 @@ jobs:
               echo "::error::$f exists but index.html does not reference it"
               fail=1
             fi
+            if [ -f "$f" ] && ! grep -qx "/$f" _headers; then
+              echo "::error::$f has no immutable cache block in _headers"
+              fail=1
+            fi
           done
           [ "$fail" -eq 0 ] && echo "All references resolve"
           exit $fail
@@ -164,11 +168,11 @@ jobs:
           # (4) the weather (=rand()): ONE entropy read each in the birds and the sky, above
           # INIT-END; no clock but the hour's one read; never Math.random
           for f in $JS $SKY; do
-            if [ "$(grep -c 'getRandomValues(' $f)" != "1" ]; then
+            if [ "$(grep -o 'getRandomValues(' $f | wc -l)" != "1" ]; then
               echo "::error::$f must draw entropy exactly once (getRandomValues( count != 1)"
               fail=1
             fi
-            if grep -nE 'Math\.random|new Date|Date\.now' $f; then
+            if grep -nE 'Math\.random|\bDate\b|randomUUID' $f; then
               echo "::error::Math.random or a clock read in $f — the only randomness is the visit seed"
               fail=1
             fi
@@ -176,7 +180,7 @@ jobs:
               echo "::error::INIT-END marker missing from $f"
               fail=1
             fi
-            bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date/{print NR": "$0}' $f)
+            bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date|randomUUID|performance\.now/{print NR": "$0}' $f)
             if [ -n "$bad" ]; then
               echo "$bad"
               echo "::error::an entropy or clock read below the INIT-END marker in $f"
@@ -184,7 +188,7 @@ jobs:
             fi
           done
           # the hour reads the clock exactly once, and draws no entropy
-          if [ "$(grep -c 'new Date(' $HOUR)" != "1" ] || grep -nE 'Date\.now|Math\.random|getRandomValues' $HOUR; then
+          if [ "$(grep -o 'new Date(' $HOUR | wc -l)" != "1" ] || [ "$(grep -oE '\bDate\b' $HOUR | wc -l)" != "1" ] || grep -nE 'Math\.random|getRandomValues|randomUUID|performance\.now' $HOUR; then
             echo "::error::$HOUR must read the clock exactly once (new Date) and nothing else"
             fail=1
           fi

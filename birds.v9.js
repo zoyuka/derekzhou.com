@@ -20,7 +20,7 @@
    cloud and up at the sky (FOV across its longer side, the horizon a
    fifth of the window's height above its bottom edge, or lower where the
    words come down that far), and every flight flies a path in the air
-   in front of it, nearer than any cloud; the sky behind (sky.v1.js) is
+   in front of it, nearer than any cloud; the sky behind (the sky's script) is
    drawn through the same camera, lent to it (skyAir.aim):
    straight, or wheeling through a banked turn, climbing or sinking a
    little; across the window mostly, now and then angling away from it,

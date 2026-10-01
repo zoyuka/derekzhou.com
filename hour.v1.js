@@ -1,6 +1,6 @@
 /* The hour — which part of the day the sky opens on.
 
-   The sky cycles through six times of day (sky.v1.js), and a visit opens
+   The sky cycles through six times of day (the sky's script), and a visit opens
    on the visitor's own: night 21-05, dawn 05-08, day 08-13, rain 13-16,
    sunset 16-19, dusk 19-21. This reads the clock, once, here and nowhere
    else, and marks the page before its first paint: data-sky (which time

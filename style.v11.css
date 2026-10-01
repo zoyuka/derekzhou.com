@@ -138,9 +138,9 @@ body {
 }
 
 /* ------------------------------------------------
-   The sky — behind everything, the whole window. sky.v1.js draws it
+   The sky — behind everything, the whole window. The sky's script draws it
    (WebGL2) and fades it in over the stylesheet's still sky of the hour
-   (data-sky, set by hour.v1.js before the first paint). The words'
+   (data-sky, set by the hour's script before the first paint). The words'
    colours follow the sky: dark on a light one, light on a dark one; the
    script refines them for the sky it drew (4.6:1 for the dimmed words).
    With no script the page is the still day sky.
@@ -213,7 +213,7 @@ body {
 /* ------------------------------------------------
    The birds — samara.com/jobs's dots (body > .dot), as birds: fixed to
    the window, over the page like Samara's, fading in over a second when
-   each appears. birds.v9.js moves them; without it they never show.
+   each appears. The birds' script moves them; without it they never show.
    They never take a click: links under a bird still work. Their ink is
    the words' (dark on a light sky, light on a dark one).
    ------------------------------------------------ */
