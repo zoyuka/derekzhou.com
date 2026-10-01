@@ -16,9 +16,12 @@
    and then a tail, in its kind's proportions (a gull long in the wing, a
    finch small and neat, a heron trailing its legs).
 
-   THE SKY IN DEPTH. The window is a camera looking out and up at the sky
-   (FOV across its longer side, the horizon a little below its bottom
-   edge), and every flight flies a path in the air in front of it:
+   THE SKY IN DEPTH. The window is a camera looking out over a sea of
+   cloud and up at the sky (FOV across its longer side, the horizon a
+   fifth of the window's height above its bottom edge, or lower where the
+   words come down that far), and every flight flies a path in the air
+   in front of it, nearer than any cloud; the sky behind (sky.v1.js) is
+   drawn through the same camera, lent to it (skyAir.aim):
    straight, or wheeling through a banked turn, climbing or sinking a
    little; across the window mostly, now and then angling away from it,
    seldom coming nearer. All that is seen is that air in perspective. A

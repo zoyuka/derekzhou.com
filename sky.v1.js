@@ -84,8 +84,8 @@
   var TOWERS = 6;             // tower slots
   var BUILD = 90;             // s: a tower building out of the sea, or sinking back
   var WORDS_CORE = 8;         // px: the veil's full hold about the words
-  var WORDS_FEATHER = 64;     // px: its feather beyond
-  var LINKS_CORE = 6, LINKS_FEATHER = 22;
+  var WORDS_FEATHER = 110;    // px: its feather beyond (a Gaussian's fall)
+  var LINKS_CORE = 6, LINKS_FEATHER = 40;
   var RATIO = 4.6;            // the words' contrast on the sky (WCAG, with margin)
   var RING = 3.1;             // the focus ring's
   var FLIP = 0.18;            // the sky's luminance where dark words give way to light
@@ -238,6 +238,26 @@
   });
   var ROUND = 0, starts = [];
   DAY.forEach(function (n) { starts.push(ROUND); ROUND += SCENES[n].hold + SCENES[n].move; });
+  /* the twilight between a time of dark words and one of light (sunset to
+     dusk, night to dawn): halfway in everything, but the sky where the
+     words stand evenly at the crossing (OKLab L 0.56, where dark words
+     and light read alike), the glows low. The words flip there, and the
+     veil has nothing to hold */
+  var TWILIGHT = [0.594, 0.568, 0.553, 0.543, 0.492];   // (as drawn, with the haze and glows, the crossing itself)
+  DAY.forEach(function (n, i) {
+    var A = SCENES[n], B = SCENES[DAY[(i + 1) % DAY.length]], C = {}, j, f;
+    if (A.words === B.words) return;
+    C.skyL = A.skyL.map(function (c, j) { var m = lerp3(c, B.skyL[j], 0.5); return [TWILIGHT[j], m[1] * 0.7, m[2] * 0.7]; });
+    for (j = 0; j < COLOURS.length; j++) { f = COLOURS[j] + 'L'; C[f] = lerp3(A[f], B[f], 0.5); }
+    for (j = 0; j < NUMBERS.length; j++) { f = NUMBERS[j]; C[f] = mix(A[f], B[f], 0.5); }
+    C.tintL = [0.6, C.tintL[1] * 0.7, C.tintL[2] * 0.7]; C.tintAmt *= 0.4;
+    C.fogCL = [0.62, C.fogCL[1] * 0.8, C.fogCL[2] * 0.8];
+    C.deckCL = [0.55, C.deckCL[1] * 0.7, C.deckCL[2] * 0.7];
+    C.sea = lerpN(A.sea, B.sea, 0.5); C.deck = lerpN(A.deck, B.deck, 0.5); C.deck[2] *= 0.6;
+    C.rain = 0; C.shafts *= 0.4; C.bloom = Math.min(C.bloom, 0.08);
+    C.lightI *= 0.4; C.ambUI *= 0.6; C.ambDI *= 0.55;  // (the cloud sea under the links dims to the crossing as well)
+    A.twi = C;
+  });
 
   /* where the visit opens: the visitor's hour, part way through it (hour.v1.js) */
   var root = document.documentElement;
@@ -307,19 +327,24 @@
     var u = ((t0 + t) % ROUND + ROUND) % ROUND, i = 0, A, B, k, j, f;
     while (i < DAY.length - 1 && u >= starts[i + 1]) i++;
     A = SCENES[DAY[i]]; B = SCENES[DAY[(i + 1) % DAY.length]];
-    k = smooth((u - starts[i] - A.hold) / A.move);
+    k = clamp((u - starts[i] - A.hold) / A.move, 0, 1);
+    var X = A, Y = B, q;                                  // (a change that flips the words eases into its twilight and out:
+    if (A.twi) {                                          //  the light lingers where the words flip)
+      if (k < 0.5) { Y = A.twi; q = smooth(k * 2); } else { X = A.twi; q = smooth(k * 2 - 1); }
+    } else q = k = smooth(k);
     P.k = k; P.a = A; P.b = B; P.name = k < 0.5 ? DAY[i] : DAY[(i + 1) % DAY.length];
     P.sky = [];
-    for (j = 0; j < 5; j++) P.sky.push(linOf(lerp3(A.skyL[j], B.skyL[j], k)));
-    for (j = 0; j < COLOURS.length; j++) { f = COLOURS[j]; P[f] = linOf(lerp3(A[f + 'L'], B[f + 'L'], k)); }
-    for (j = 0; j < NUMBERS.length; j++) { f = NUMBERS[j]; P[f] = mix(A[f], B[f], k); }
-    P.sea = lerpN(A.sea, B.sea, k); P.deck = lerpN(A.deck, B.deck, k);
+    for (j = 0; j < 5; j++) P.sky.push(linOf(lerp3(X.skyL[j], Y.skyL[j], q)));
+    for (j = 0; j < COLOURS.length; j++) { f = COLOURS[j]; P[f] = linOf(lerp3(X[f + 'L'], Y[f + 'L'], q)); }
+    for (j = 0; j < NUMBERS.length; j++) { f = NUMBERS[j]; P[f] = mix(X[f], Y[f], q); }
+    P.sea = lerpN(X.sea, Y.sea, q); P.deck = lerpN(X.deck, Y.deck, q);
     P.words = mix(A.words, B.words, k);
+    P.flipW = A.twi ? Math.abs(k - 0.5) * 3 : 1;        // (how far from the twilight the words' flip is)
     var la = A.light === 'disc' ? discDir(A.disc) : dirOf(A.light.az, A.light.el),
         lb = B.light === 'disc' ? discDir(B.disc) : dirOf(B.light.az, B.light.el);
     P.light = norm3(lerp3(la, lb, k));
-    P.discA = A.disc ? discOf(A.disc, 1 - k) : null;
-    P.discB = B.disc ? discOf(B.disc, k) : null;
+    P.discA = A.disc ? discOf(A.disc, smooth(1 - 2 * k)) : null;
+    P.discB = B.disc ? discOf(B.disc, smooth(2 * k - 1)) : null;
     return P;
   }
   function discOf(D, w) { return { d: discDir(D), r: D.r, i: D.i * w, halo: D.halo, haloI: D.haloI * w, wide: D.wide * w, c: linOf(D.L) }; }
@@ -755,9 +780,9 @@
   /* the window: two cloud frames crossfaded, the stars, the rain, the veil about the words */
   var SHOW = HASH + [
     'uniform sampler2D uA; uniform sampler2D uB; uniform float uK; uniform vec4 uVp;',
-    'uniform vec4 uR[4]; uniform vec2 uFe; uniform vec3 uBand; uniform vec2 uBandL;',
+    'uniform vec4 uR[4]; uniform vec2 uFe; uniform vec2 uBand; uniform vec2 uBandT;',
     'uniform vec4 uSt; uniform vec4 uRn; uniform vec3 uRnC; out vec4 o;',
-    'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float k = 1.0 - clamp(length(max(d, 0.0)) / fe, 0.0, 1.0); return k * k * (3.0 - 2.0 * k); }',
+    'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float q = length(max(d, 0.0)) / fe; return exp(-4.5 * q * q); }',
     'vec3 h32(vec2 c, float s) { return rnd3(vec3(mod(c, 4096.0) + 4096.0, s), 17u); }',
     'float stars(vec2 p) {',
     '  vec2 c = floor(p / 23.0);',
@@ -789,8 +814,9 @@
     '  if (uSt.x > 0.0) col += vec3(0.92, 0.94, 1.0) * stars(p) * uSt.x * c.a * smoothstep(uSt.z + 2.0, uSt.z - 70.0, p.y);',
     '  if (uRn.x > 0.0) { float r = rain(p, 0.0) * 0.6 + rain(p, 1.0); col = mix(col, uRnC, clamp(r * uRn.x * 0.32 * (1.0 - m), 0.0, 1.0)); }',
     '  float Y = dot(col, vec3(0.2126, 0.7152, 0.0722));',
-    '  if (uBand.z < 0.5) { float lo = max(uBand.x * m0, uBandL.x * m1); if (Y < lo) col *= lo / max(Y, 1e-4); }',
-    '  else { float hi = min(mix(1.0, uBand.y, m0), mix(1.0, uBandL.y, m1)); if (Y > hi) col *= hi / Y; }',
+    '  float lo = max(uBand.x * m0, uBandT.x * m1), hi = min(mix(1.0, uBand.y, m0), mix(1.0, uBandT.y, m1));',
+    '  if (Y < lo) col *= lo / max(Y, 1e-4);',
+    '  else if (Y > hi) col *= hi / Y;',
     '  col = clamp(col, 0.0, 1.0);',
     '  vec3 e = mix(col * 12.92, 1.055 * pow(col, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, col));',
     '  float n = ign(gl_FragCoord.xy) + ign(gl_FragCoord.xy + vec2(17.0, 59.0)) - 1.0;',
@@ -1046,7 +1072,7 @@
 
   /* ---------------- the window: crossfaded, with stars, rain and the veil ---------------- */
 
-  var lastShow = -1, band = { lo: FLIP, hi: FLIP, mode: 0 };
+  var lastShow = -1, lastSteer = -1;
   function show(S) {
     var p = progs.show, k = clamp((t - doneAt) / period, 0, 1);
     if (still) k = 1;
@@ -1056,8 +1082,8 @@
     gl.uniform4f(U(p, 'uVp'), canvas.width, canvas.height, W, H);
     gl.uniform4fv(U(p, 'uR'), rectOf(wordsR, WORDS_CORE).concat(rectOf(nameR, WORDS_CORE), rectOf(links[0], LINKS_CORE), rectOf(links[1], LINKS_CORE)));
     gl.uniform2f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER);
-    gl.uniform3f(U(p, 'uBand'), band.lo, band.hi, band.mode);
-    gl.uniform2f(U(p, 'uBandL'), FLIP, HI_MAX);
+    gl.uniform2f(U(p, 'uBand'), band.lo, band.hi);
+    gl.uniform2f(U(p, 'uBandT'), band.tlo, band.thi);
     gl.uniform4f(U(p, 'uSt'), S.stars, starSeed, cam.hy, Math.max(0.7, Math.min(1.1, canvas.width / W * 0.6)));
     gl.uniform4f(U(p, 'uRn'), still ? 0 : S.rain, Math.floor(t * DRAW_FPS), 0.18 * windDir, 0);
     gl.uniform3fv(U(p, 'uRnC'), S.rainC);
@@ -1092,18 +1118,39 @@
     gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, statsOut);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     var sq = function (i) { var v = statsOut[i * 4] / 255; return v * v; };
-    var mn = sq(0), mx = sq(1), mean = sq(2), sd = sq(4);
-    if (band.mode === 0 && mean < FLIP - 0.012) band.mode = 1;
-    else if (band.mode === 1 && mean > FLIP + 0.012) band.mode = 0;
-    band.lo = clamp(Math.max(mn, mean - 2.2 * sd) * 0.97, FLIP, 1);   // (the rare darker or lighter sample is the veil's)
-    band.hi = clamp(Math.min(mx, mean + 2.2 * sd) * 1.03, 0.004, HI_MAX);
-    words();
+    seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4) };
     var top = '#', i, v;
     for (i = 0; i < 3; i++) { v = statsOut[12 + i]; top += (v < 16 ? '0' : '') + v.toString(16); }
     if (meta && top !== themeWas) { meta.setAttribute('content', top); themeWas = top; }
   }
-  var themeWas = '', TEXT_LIGHT = [0.975, 0.008, 95], TEXT_LIGHT_Y = lumOf(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]))), tokensWere = {};
+  var themeWas = '', TEXT_LIGHT = [0.99, 0.006, 95], TEXT_LIGHT_Y = lumOf(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]))), tokensWere = {};
   var HI_MAX = (TEXT_LIGHT_Y + 0.05) / RATIO - 0.05;   // the lightest sky light words read on
+  /* the band: the ground the words are held to, followed smoothly from what
+     was drawn. Dark words want it no darker than FLIP, light words no
+     lighter than HI_MAX; the bio's ground sets its dimmed grey. Near the
+     crossing the band pinches toward the one ground both read on, the
+     words flip there, and it opens again: nothing jumps but the words */
+  var seen = null, seenT = null, band = { lo: FLIP, hi: 1, tlo: FLIP, thi: 1, mode: 0 };
+  function steer(dt, S) {
+    var f, k, m, lo, hi, w, mode = S.words >= 0.5 ? 1 : 0;   // (the words flip at the twilight, on the cycle's own time)
+    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, Math.max(0.004, S.flipW)); return; }
+    if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
+    k = still ? 1 : 1 - Math.exp(-dt / 0.6);
+    for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
+    m = seen.mean; lo = Math.max(seen.mn, m - 2.2 * seen.sd); hi = Math.min(seen.mx, m + 2.2 * seen.sd);
+    w = Math.max(0.004, S.flipW);
+    opened(mode, lo, hi, w);
+  }
+  function opened(mode, lo, hi, w) {
+    band.mode = mode;
+    if (mode === 0) {
+      band.lo = Math.max(FLIP, lo * 0.97); band.hi = Math.max(band.lo + 0.004, FLIP + w);
+      band.tlo = FLIP; band.thi = FLIP + w;
+    } else {
+      band.hi = Math.min(HI_MAX, hi * 1.03); band.lo = Math.min(band.hi - 0.004, Math.max(0, HI_MAX - w));
+      band.tlo = Math.max(0, HI_MAX - w); band.thi = HI_MAX;
+    }
+  }
   /* the words' colours for the band: black and a grey on a light sky; a near-white and a lighter grey on a dark one */
   function words() {
     var Yd, Yf, tk = {};
@@ -1115,8 +1162,8 @@
       tk['--color-focus'] = hex(ofLum(Math.max(Yf, 0.004), 0.12, 75));
       tk['--color-selection'] = '#e6e2d6';
     } else {
-      Yd = clamp(RATIO * (band.hi + 0.05) - 0.05, 0.4, 0.85);
-      Yf = clamp(RING * (band.hi + 0.05) - 0.05, 0.45, 0.9);
+      Yd = Math.min(TEXT_LIGHT_Y, Math.max(0.4, RATIO * (band.hi + 0.05) - 0.05));
+      Yf = Math.min(TEXT_LIGHT_Y, Math.max(0.45, RING * (band.hi + 0.05) - 0.05));
       tk['--color-text'] = hex(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2])));
       tk['--color-dimmed'] = hex(ofLum(Yd, 0.014, 255));
       tk['--color-focus'] = hex(ofLum(Yf, 0.11, 85));
@@ -1146,7 +1193,6 @@
     var S = blend(t);
     tendTowers(still ? 0 : step, S, still || frames === 0);
     if (S.name !== nameWas) { root.setAttribute('data-sky', S.name); nameWas = S.name; }
-    if (!frames && !job) { band.mode = S.words > 0.5 ? 1 : 0; band.lo = FLIP; band.hi = HI_MAX; }
     if (!job && (!still || !shown[1])) startJob(!shown[1]);
     if (job) {
       slice(job.fast || still ? Math.ceil(ch / 4) : Math.max(4, Math.ceil(ch * step / (period * 0.85))));
@@ -1156,7 +1202,10 @@
       }
     }
     pollStats();
-    if (shown[1] && (now - lastShow >= 1000 / DRAW_FPS - 4 || still)) { show(S); lastShow = now; }
+    if (shown[1] && (now - lastShow >= 1000 / DRAW_FPS - 4 || still)) {
+      steer(lastSteer < 0 ? 0 : Math.min((now - lastSteer) / 1000, 0.25), S); lastSteer = now;
+      words(); show(S); lastShow = now;
+    }
     if (!still || job || sync) raf = requestAnimationFrame(frame);
   }
   /* a slow device: a longer frame period first, then a smaller frame */

@@ -16,9 +16,11 @@ jobs:
         run: |
           files=(
             index.html
-            style.v10.css
+            style.v11.css
             site.js
-            birds.v8.js
+            hour.v1.js
+            sky.v1.js
+            birds.v9.js
             robots.txt
             _headers
             _redirects
@@ -115,7 +117,7 @@ jobs:
           done
           # And the reverse: the versioned css/js the repo ships must be the
           # ones index.html loads.
-          for f in style.v*.css birds.v*.js; do
+          for f in style.v*.css birds.v*.js sky.v*.js hour.v*.js; do
             if [ -f "$f" ] && ! grep -q "\"/$f\"" index.html; then
               echo "::error::$f exists but index.html does not reference it"
               fail=1
@@ -138,8 +140,8 @@ jobs:
 
       - name: Absences are enforced
         run: |
-          JS=$(ls birds.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
-          echo "checking $JS and $CSS"
+          JS=$(ls birds.v*.js | head -1); SKY=$(ls sky.v*.js | head -1); HOUR=$(ls hour.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
+          echo "checking $JS, $SKY, $HOUR and $CSS"
           # The page has none of the internet's body language, and CI fails
           # (rather than remembers) if any of it comes back. Scoped to the
           # shipped files only — never to CLAUDE.md prose.
@@ -150,36 +152,44 @@ jobs:
             fail=1
           fi
           # (2) behaviour: no exit, idle, pointer-position, key or title handlers
-          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage|localStorage' site.js $JS; then
+          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage|localStorage' site.js $JS $SKY $HOUR; then
             echo "::error::a needy behaviour (exit/idle/title/pointer handler or storage) was introduced"
             fail=1
           fi
-          # (3) the birds add no DOM: they are the SVGs in index.html
-          if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS; then
-            echo "::error::$JS builds DOM — the birds live in index.html"
+          # (3) the birds and the sky add no DOM: the SVGs and the canvas are in index.html
+          if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS $SKY $HOUR; then
+            echo "::error::DOM built in script — the birds and the sky's canvas live in index.html"
             fail=1
           fi
-          # (4) the weather (=rand()): ONE entropy read, above INIT-END; no clock; never Math.random
-          if [ "$(grep -c 'getRandomValues(' $JS)" != "1" ]; then
-            echo "::error::$JS must draw entropy exactly once (getRandomValues( count != 1)"
-            fail=1
-          fi
-          if grep -nE 'Math\.random|new Date|Date\.now' $JS; then
-            echo "::error::Math.random or a clock read in $JS — the only randomness is the visit seed"
-            fail=1
-          fi
-          if ! grep -q -- '---- INIT-END:' $JS; then
-            echo "::error::INIT-END marker missing from $JS"
-            fail=1
-          fi
-          bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date/{print NR": "$0}' $JS)
-          if [ -n "$bad" ]; then
-            echo "$bad"
-            echo "::error::an entropy or clock read below the INIT-END marker"
+          # (4) the weather (=rand()): ONE entropy read each in the birds and the sky, above
+          # INIT-END; no clock but the hour's one read; never Math.random
+          for f in $JS $SKY; do
+            if [ "$(grep -c 'getRandomValues(' $f)" != "1" ]; then
+              echo "::error::$f must draw entropy exactly once (getRandomValues( count != 1)"
+              fail=1
+            fi
+            if grep -nE 'Math\.random|new Date|Date\.now' $f; then
+              echo "::error::Math.random or a clock read in $f — the only randomness is the visit seed"
+              fail=1
+            fi
+            if ! grep -q -- '---- INIT-END:' $f; then
+              echo "::error::INIT-END marker missing from $f"
+              fail=1
+            fi
+            bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date/{print NR": "$0}' $f)
+            if [ -n "$bad" ]; then
+              echo "$bad"
+              echo "::error::an entropy or clock read below the INIT-END marker in $f"
+              fail=1
+            fi
+          done
+          # the hour reads the clock exactly once, and draws no entropy
+          if [ "$(grep -c 'new Date(' $HOUR)" != "1" ] || grep -nE 'Date\.now|Math\.random|getRandomValues' $HOUR; then
+            echo "::error::$HOUR must read the clock exactly once (new Date) and nothing else"
             fail=1
           fi
           # (5) no URL hook, no sound, no custom cursor
-          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS index.html 404.html; then
+          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS $SKY $HOUR index.html 404.html; then
             echo "::error::a URL hook or sound was introduced"
             fail=1
           fi
