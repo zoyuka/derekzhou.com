@@ -138,10 +138,84 @@ body {
 }
 
 /* ------------------------------------------------
+   The sky — behind everything, the whole window. sky.v1.js draws it
+   (WebGL2) and fades it in over the stylesheet's still sky of the hour
+   (data-sky, set by hour.v1.js before the first paint). The words'
+   colours follow the sky: dark on a light one, light on a dark one; the
+   script refines them for the sky it drew (4.6:1 for the dimmed words).
+   With no script the page is the still day sky.
+   ------------------------------------------------ */
+
+.sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sky.on {
+  opacity: 1;
+  animation: appear 2s;
+}
+
+/* the still skies: the sky from the top edge to the horizon (four
+   fifths of the way down), then the sea of cloud */
+body {
+  background: linear-gradient(to bottom, #5a9fd2 0%, #7dbde6 26%, #a4d6ef 52%, #cce8f3 72%, #e2f1f6 79.5%, #f1f6f7 80.5%, #dce9f1 92%, #cddff0 100%) #cce8f3;
+}
+
+:root[data-sky="dawn"] body {
+  background: linear-gradient(to bottom, #9d96c0 0%, #b9a9cc 26%, #dcbccd 52%, #f0c9c7 72%, #f8d6c6 79.5%, #fbe9dd 80.5%, #ead7da 92%, #dccbd9 100%) #f0c9c7;
+}
+
+:root[data-sky="rain"] body {
+  background: linear-gradient(to bottom, #5f7887 0%, #6d8894 26%, #829fa7 52%, #98b5b8 72%, #a9c4c4 79.5%, #b9cccd 80.5%, #9eb3b8 92%, #8aa1aa 100%) #98b5b8;
+}
+
+:root[data-sky="sunset"] body {
+  background: linear-gradient(to bottom, #ad8dac 0%, #c9a5b6 26%, #ebbfba 52%, #f8d0b4 72%, #fddcb1 79.5%, #fde8cc 80.5%, #efd2c4 92%, #dfc0be 100%) #f8d0b4;
+}
+
+:root[data-sky="dusk"] body {
+  background: linear-gradient(to bottom, #1a3132 0%, #263c30 26%, #3b4730 52%, #5c5b37 72%, #7f6a3d 79.5%, #6d6440 80.5%, #4f4c38 92%, #3d3d32 100%) #3b4730;
+}
+
+:root[data-sky="night"] body {
+  background: linear-gradient(to bottom, #0d1842 0%, #132556 26%, #1c3160 52%, #283f69 72%, #314c71 79.5%, #3a5277 80.5%, #2a3d63 92%, #20325a 100%) #1c3160;
+}
+
+/* the words on the still skies */
+:root[data-sky="rain"] {
+  --color-dimmed: #2e2d2a;
+  --color-focus: #3f2c05;
+}
+
+:root[data-sky="dusk"],
+:root[data-sky="night"] {
+  --color-text: #f6f4ec;
+  --color-dimmed: #b9bccb;
+  --color-focus: #e4c271;
+  --color-selection: #3b3f55;
+}
+
+:root:not([data-sky]),
+:root[data-sky="day"],
+:root[data-sky="dawn"],
+:root[data-sky="sunset"] {
+  --color-dimmed: #4f4c47;
+  --color-focus: #6b4a0c;
+}
+
+/* ------------------------------------------------
    The birds — samara.com/jobs's dots (body > .dot), as birds: fixed to
    the window, over the page like Samara's, fading in over a second when
-   each appears. birds.v1.js moves them; without it they never show.
-   They never take a click: links under a bird still work.
+   each appears. birds.v9.js moves them; without it they never show.
+   They never take a click: links under a bird still work. Their ink is
+   the words' (dark on a light sky, light on a dark one).
    ------------------------------------------------ */
 
 .bird {
@@ -261,6 +335,7 @@ footer a, .back-link {
 
 @media (forced-colors: active) {
   .bird { stroke: CanvasText; }
+  .sky { display: none; }
 }
 
 /* ------------------------------------------------
@@ -269,11 +344,14 @@ footer a, .back-link {
 
 @media print {
   .bird,
+  .bird.on,
+  .sky,
   footer {
     display: none;
   }
 
-  body {
+  body,
+  :root[data-sky] body {
     color: #000;
     background: #fff;
   }
