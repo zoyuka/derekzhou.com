@@ -204,6 +204,57 @@ jobs:
           [ "$fail" -eq 0 ] && echo "All absences hold"
           exit $fail
 
+      - name: Still skies keep the words legible
+        run: |
+          # The stylesheet's still skies (no WebGL2, no script, the moment
+          # before the sky is drawn) must hold their words' colours against
+          # the whole gradient, wherever a window puts the words: text and
+          # the dimmed grey 4.5:1, the focus ring 3:1 (WCAG 1.4.3, 1.4.11).
+          CSS=$(ls style.v*.css | head -1)
+          python3 - "$CSS" <<'EOF'
+          import re, sys
+          css = re.sub(r'/\*.*?\*/', '', open(sys.argv[1]).read(), flags=re.S)
+          def lin(v): v /= 255; return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+          def rgb(h): h = h.lstrip('#'); return [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+          def Y(c): r, g, b = [lin(x) for x in c]; return 0.2126 * r + 0.7152 * g + 0.0722 * b
+          def ratio(a, b): a, b = Y(a), Y(b); return (max(a, b) + .05) / (min(a, b) + .05)
+          rules = re.findall(r'([^{}]+)\{([^{}]*)\}', css)
+          def tokens(name):
+              out = {}
+              for sel, body in rules:
+                  sels = [x.strip() for x in sel.split(',')]
+                  if ':root' in sels or ':root[data-sky="%s"]' % name in sels or (name == 'day' and ':root:not([data-sky])' in sels):
+                      out.update(dict(re.findall(r'(--color-[a-z]+):\s*(#[0-9a-fA-F]{6})', body)))
+              return out
+          def gradient(name):
+              sel = 'body' if name == 'day' else ':root[data-sky="%s"] body' % name
+              for s_, body in rules:
+                  if s_.strip() == sel:
+                      m = re.search(r'linear-gradient\(to bottom, ([^)]*)\)\s*(#[0-9a-fA-F]{6})?', body)
+                      if m:
+                          stops = [(float(p.rstrip('%')) / 100, rgb(c)) for c, p in (x.split() for x in m.group(1).split(','))]
+                          return stops, (rgb(m.group(2)) if m.group(2) else None)
+              return None, None
+          fail = 0
+          for name in ['day', 'dawn', 'rain', 'sunset', 'dusk', 'night']:
+              stops, solid = gradient(name); t = tokens(name)
+              if not stops: print('::error::no still sky for', name); fail = 1; continue
+              ground = [solid] if solid else []
+              for k in range(201):
+                  y = k / 200
+                  for (p0, c0), (p1, c1) in zip(stops, stops[1:]):
+                      if p0 <= y <= p1:
+                          f = (y - p0) / (p1 - p0) if p1 > p0 else 0
+                          ground.append([c0[i] + (c1[i] - c0[i]) * f for i in range(3)])
+                          break
+              for role, need in [('--color-text', 4.5), ('--color-dimmed', 4.5), ('--color-focus', 3.0)]:
+                  worst = min(ratio(rgb(t[role]), g) for g in ground)
+                  print('%-7s %-15s %5.2f' % (name, role, worst))
+                  if worst < need:
+                      print('::error::%s on the %s still sky falls to %.2f:1 (needs %.1f)' % (role, name, worst, need)); fail = 1
+          sys.exit(fail)
+          EOF
+
       - name: Validate HTML
         run: |
           # Basic HTML validity checks

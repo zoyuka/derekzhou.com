@@ -21,7 +21,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /robots.txt             Allow search engines, block AI crawlers
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security + caching + Early Hints headers
-/\_redirects             HTTPS enforcement; /CLAUDE.md and /.github/* are not served (to /)
+/\_redirects             HTTPS enforcement; /CLAUDE.md and /.github/* redirected to / (exact paths: see Security)
 /\_routes.json           Scopes Pages Functions to /api/* only
 /.github/workflows/validate.yml  CI checks
 
@@ -104,10 +104,10 @@ first brief's light ground gives way, at the owner's choice, to a sky
 that is dark at dusk and at night.
 
 The words' colours follow the sky (see Sky). On a light sky: text #000,
-the dimmed grey a warm grey worked out for 4.6:1 on the bio's own ground
-(never lighter than #5f5c56), focus a dark ochre for 3:1, selection
+the dimmed grey a warm grey worked out for 4.7:1 on the bio's own ground
+(never lighter than #5f5c56), focus a dark ochre for 3.3:1, selection
 #e6e2d6 under the black text; on a dark sky (dusk, night): text #fdfcf7,
-the dimmed grey a cool light grey for 4.6:1, focus a light gold,
+the dimmed grey a cool light grey for 4.7:1, focus a light gold,
 selection #3b3f55. The stylesheet carries each hour's colours for its
 still sky; the script refines them for the sky it drew (CSSOM custom
 properties on the root). bg #f9f8f1 (Samara's cream) stays the paper:
@@ -131,7 +131,8 @@ same?"), or v5-v7's flat sky, every lane drawn on the window's own plane
 
 THE SKY IN DEPTH (v8): the window is a camera looking out over a sea of
 cloud and up at the sky (FOV 60 degrees across its longer side, pitched so
-the horizon lies HORIZON 0.2 of its height above its bottom edge (v9), or
+the horizon lies 0.2 of its height above its bottom edge (v9: HORIZON
+-0.2, negative being above), or
 lower where the words come down that far: SEA_CLEAR 60 px below their
 margin, with SEA_MIN 5% of the height of sea at least), and lends that
 camera to the sky (skyAir.aim), so cloud and bird share one air; every
@@ -406,12 +407,13 @@ the sky's light (a gradient by height above the horizon: 0, 5, 15, 32,
 haze band toward the horizon; the sun or the moon, their halos and a
 wider glow); a high deck at 5-7 (thin streaks, or a whole overcast with
 rain under it), fogged toward its own sky; cumulus towers rising out of
-the sea (TOWERS 6 slots: a two-sphere core and nine lobes on the dome's
+the sea (TOWERS 6 slots: a three-sphere core and nine lobes on the dome's
 envelope, joined by a smooth minimum and eroded by tiling 3D noise, soft
 edged; lit by a wrapped sun, shadowed toward it by two looks along the
 light, bases darker, thin edges glowing when the light is behind them;
-each builds out of the sea or sinks back over BUILD 90 s, and gives way
-where it would rise behind the words); and the sea of cloud below the
+each builds out of the sea over BUILD 90 s, sinks back in about a minute
+(1.6x), and gives way where it would rise behind the words; with no room,
+a slot looks again in 2-5 s); and the sea of cloud below the
 eye (a heightfield of domes, round caps smoothly joined, two sizes, the
 small only near; soft as cloud, self-shadowed at a low sun, rims lit
 against it; ending in the horizon's haze). Shadows take the sky's colour
@@ -420,7 +422,7 @@ perspective: everything fades with distance into the horizon's haze,
 and a low mist lies on the sea. Then light shafts (radial, from the sky
 seen near the sun), a soft glow (dual-filter bloom) and a shoulder for
 the highlights. The noise (64 cubed 3D, 256 square 2D) is baked on the
-GPU at start.
+GPU over the first nine frames (eight layers a frame).
 
 THE DAY (SCENES; the round 14 minutes): dawn (75 s held, 55 s into the
 next), day (110, 60), rain (80, 60), sunset (80, 60), dusk (50, 60),
@@ -434,54 +436,83 @@ with blue shadows; rain an overcast, teal-slate, rain falling; sunset
 mauve to rose to gold, the sun on the horizon, rays; dusk an olive
 murk, an amber glow under the horizon; night deep indigo, the moon, the
 stars. A visit opens on the visitor's hour (hour.v1.js: night 21-05,
-dawn 05-08, day 08-13, rain 13-16, sunset 16-19, dusk 19-21), as far
-through that time of day's hold as the hour is through its span.
+dawn 05-08, day 08-13, rain 13-16, sunset 16-19, dusk 19-21), nine tenths
+as far through that time of day's hold as the hour is through its span.
 
-THE WORDS on every sky (the veil and the band): a frame's light where
+THE WORDS on every sky (the veil and the bands): a frame's light where
 the words stand is read back (8 numbers: the bio's ground, its mean,
-spread, darkest and lightest; the window's top colour for theme-color;
-a PBO and a fence, never a stall) and followed smoothly; dark words
-want their ground no darker than FLIP 0.18, light words no lighter than
-HI_MAX (0.17); the dimmed grey is worked out for RATIO 4.6:1 on the
-bio's ground (mean +- 3 sd), the focus ring for RING 3.1:1. Where the
-words stand (their boxes grown WORDS_CORE 8 px, a Gaussian feather of
-WORDS_FEATHER 110 px; the links LINKS_CORE 6, LINKS_FEATHER 40) the
-composite holds the light inside the band, lifting or dimming only what
-would break it: contrast holds whatever the read-back says. The flip
-from dark words to light (sunset to dusk) and back (night to dawn)
-happens at a twilight: a change that flips the words eases into a
-waypoint where the sky behind the words, and the sea under the links,
-stand evenly at the crossing (TWILIGHT, calibrated as drawn), flips the
-words there on the cycle's own time, and eases out; the band pinches
-toward the crossing on the same schedule, so nothing jumps but the
-words. Measured (Chromium, SwiftShader; 3 viewports x 6 hours x 2
-moments, each text element's own colour against every ground pixel
-under its line boxes, the words hidden): every role at 4.5:1 or more,
-the dimmed grey 4.52-4.97.
+spread, darkest and lightest; the links' ground, darkest and lightest;
+the window's top colour for theme-color; a PBO and a fence, never a
+stall; one at a time, the next queued) and followed smoothly. Dark words
+want their ground no darker than FLIP 0.186, light words no lighter than
+HI_MAX (0.167): RATIO 4.7:1, room above WCAG's 4.5 for rounding and
+dither. The dimmed grey is worked out for RATIO on the bio's ground
+(mean +- 3 sd), the focus ring for RING 3.3:1 on the links' ground (it
+is drawn around the links). Where the words stand (the bio and credit
+grown WORDS_CORE 8 px, the name NAME_CORE 20 px, as its letters reach
+below its box; a Gaussian feather of WORDS_FEATHER 110 px; the links
+LINKS_CORE 6, LINKS_FEATHER 40; drawn into a mask texture when the page
+moves, a ResizeObserver catching reflows that move no window: text
+spacing, zoom) the composite holds the light inside each band, lifting
+or dimming only what would break it: contrast holds whatever the
+read-back says. A scroll redraws the veil on the next frame. The words'
+colours are set only while the drawn sky shows (otherwise the
+stylesheet's are left alone); while it fades in over the still sky (2 s)
+they take the safer of the two sets (darker on a light sky, lighter on a
+dark one). The flip from dark words to light (sunset to dusk) and back
+(night to dawn) happens at a twilight: a change that flips the words
+eases into a waypoint where the sky behind the words, and the sea under
+the links, stand evenly at the crossing (TWILIGHT and TWILIGHT_SEA,
+calibrated as drawn: 0.165-0.19 there), flips the words there on the
+cycle's own time, and eases out; the bands pinch toward the crossing on
+the same schedule, so nothing jumps but the words. Measured (Chromium,
+SwiftShader; each text element's own colour against every ground pixel
+under its line boxes, the words hidden; the ring against the ground 2-6
+px about each link): settled, 3 viewports x 6 hours, every text role
+4.6:1 or more and the ring 3.23 or more; through the fade-in (0, 0.7,
+1.4 s), 3 viewports x 6 hours, the dimmed grey 4.70 or more, the ring
+3.34 or more.
 
 CALM AND COST: the clouds drift with one wind (SEA_DRIFT 0.45-0.8 px/s
-where the sea is nearest, less far off, the deck faster aloft) and the
-towers build and sink over minutes; the light changes over a minute;
-rain falls on twos (DRAW_FPS 12). A cloud frame (the window at SCALE 0.5
-of its CSS px, never over PX_MAX 640,000 px) is drawn in row slices over
-PERIOD 1.5 s and crossfaded into; the window is drawn 12 times a second
-(canvas at most CANVAS_DPR 1.5); all GPU work happens on those drawing
-ticks, each ending with the window drawn (a browser may present the
-canvas after any frame that drew at all: WebKit showed black). A slow
-device lengthens the period (to PERIOD_MAX 3.5 s), then draws smaller
-(to SCALE_MIN 0.3), then keeps the still sky; a renderer on the CPU
-(SwiftShader, llvmpipe and the like, by its name) gets the still sky
-from the start.
+where the sea is nearest, less far off, the deck faster aloft; the
+distance gone is kept, so a new window changes the wind, never where the
+clouds are) and the towers build and sink over minutes; the light
+changes over a minute. A cloud frame (the window at SCALE 0.5 of its CSS
+px, never over PX_MAX 640,000 px) is drawn in equal row slices over
+PERIOD 1.5 s and crossfaded into. The window is drawn (DRAW_FPS) 12
+times a second while it rains (on twos), else 6, and after THIN 300 s 4
+(the frames over twice the period); the canvas at most CANVAS_DPR 1.25
+device px a CSS px. All GPU work happens on those drawing ticks, each
+ending with the window drawn (a browser may present the canvas after any
+frame that drew at all: WebKit showed black); the frames on show are
+kept through a resize until the first new one lands (never a blank
+sky). A slow device, read two ways (the frame after a drawing tick
+coming late against the display's own pace, learnt and relearnt; and a
+fence showing the GPU still busy with one tick's work at the next),
+steps down a LADDER (the canvas at 1 device px a CSS px; frames over
+twice the period; smaller frames, twice) and back up after EASE 60 s at
+ease; slow at its foot for 10 s, it keeps the still sky. A renderer on
+the CPU (SwiftShader, llvmpipe and the like, by its name) gets the still
+sky from the start. Simulated: steady rates, 120/144 Hz falling to 60,
+a 30 fps low-power cap, a stray short frame and 8 s of contention leave
+it untouched; a GPU that misses a frame every tick steps down a rung
+every ~4 s, and recovers once eased. (Cost, modelled from exact
+per-pixel counts: a phone's sky keeps its GPU 1-16% busy, the
+composite the larger share.)
 
 FALLBACKS: the canvas shows only once its first frame's read-back looks
-like the sky it should be (a GPU or driver that draws nonsense is let
-go: the stylesheet's sky stays); a lost context hides it (the still sky
-of the hour) until restored; no WebGL2: the stylesheet's still sky of
-the hour (data-sky, by hour.v1.js), its colours and words; no script:
-the still day sky. prefers-reduced-motion: the hour's sky, drawn once,
-still (live both ways). forced-colors: no sky. A hidden tab draws
-nothing; the sky's clock steps at most 50 ms. A resize re-aims and
-redraws.
+like the sky it should be (doubted once, drawn and read again; doubted
+twice, a GPU or driver that draws nonsense is let go, its context freed:
+the stylesheet's sky stays); a lost context hides it (the still sky of
+the hour, its own colours) until restored, then read again and shown;
+no WebGL2: the stylesheet's still sky of the hour (data-sky, by
+hour.v1.js), its colours and words; no script: the still day sky.
+prefers-reduced-motion: the hour's sky, drawn once, still (live both
+ways). forced-colors: no sky (and the sky back, read again, when they
+end). A hidden tab draws nothing; the sky's clock steps at most 50 ms. A
+resize re-aims and redraws. The sky animates for as long as the page is
+open, as the birds do: WCAG 2.2.2 asks for a pause control, and the
+owner chose none; prefers-reduced-motion is the stop.
 
 THE WEATHER: one crypto.getRandomValues above sky.v1.js's INIT-END
 marker (the cloud field, the towers, the wind, the stars), and no clock:
@@ -492,21 +523,26 @@ VERIFY before changing the sky: stills of every hour at 1440x900,
 390x844, 844x390 and 768x1024 (Chromium with SwiftShader, the page's
 clock faked); time-lapses of the round and stepped, frame-exact renders
 of each flip (the words hidden, the light measured where they stand);
-the contrast audit above; reduced motion, a lost and restored context,
-rotation, print, forced colours, the 404 page, no WebGL, no script; a
-forced-black sky (the fallback takes it); WebKit (Safari's engine); the
-bird suite and the live bird pass with the sky running.
+the contrast audit above, settled and through the fade-in; reduced
+motion, a lost and restored context, rotation (no blank frame), print,
+forced colours, the 404 page, no WebGL, no script; a forced-black sky
+(the fallback takes it); the governor on synthetic frame clocks; WebKit
+(Safari's engine); the bird suite and the live bird pass with the sky
+running. (In the harness, the GPU's name is faked and its fences report
+done, or SwiftShader's slowness would rightly get the still sky.)
 
 ## CSS
 
 One file: style.v11.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
-WCAG AA contrast on all dimmed text over every sky (the script holds it
-on the drawn sky; the stylesheet's still skies carry colours of their
-own). The still skies: a gradient per hour on the body (the sky to the
-horizon at four fifths of the way down, then the sea), :root[data-sky]
-choosing it and the words' colours. The canvas (.sky) is fixed behind
+WCAG AA contrast on all text over every sky (the script holds it on the
+drawn sky). The still skies: a gradient per hour on the body (the sky to
+the horizon at four fifths of the way down, then the sea), :root[data-sky]
+choosing it and the words' colours; each sky's colours hold against its
+whole gradient, wherever a window puts the words (text and the dimmed
+grey 4.7:1 or more, the focus ring 3.3:1; CI samples every gradient as
+the browser draws it and fails below 4.5 and 3). The canvas (.sky) is fixed behind
 everything (z-index -1), unseen until drawn. One keyframe, `appear` (a
 bird's 1 s fade-in, Samara's, off under prefers-reduced-motion; the
 sky's 2 s dissolve over the still sky, kept: a dissolve is not motion);
@@ -578,8 +614,8 @@ preloaded in index.html and Early-Hinted via Link headers on / in
 \_headers. Never preload a font no rule uses (Chrome warns, and every
 first visit pays for it).
 
-theme-color opens at the cream (#f9f8f1) and follows the top of the drawn
-sky. The favicon is SVG-first with PNG fallback.
+theme-color opens at the top of the hour's still sky (hour.v1.js, before
+the first paint) and follows the top of the drawn sky. The favicon is SVG-first with PNG fallback.
 
 ## Caching
 
@@ -620,7 +656,9 @@ key, blur, title, favicon-swap or storage handler in the JS; any DOM
 building in the birds, the sky or the hour; more or fewer than one
 getRandomValues in the birds or the sky, or one below its INIT-END
 marker; any Math.random or clock read (Date) in either; anything in the
-hour but its one `new Date(` (no entropy); any URL hook
+hour but its one `new Date(` (no entropy; calls counted, not lines; no
+Date() or randomUUID anywhere, no performance.now below a marker); any
+URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
 AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 `cursor:` rule in the stylesheet (OS cursors only).
@@ -644,7 +682,14 @@ frame-ancestors cannot ride the meta tag, X-Frame-Options on /* covers
 framing.
 The sky needs no CSP change: WebGL2 from a same-origin script, no
 workers, no blobs, no fetches. \_redirects sends /CLAUDE.md and
-/.github/* to / (they were served as static files).
+/.github/* to / (they were served as static files). Exact paths only:
+Cloudflare matches redirects on the raw path, so a percent-encoded
+spelling (/%43LAUDE.md) still reaches the file; the repo is public, so
+nothing leaks that GitHub doesn't show. To truly stop serving repo files,
+move the site into a folder and set it as the Pages build output
+directory (still no build command). The hour's script carries
+data-cfasync="false" so Rocket Loader leaves it to run before the first
+paint.
 robots.txt blocks: GPTBot, ClaudeBot, CCBot, Google-Extended, ChatGPT-User,
 Bytespider, anthropic-ai, cohere-ai, FacebookBot.
 

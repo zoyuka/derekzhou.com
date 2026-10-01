@@ -41,16 +41,20 @@
    held inside a band (the veil: a feathered lift, or a dimming, of only
    what would break it), and the words' colours follow the sky: dark on
    a light sky, light on a dark one, the dimmed grey worked out afresh
-   for 4.6:1 on its ground, the focus ring 3:1. The flip from dark words
-   to light (dusk) and back (dawn) happens where both read at 4.6:1. The
-   ground is read back from what was drawn (8 numbers, without stalling).
+   for 4.7:1 on its ground, the focus ring 3.3:1 on the links'. The flip
+   from dark words to light (dusk) and back (dawn) happens halfway
+   through the passing, the sky held at a twilight there where both read
+   at 4.7:1. The ground is read back from what was drawn (8 numbers,
+   without stalling).
 
    CALM. The clouds drift (well under a pixel a second near the window,
    less far off) and build and dissolve over minutes; the light changes
    over a minute; rain falls on twos (12 drawings a second, as the birds'
    hand). A cloud frame is drawn in slices over about a second and a half
-   and crossfaded into, so no frame is long; the sky is drawn 12 times a
-   second; a slow device draws it smaller. prefers-reduced-motion: a
+   and crossfaded into, so no frame is long; the window is drawn 6 times
+   a second (12 while it rains, 4 on a long visit) and between drawings
+   the page is left alone; a slow device steps down (LADDER) and draws it
+   coarser, slower, smaller, at last still. prefers-reduced-motion: a
    still sky of the visitor's hour, drawn once. A hidden tab draws
    nothing. Forced colours: no sky. No WebGL2: the stylesheet's sky of
    the hour (and with no script at all, its day).
@@ -74,21 +78,27 @@
 
   var STEP_MAX = 0.05;        // s: the longest step the sky's clock takes (a hidden tab stops it)
   var PERIOD = 1.5;           // s: a cloud frame is drawn over this, then crossfaded into
-  var PERIOD_MAX = 3.5;       // s: ... at most, on a slow device
-  var DRAW_FPS = 12;          // the sky is drawn on twos, as the birds' hand
+  var DRAW_FPS = [12, 6, 4];  // the window drawn 12 times a second while it rains (on twos, as the birds'
+                              //  hand), else 6, and 4 once the visit is long (THIN)
+  var THIN = 300;             // s: a long visit: drawn less often, frames over a longer period
   var SCALE = 0.5;            // cloud frames at this share of the window's CSS px...
-  var SCALE_MIN = 0.3;        // ... down to this on a slow device
   var PX_MAX = 640000;        // ... and never more pixels than this
-  var CANVAS_DPR = 1.5;       // the canvas at most this many device px a CSS px
+  var CANVAS_DPR = 1.25;      // the canvas at most this many device px a CSS px
+  /* a slow device steps down, one rung at a time (and back up after a
+     minute's ease): the canvas at 1 device px a CSS px, frames over a
+     longer period, smaller frames, smaller still, then the still sky */
+  var LADDER = [{ dpr: CANVAS_DPR, period: 1, scale: 1 }, { dpr: 1, period: 1, scale: 1 }, { dpr: 1, period: 2, scale: 1 }, { dpr: 1, period: 2, scale: 0.8 }, { dpr: 1, period: 2.4, scale: 0.6 }];
+  var EASE = 60;              // s: free of slowness this long, a rung back up
   var SEA_DRIFT = [0.45, 0.8];   // px/s: the sea's drift where it is nearest the window
   var TOWERS = 6;             // tower slots
   var BUILD = 90;             // s: a tower building out of the sea, or sinking back
   var WORDS_CORE = 8;         // px: the veil's full hold about the words
+  var NAME_CORE = 20;         // px: ... and about the name (its letters reach below its box)
   var WORDS_FEATHER = 110;    // px: its feather beyond (a Gaussian's fall)
   var LINKS_CORE = 6, LINKS_FEATHER = 40;
-  var RATIO = 4.6;            // the words' contrast on the sky (WCAG, with margin)
-  var RING = 3.1;             // the focus ring's
-  var FLIP = 0.18;            // the sky's luminance where dark words give way to light
+  var RATIO = 4.7;            // the words' contrast on the sky (WCAG's 4.5, with room for rounding and dither)
+  var RING = 3.3;             // the focus ring's (3)
+  var FLIP = 0.186;           // the darkest sky black words read on at RATIO
   var DEG = Math.PI / 180;
 
   /* ---------------- the visit's streams (splitmix32) ---------------- */
@@ -243,7 +253,8 @@
      words stand evenly at the crossing (OKLab L 0.56, where dark words
      and light read alike), the glows low. The words flip there, and the
      veil has nothing to hold */
-  var TWILIGHT = [0.594, 0.568, 0.553, 0.543, 0.492];   // (as drawn, with the haze and glows, the crossing itself)
+  var TWILIGHT = [0.585, 0.558, 0.553, 0.552, 0.51];    // (as drawn, with the haze and glows, the crossing itself)
+  var TWILIGHT_SEA = { 0: 1.12, 1: 0.8 };                // (the sea's light there, from dark words to light, and back)
   DAY.forEach(function (n, i) {
     var A = SCENES[n], B = SCENES[DAY[(i + 1) % DAY.length]], C = {}, j, f;
     if (A.words === B.words) return;
@@ -255,7 +266,8 @@
     C.deckCL = [0.55, C.deckCL[1] * 0.7, C.deckCL[2] * 0.7];
     C.sea = lerpN(A.sea, B.sea, 0.5); C.deck = lerpN(A.deck, B.deck, 0.5); C.deck[2] *= 0.6;
     C.rain = 0; C.shafts *= 0.4; C.bloom = Math.min(C.bloom, 0.08);
-    C.lightI *= 0.4; C.ambUI *= 0.6; C.ambDI *= 0.55;  // (the cloud sea under the links dims to the crossing as well)
+    f = TWILIGHT_SEA[A.words];                           // (the cloud sea under the links at the crossing as well)
+    C.lightI *= 0.4 * f; C.ambUI *= 0.6 * f; C.ambDI *= 0.55 * f;
     A.twi = C;
   });
 
@@ -322,8 +334,8 @@
 
   /* ---------------- the cycle: where the sky is, blended ---------------- */
 
-  var P = {};                 // the sky now: every field of a scene, blended, and the discs
-  function blend(t) {
+  var NOW = {};               // the sky now (a frame's own sky is blended apart)
+  function blend(t, P) {
     var u = ((t0 + t) % ROUND + ROUND) % ROUND, i = 0, A, B, k, j, f;
     while (i < DAY.length - 1 && u >= starts[i + 1]) i++;
     A = SCENES[DAY[i]]; B = SCENES[DAY[(i + 1) % DAY.length]];
@@ -354,7 +366,8 @@
 
   /* ---------------- the wind ---------------- */
 
-  var wind = [0, 0], windDir = (rWind() < 0.65 ? 1 : -1), windPx = mix(SEA_DRIFT[0], SEA_DRIFT[1], rWind()), windSlant = (rWind() * 2 - 1) * 0.25;
+  var wind = [0, 0], drift = [0, 0], windDir = (rWind() < 0.65 ? 1 : -1), windPx = mix(SEA_DRIFT[0], SEA_DRIFT[1], rWind()), windSlant = (rWind() * 2 - 1) * 0.25;
+  function blow(dt) { drift[0] += wind[0] * dt; drift[1] += wind[1] * dt; }   // (how far the air has gone: a new window changes the wind, never where the clouds are)
   /* in the air's units a second: the sea's nearest tops drift windPx on the window */
   function aimWind() {
     var zNear = 1 / Math.tan(Math.max(1 * DEG, Math.atan((H - cam.hy) / cam.f)));
@@ -408,8 +421,8 @@
     }
     return false;
   }
-  /* a tower's puffs: a cumulus. A core (two broad spheres, the dome's
-     bulk) and ten rounded lobes on the dome's envelope (an upper
+  /* a tower's puffs: a cumulus. A core (three broad spheres, the dome's
+     bulk) and nine rounded lobes on the dome's envelope (an upper
      half-ellipsoid as wide as the tower and as tall), more of them high
      up and toward the window, each its own size: a cauliflower crown */
   function puffs(T) {
@@ -433,7 +446,10 @@
       T = towers[i];
       want = clamp(P.towers * TOWERS - i, 0, 1);
       if (!T.on) {
-        if (want > 0.05 && (still || (T.wait || 0) <= 0)) { if (spawn(T) && still) T.p = want; }
+        if (want > 0.05 && (still || (T.wait || 0) <= 0)) {
+          if (!spawn(T)) T.wait = 2 + 3 * rTower();        // (no room: look again in a few seconds)
+          else if (still) T.p = want;
+        }
         T.wait = (T.wait || 0) - dt;
         continue;
       }
@@ -450,8 +466,7 @@
 
   /* ---------------- GL ---------------- */
 
-  var gl = null, ext = {}, progs = {}, vao = null, tex = {}, fb = {}, ready = false, lost = false;
-  var cw = 0, ch = 0, scale = SCALE, period = PERIOD;
+  var gl = null, ext = {}, progs = {}, vao = null, tex = {}, ready = false, lost = false, cw = 0, ch = 0;
   var HEAD = '#version 300 es\nprecision highp float;\nprecision highp int;\nprecision highp sampler3D;\n';
   var VERT = '#version 300 es\nvoid main() { vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)); gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0); }';
   var HASH = [
@@ -529,7 +544,7 @@
   /* the scene: sky, deck, towers and sea, per pixel, in the air's light (linear) */
   var SCENE = [
     'uniform sampler3D uN3; uniform sampler2D uN2;',
-    'uniform vec4 uVp; uniform vec4 uCam; uniform vec2 uC0; uniform float uT; uniform vec2 uWind; uniform float uPx;',
+    'uniform vec4 uVp; uniform vec4 uCam; uniform vec2 uC0; uniform float uT; uniform vec2 uDrift; uniform float uPx;',
     'uniform vec3 uL; uniform vec3 uLC; uniform vec3 uSk[5]; uniform vec3 uTint; uniform vec4 uTintP;',
     'uniform vec4 uDa; uniform vec4 uDaP; uniform vec3 uDaC; uniform vec4 uDb; uniform vec4 uDbP; uniform vec3 uDbC;',
     'uniform vec3 uAmbU; uniform vec3 uAmbD; uniform vec3 uAlb;',
@@ -550,6 +565,7 @@
     '  return C * (P.z * pow(cg, P.y) + P.w * pow(cg, P.y * 0.06));',
     '}',
     'vec3 disc(vec3 rd, vec4 D, vec4 P, vec3 C) {',
+    '  if (P.x <= 0.0) return vec3(0.0);',
     '  float cg = dot(rd, D.xyz), r = 1.0 - D.w;',
     '  float limb = clamp((cg - D.w) / r, 0.0, 1.0);',
     '  return C * P.x * smoothstep(D.w - r * 0.3, D.w + r * 0.15, cg) * (0.75 + 0.25 * sqrt(limb));',
@@ -568,7 +584,7 @@
     'float mistOf(float y, float t) { return uFog.y * exp(-max(y + uSea.x - uSea.y * 0.55, 0.0) / uFog.z) * smoothstep(4.0, 24.0, t); }',
     /* the sea of cloud */
     'float seaH(vec2 xz, float lod, float t) {',
-    '  vec2 q = xz + uWind * uT;',
+    '  vec2 q = xz + uDrift;',
     '  float a = textureLod(uN2, q * 0.05, lod).r;',
     '  float fine = 1.0 - smoothstep(10.0, 28.0, t);',
     '  float b = fine > 0.0 ? textureLod(uN2, q * 0.17 + vec2(0.31, 0.67), lod + 1.4).g : 0.5;',
@@ -598,7 +614,7 @@
     '  float t = (-uSea.x + uSea.y * 1.02) / rd.y;',
     '  t *= 1.0 + jit * 0.02;',
     '  for (int i = 0; i < 64; i++) {',
-    '    if (T < 0.015 || t > 600.0) break;',
+    '    if (T < 0.03 || t > 600.0) break;',
     '    vec3 p = rd * t;',
     '    float lod = log2(max(t * uPx * 0.05 * 256.0 * 1.5, 1.0));',
     '    float h = seaH(p.xz, lod, t);',
@@ -653,7 +669,7 @@
     '  float R = uTx[k].x;',
     '  t += jit * R * 0.05;',
     '  for (int i = 0; i < 56; i++) {',
-    '    if (t > t1 || T < 0.015) break;',
+    '    if (t > t1 || T < 0.03) break;',
     '    vec3 p = rd * t;',
     '    float lod = log2(max(t * uPx * 0.45 / R * 64.0, 1.0));',
     '    float sf = R * 0.05 + t * uPx * 1.5;',
@@ -670,7 +686,7 @@
     'vec4 deck(vec3 rd, vec3 bg) {',
     '  if (rd.y < 0.002 || uDeck.z <= 0.0) return vec4(0.0);',
     '  float t = uDeck.x / rd.y;',
-    '  vec2 q = rd.xz * t + uWind * uT * 1.8;',
+    '  vec2 q = rd.xz * t + uDrift * 1.8;',
     '  float lod = log2(max(t * uPx / max(rd.y, 0.05) * 0.05 * 256.0, 1.0));',
     '  float a = textureLod(uN2, q * vec2(0.024, 0.06), lod).a, b = textureLod(uN2, q * vec2(0.075, 0.13) + 0.37, lod + 1.0).b;',
     '  float n = a * 0.72 + b * 0.28;',
@@ -751,9 +767,17 @@
   ].join('\n');
   /* what was drawn where the words stand (and the window's top edge): 8 numbers */
   var STATS = [
-    'uniform sampler2D uF; uniform vec4 uRs; out vec4 o;',
+    'uniform sampler2D uF; uniform vec4 uRs; uniform vec4 uRl; out vec4 o;',
     'void main() {',
     '  int i = int(gl_FragCoord.x);',
+    '  if (i == 5 || i == 7) {',
+    '    float mn = 1.0, mx = 0.0;',
+    '    for (int y = 0; y < 6; y++) for (int x = 0; x < 16; x++) {',
+    '      float Y = dot(textureLod(uF, mix(uRl.xy, uRl.zw, (vec2(float(x), float(y)) + 0.5) / vec2(16.0, 6.0)), 0.0).rgb, vec3(0.2126, 0.7152, 0.0722));',
+    '      mn = min(mn, Y); mx = max(mx, Y);',
+    '    }',
+    '    o = vec4(sqrt(i == 5 ? mn : mx), 0.0, 0.0, 1.0); return;',
+    '  }',
     '  if (i == 3 || i == 6) {',
     '    vec3 c = vec3(0.0); float y0 = i == 3 ? 0.995 : 0.005;',
     '    for (int x = 0; x < 16; x++) c += textureLod(uF, vec2((float(x) + 0.5) / 16.0, y0), 0.0).rgb;',
@@ -777,12 +801,20 @@
     '  o = vec4(sqrt(v), 0.0, 0.0, 1.0);',
     '}'
   ].join('\n');
+  /* where the words stand, for the veil: the bio (r), the name (g), the links (b); drawn when the page moves */
+  var MASK = [
+    'uniform vec4 uVp; uniform vec4 uR[4]; uniform vec2 uFe; out vec4 o;',
+    'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float q = length(max(d, 0.0)) / fe; return exp(-4.5 * q * q); }',
+    'void main() {',
+    '  vec2 fc = gl_FragCoord.xy / uVp.xy, p = vec2(fc.x * uVp.z, (1.0 - fc.y) * uVp.w);',
+    '  o = vec4(box(p, uR[0], uFe.x), box(p, uR[1], uFe.x), max(box(p, uR[2], uFe.y), box(p, uR[3], uFe.y)), 1.0);',
+    '}'
+  ].join('\n');
   /* the window: two cloud frames crossfaded, the stars, the rain, the veil about the words */
   var SHOW = HASH + [
-    'uniform sampler2D uA; uniform sampler2D uB; uniform float uK; uniform vec4 uVp;',
-    'uniform vec4 uR[4]; uniform vec2 uFe; uniform vec2 uBand; uniform vec2 uBandT;',
+    'uniform sampler2D uA; uniform sampler2D uB; uniform sampler2D uM; uniform float uK; uniform vec4 uVp;',
+    'uniform vec2 uBand; uniform vec2 uBandN; uniform vec2 uBandL;',
     'uniform vec4 uSt; uniform vec4 uRn; uniform vec3 uRnC; out vec4 o;',
-    'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float q = length(max(d, 0.0)) / fe; return exp(-4.5 * q * q); }',
     'vec3 h32(vec2 c, float s) { return rnd3(vec3(mod(c, 4096.0) + 4096.0, s), 17u); }',
     'float stars(vec2 p) {',
     '  vec2 c = floor(p / 23.0);',
@@ -810,11 +842,12 @@
     '  vec2 p = vec2(fc.x * uVp.z, (1.0 - fc.y) * uVp.w);',
     '  vec4 c = mix(texture(uA, fc), texture(uB, fc), uK);',
     '  vec3 col = c.rgb;',
-    '  float m0 = box(p, uR[0], uFe.x), m1 = max(box(p, uR[1], uFe.x), max(box(p, uR[2], uFe.y), box(p, uR[3], uFe.y))), m = max(m0, m1);',
-    '  if (uSt.x > 0.0) col += vec3(0.92, 0.94, 1.0) * stars(p) * uSt.x * c.a * smoothstep(uSt.z + 2.0, uSt.z - 70.0, p.y);',
+    '  vec3 mk = texture(uM, fc).rgb; float m = max(mk.r, max(mk.g, mk.b));',
+    '  if (uSt.x > 0.0) col += vec3(0.92, 0.94, 1.0) * stars(p) * uSt.x * c.a * (1.0 - smoothstep(uSt.z - 70.0, uSt.z + 2.0, p.y));',
     '  if (uRn.x > 0.0) { float r = rain(p, 0.0) * 0.6 + rain(p, 1.0); col = mix(col, uRnC, clamp(r * uRn.x * 0.32 * (1.0 - m), 0.0, 1.0)); }',
     '  float Y = dot(col, vec3(0.2126, 0.7152, 0.0722));',
-    '  float lo = max(uBand.x * m0, uBandT.x * m1), hi = min(mix(1.0, uBand.y, m0), mix(1.0, uBandT.y, m1));',
+    '  float lo = max(uBand.x * mk.r, max(uBandN.x * mk.g, uBandL.x * mk.b));',
+    '  float hi = min(mix(1.0, uBand.y, mk.r), min(mix(1.0, uBandN.y, mk.g), mix(1.0, uBandL.y, mk.b)));',
     '  if (Y < lo) col *= lo / max(Y, 1e-4);',
     '  else if (Y > hi) col *= hi / Y;',
     '  col = clamp(col, 0.0, 1.0);',
@@ -824,6 +857,7 @@
     '}'
   ].join('\n');
 
+
   function setup() {
     gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, premultipliedAlpha: false, preserveDrawingBuffer: false, powerPreference: 'low-power' });
     if (!gl) return false;
@@ -831,7 +865,7 @@
     FORMATS = { rgba8: [gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE], rgba16f: [gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT], srgb: [gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE] };
     ext.par = gl.getExtension('KHR_parallel_shader_compile');
     var info = gl.getExtension('WEBGL_debug_renderer_info'), who = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
-    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(who)) { frozen = true; scale = SCALE_MIN; }   // (drawn on the CPU: the still sky, drawn once)
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(who)) { frozen = true; level = LADDER.length - 1; }   // (drawn on the CPU: the still sky, drawn once, small)
     var codec = ext.float ? '#define ENC(c) (c)\n#define DEC(c) (c)\n'
                           : '#define ENC(c) sqrt(clamp((c) / (1.0 + (c)), 0.0, 1.0))\n#define DEC(c) ((c) * (c) / max(1.0 - (c) * (c), 1e-4))\n';
     var vs = compile(gl.VERTEX_SHADER, VERT);
@@ -843,8 +877,10 @@
     progs.up = link(vs, HEAD + codec + UP);
     progs.finish = link(vs, HEAD + codec + FINISH);
     progs.stats = link(vs, HEAD + STATS);
+    progs.mask = link(vs, HEAD + MASK);
     progs.show = link(vs, HEAD + SHOW);
     vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
     return true;
   }
   function compile(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
@@ -871,6 +907,7 @@
     return 1;
   }
   function U(p, name) { if (!(name in p.u)) p.u[name] = gl.getUniformLocation(p, name); return p.u[name]; }
+  var FORMATS = {};
   function texture2(w, h, fmt, filter, wrap) {
     var t = gl.createTexture(), F = FORMATS[fmt];
     gl.bindTexture(gl.TEXTURE_2D, t);
@@ -882,7 +919,6 @@
     t.w = w; t.h = h;
     return t;
   }
-  var FORMATS = {};
   function target(t) {
     var f = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, f);
@@ -890,6 +926,8 @@
     f.t = t;
     return f;
   }
+  function pair(w, h, fmt) { var t = texture2(w, h, fmt, gl.LINEAR); return { t: t, f: target(t) }; }
+  function drop(o) { if (o) { gl.deleteFramebuffer(o.f); gl.deleteTexture(o.t); } }
   function draw(p, f, w, h) {
     gl.useProgram(p);
     gl.bindFramebuffer(gl.FRAMEBUFFER, f);
@@ -902,21 +940,30 @@
     gl.uniform1i(U(p, name), unit);
   }
 
-  /* the noise, baked once on the GPU */
-  function bakeNoise() {
-    var p = progs.bake3, f = gl.createFramebuffer(), z;
-    tex.n3 = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_3D, tex.n3);
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA8, 64, 64, 64, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.useProgram(p);
-    gl.uniform1ui(U(p, 'uSeed'), noiseSeed);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, f);
-    gl.viewport(0, 0, 64, 64);
-    for (z = 0; z < 64; z++) {
-      gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, tex.n3, 0, z);
-      gl.uniform1f(U(p, 'uZ'), (z + 0.5) / 64);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+  /* the noise, baked on the GPU over the first frames (8 layers a frame), then the 2D */
+  var baked = 0, bakeFb = null;
+  function bakeStep() {
+    var p, z;
+    if (!baked) {
+      tex.n3 = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_3D, tex.n3);
+      gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA8, 64, 64, 64, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      bakeFb = gl.createFramebuffer();
     }
+    if (baked < 8) {
+      p = progs.bake3; gl.useProgram(p);
+      gl.uniform1ui(U(p, 'uSeed'), noiseSeed);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, bakeFb);
+      gl.viewport(0, 0, 64, 64);
+      for (z = baked * 8; z < baked * 8 + 8; z++) {
+        gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, tex.n3, 0, z);
+        gl.uniform1f(U(p, 'uZ'), (z + 0.5) / 64);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      baked++;
+      return;
+    }
+    gl.deleteFramebuffer(bakeFb); bakeFb = null;
     gl.bindTexture(gl.TEXTURE_3D, tex.n3);
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -925,47 +972,56 @@
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.REPEAT);
     gl.generateMipmap(gl.TEXTURE_3D);
     tex.n2 = texture2(256, 256, 'rgba8', gl.LINEAR_MIPMAP_LINEAR, gl.REPEAT);
-    f = target(tex.n2);
-    p = progs.bake2;
-    gl.useProgram(p);
+    var f = target(tex.n2);
+    p = progs.bake2; gl.useProgram(p);
     gl.uniform1ui(U(p, 'uSeed'), noiseSeed + 11);
     draw(p, f, 256, 256);
+    gl.deleteFramebuffer(f);
     gl.bindTexture(gl.TEXTURE_2D, tex.n2);
     gl.generateMipmap(gl.TEXTURE_2D);
+    baked = 9;
   }
 
-  /* the frames' textures, for this window */
+  /* the frames' textures, for this window and this rung. The frames on
+     show are kept (and shown stretched) until the first new one lands:
+     a new size never shows a blank sky */
+  var level = 0, work = {}, finals = [], stale = [], maskDirty = true;
   function buffers() {
-    var w = Math.max(1, Math.round(W * scale)), h = Math.max(1, Math.round(H * scale)), k, dpr;
+    var L = LADDER[level], w = Math.max(1, Math.round(W * SCALE * L.scale)), h = Math.max(1, Math.round(H * SCALE * L.scale)), k, hdr, dpr, cvw, cvh;
     if (w * h > PX_MAX) { k = Math.sqrt(PX_MAX / (w * h)); w = Math.round(w * k); h = Math.round(h * k); }
-    dpr = Math.min(window.devicePixelRatio || 1, CANVAS_DPR);
-    canvas.width = Math.max(1, Math.round(W * dpr)); canvas.height = Math.max(1, Math.round(H * dpr));
-    if (w === cw && h === ch && tex.s) return;
+    dpr = Math.min(window.devicePixelRatio || 1, L.dpr);
+    cvw = Math.max(1, Math.round(W * dpr)); cvh = Math.max(1, Math.round(H * dpr));
+    if (canvas.width !== cvw) canvas.width = cvw;
+    if (canvas.height !== cvh) canvas.height = cvh;
+    if (w === cw && h === ch && work.s) return;
     cw = w; ch = h;
-    ['s', 'sh', 'b1', 'b2', 'b3', 'u2', 'u1', 'f0', 'f1', 'f2'].forEach(function (k) { if (tex[k]) gl.deleteTexture(tex[k]); if (fb[k]) gl.deleteFramebuffer(fb[k]); });
-    var hdr = ext.float ? 'rgba16f' : 'rgba8';
-    tex.s = texture2(cw, ch, hdr, gl.LINEAR); fb.s = target(tex.s);
-    tex.sh = texture2(Math.ceil(cw / 2), Math.ceil(ch / 2), 'rgba8', gl.LINEAR); fb.sh = target(tex.sh);
-    tex.b1 = texture2(Math.ceil(cw / 2), Math.ceil(ch / 2), hdr, gl.LINEAR); fb.b1 = target(tex.b1);
-    tex.b2 = texture2(Math.ceil(cw / 4), Math.ceil(ch / 4), hdr, gl.LINEAR); fb.b2 = target(tex.b2);
-    tex.b3 = texture2(Math.ceil(cw / 8), Math.ceil(ch / 8), hdr, gl.LINEAR); fb.b3 = target(tex.b3);
-    tex.u2 = texture2(Math.ceil(cw / 4), Math.ceil(ch / 4), hdr, gl.LINEAR); fb.u2 = target(tex.u2);
-    tex.u1 = texture2(Math.ceil(cw / 2), Math.ceil(ch / 2), hdr, gl.LINEAR); fb.u1 = target(tex.u1);
-    for (k = 0; k < 3; k++) { tex['f' + k] = texture2(cw, ch, 'srgb', gl.LINEAR); fb['f' + k] = target(tex['f' + k]); }
-    shown = [null, null]; job = null;
+    for (k in work) drop(work[k]);
+    hdr = ext.float ? 'rgba16f' : 'rgba8';
+    work = { s: pair(cw, ch, hdr), sh: pair(Math.ceil(cw / 2), Math.ceil(ch / 2), 'rgba8'), b1: pair(Math.ceil(cw / 2), Math.ceil(ch / 2), hdr),
+             b2: pair(Math.ceil(cw / 4), Math.ceil(ch / 4), hdr), b3: pair(Math.ceil(cw / 8), Math.ceil(ch / 8), hdr),
+             u2: pair(Math.ceil(cw / 4), Math.ceil(ch / 4), hdr), u1: pair(Math.ceil(cw / 2), Math.ceil(ch / 2), hdr), m: pair(cw, ch, 'rgba8') };
+    stale = stale.concat(finals);
+    finals = [pair(cw, ch, 'srgb'), pair(cw, ch, 'srgb'), pair(cw, ch, 'srgb')];
+    job = null; fresh = true; maskDirty = true;
+    sweep();
+  }
+  /* the old frames no longer on show go */
+  function sweep() {
+    stale = stale.filter(function (o) { if (o === shown[0] || o === shown[1]) return true; drop(o); return false; });
   }
 
   /* ---------------- a cloud frame: set up, drawn in slices, finished ---------------- */
 
-  var t = 0, job = null, shown = [null, null], doneAt = -1, spare = 0, frames = 0;
+  var t = 0, acc = 0, job = null, fresh = true, redo = false, shown = [null, null], doneAt = -1, fadeP = PERIOD, frames = 0;
+  function periodNow() { return PERIOD * LADDER[level].period * (t > THIN && !still ? 2 : 1); }
   function startJob(fast) {
-    var p = progs.scene, S = blend(t + (fast ? 0 : period)), i, k, n = 0, T, list = [], s, lift, R, j;
+    var per = periodNow(), ahead = fast || still ? 0 : per, S = blend(t + ahead, {}), p = progs.scene, i, n = 0, T, list = [], s, lift, R, j;
     gl.useProgram(p);
     gl.uniform4f(U(p, 'uVp'), cw, ch, W, H);
     gl.uniform4f(U(p, 'uCam'), cam.f, cam.c, cam.s, 0);
     gl.uniform2f(U(p, 'uC0'), cam.x0, cam.y0);
-    gl.uniform1f(U(p, 'uT'), still ? 0 : t + (fast ? 0 : period));
-    gl.uniform2f(U(p, 'uWind'), wind[0], wind[1]);
+    gl.uniform1f(U(p, 'uT'), still ? 0 : t + ahead);
+    gl.uniform2f(U(p, 'uDrift'), drift[0] + wind[0] * ahead, drift[1] + wind[1] * ahead);
     gl.uniform1f(U(p, 'uPx'), (W / cw) / cam.f);
     gl.uniform3fv(U(p, 'uL'), S.light);
     gl.uniform3fv(U(p, 'uLC'), scale3(S.lightC, S.lightI));
@@ -998,24 +1054,24 @@
     }
     gl.uniform1i(U(p, 'uTwN'), n);
     gl.uniform4fv(U(p, 'uTw'), tw); gl.uniform4fv(U(p, 'uTb'), tb); gl.uniform4fv(U(p, 'uTx'), tx);
-    job = { row: 0, S: S, fast: !!fast };
+    job = { row: 0, S: S, fast: !!fast, period: per };
   }
   function scale3(c, k) { return [c[0] * k, c[1] * k, c[2] * k]; }
   function flat(a) { var o = [], i; for (i = 0; i < a.length; i++) o.push(a[i][0], a[i][1], a[i][2]); return o; }
   function discUniforms(p, n, D) {
-    if (!D) { gl.uniform4f(U(p, n), 0, 1, 0, 2); gl.uniform4f(U(p, n + 'P'), 0, 1, 0, 0); gl.uniform3f(U(p, n + 'C'), 0, 0, 0); return; }
+    if (!D) { gl.uniform4f(U(p, n), 0, 1, 0, 0.9999); gl.uniform4f(U(p, n + 'P'), 0, 1, 0, 0); gl.uniform3f(U(p, n + 'C'), 0, 0, 0); return; }
     gl.uniform4f(U(p, n), D.d[0], D.d[1], D.d[2], Math.cos(D.r * DEG));
     gl.uniform4f(U(p, n + 'P'), D.i, D.halo, D.haloI, D.wide);
     gl.uniform3fv(U(p, n + 'C'), D.c);
   }
-  /* draw rows of the scene: as many as this frame's share */
+  /* draw rows of the scene: as many as this tick's share */
   function slice(rows) {
     var p = progs.scene, y = job.row, h = Math.min(rows, ch - y);
     if (h <= 0) return;
     gl.useProgram(p);
     bind(p, 0, 'uN3', tex.n3, gl.TEXTURE_3D);
     bind(p, 1, 'uN2', tex.n2);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb.s);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, work.s.f);
     gl.viewport(0, 0, cw, ch);
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(0, y, cw, h);
@@ -1024,45 +1080,47 @@
     job.row += h;
   }
   function finishJob() {
-    var S = job.S, p, sun = sunOnWindow(S), w2 = tex.sh.w, h2 = tex.sh.h;
-    /* the shafts */
-    p = progs.shaft; gl.useProgram(p);
-    bind(p, 0, 'uS', tex.s);
-    gl.uniform2f(U(p, 'uRes'), w2, h2);
-    gl.uniform2f(U(p, 'uSun'), sun[0] / W, 1 - sun[1] / H);
-    gl.uniform4f(U(p, 'uSh'), 0.32, 0.95, W / H, 0);
-    draw(p, fb.sh, w2, h2);
-    /* the glow */
-    down(tex.s, fb.b1, 0.75); down(tex.b1, fb.b2, 0); down(tex.b2, fb.b3, 0);
-    up(tex.b3, tex.b2, fb.u2); up(tex.u2, tex.b1, fb.u1);
-    /* finished, into the spare frame */
-    var f = nextFinal();
+    var S = job.S, p, sun = sunOnWindow(S), sh = S.shafts * (sun[2] ? 1 : 0), w2 = work.sh.t.w, h2 = work.sh.t.h, f;
+    if (sh > 0.005) {                                     // the shafts
+      p = progs.shaft; gl.useProgram(p);
+      bind(p, 0, 'uS', work.s.t);
+      gl.uniform2f(U(p, 'uRes'), w2, h2);
+      gl.uniform2f(U(p, 'uSun'), sun[0] / W, 1 - sun[1] / H);
+      gl.uniform4f(U(p, 'uSh'), 0.32, 0.95, W / H, 0);
+      draw(p, work.sh.f, w2, h2);
+    }
+    if (S.bloom > 0.005) {                                // the glow
+      down(work.s.t, work.b1, 0.75); down(work.b1.t, work.b2, 0); down(work.b2.t, work.b3, 0);
+      up(work.b3.t, work.b2.t, work.u2); up(work.u2.t, work.b1.t, work.u1);
+    }
+    f = nextFinal();                                      // finished, into the spare frame
     p = progs.finish; gl.useProgram(p);
-    bind(p, 0, 'uS', tex.s); bind(p, 1, 'uSh', tex.sh); bind(p, 2, 'uBl', tex.u1);
+    bind(p, 0, 'uS', work.s.t); bind(p, 1, 'uSh', work.sh.t); bind(p, 2, 'uBl', work.u1.t);
     gl.uniform2f(U(p, 'uRes'), cw, ch);
     gl.uniform3fv(U(p, 'uShC'), S.shaftC);
-    gl.uniform4f(U(p, 'uPost'), S.shafts * (sun[2] ? 1 : 0), S.bloom, S.exposure, S.sat);
-    draw(p, fb[f], cw, ch);
+    gl.uniform4f(U(p, 'uPost'), sh > 0.005 ? sh : 0, S.bloom > 0.005 ? S.bloom : 0, S.exposure, S.sat);
+    draw(p, f.f, cw, ch);
     shown = shown[1] ? [shown[1], f] : [f, f];
-    doneAt = t; frames++;
-    readStats(tex[f], S);
+    doneAt = t; fadeP = job.period; frames++;
+    sweep();
+    readStats(f, S);
     job = null;
   }
-  function nextFinal() { var k; for (k = 0; k < 3; k++) if (shown[0] !== 'f' + k && shown[1] !== 'f' + k) return 'f' + k; return 'f0'; }
+  function nextFinal() { for (var k = 0; k < finals.length; k++) if (finals[k] !== shown[0] && finals[k] !== shown[1]) return finals[k]; return finals[0]; }
   function down(src, dst, thr) {
     var p = progs.down; gl.useProgram(p);
     bind(p, 0, 'uS', src);
     gl.uniform2f(U(p, 'uRes'), dst.t.w, dst.t.h);
     gl.uniform2f(U(p, 'uHalf'), 0.5 / src.w, 0.5 / src.h);
     gl.uniform1f(U(p, 'uThr'), thr);
-    draw(p, dst, dst.t.w, dst.t.h);
+    draw(p, dst.f, dst.t.w, dst.t.h);
   }
   function up(src, add, dst) {
     var p = progs.up; gl.useProgram(p);
     bind(p, 0, 'uS', src); bind(p, 1, 'uAdd', add);
     gl.uniform2f(U(p, 'uRes'), dst.t.w, dst.t.h);
     gl.uniform2f(U(p, 'uHalf'), 0.5 / src.w, 0.5 / src.h);
-    draw(p, dst, dst.t.w, dst.t.h);
+    draw(p, dst.f, dst.t.w, dst.t.h);
   }
   /* where the sun stands on the window (or the moon), and whether it is in front of the camera */
   function sunOnWindow(S) {
@@ -1074,29 +1132,40 @@
 
   /* ---------------- the window: crossfaded, with stars, rain and the veil ---------------- */
 
-  var lastShow = -1, lastSteer = -1;
-  function show(S) {
-    var p = progs.show, k = clamp((t - doneAt) / period, 0, 1);
-    if (still) k = 1;
+  var lastShow = -1, lastSteer = -1, lastNow = 0;
+  /* where the words stand, for the veil (drawn when the page moves) */
+  function drawMask() {
+    var p = progs.mask;
     gl.useProgram(p);
-    bind(p, 0, 'uA', tex[shown[0]]); bind(p, 1, 'uB', tex[shown[1]]);
+    gl.uniform4f(U(p, 'uVp'), cw, ch, W, H);
+    gl.uniform4fv(U(p, 'uR'), rectOf(wordsR, WORDS_CORE).concat(rectOf(nameR, NAME_CORE), rectOf(links[0], LINKS_CORE), rectOf(links[1], LINKS_CORE)));
+    gl.uniform2f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER);
+    draw(p, work.m.f, cw, ch);
+    maskDirty = false;
+  }
+  function rectOf(r, m) { return r ? [r[0] - m, r[1] - m, r[2] + m, r[3] + m] : [0, 0, 0, 0]; }
+  function show(S) {
+    var p = progs.show, k = still ? 1 : clamp((t - doneAt) / fadeP, 0, 1);
+    gl.useProgram(p);
+    bind(p, 0, 'uA', shown[0].t); bind(p, 1, 'uB', shown[1].t); bind(p, 2, 'uM', work.m.t);
     gl.uniform1f(U(p, 'uK'), k);
     gl.uniform4f(U(p, 'uVp'), canvas.width, canvas.height, W, H);
-    gl.uniform4fv(U(p, 'uR'), rectOf(wordsR, WORDS_CORE).concat(rectOf(nameR, WORDS_CORE), rectOf(links[0], LINKS_CORE), rectOf(links[1], LINKS_CORE)));
-    gl.uniform2f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER);
     gl.uniform2f(U(p, 'uBand'), band.lo, band.hi);
-    gl.uniform2f(U(p, 'uBandT'), band.tlo, band.thi);
+    gl.uniform2f(U(p, 'uBandN'), bandN.lo, bandN.hi);
+    gl.uniform2f(U(p, 'uBandL'), bandL.lo, bandL.hi);
     gl.uniform4f(U(p, 'uSt'), S.stars, starSeed, cam.hy, Math.max(0.7, Math.min(1.1, canvas.width / W * 0.6)));
-    gl.uniform4f(U(p, 'uRn'), still ? 0 : S.rain, Math.floor(t * DRAW_FPS), 0.18 * windDir, 0);
+    gl.uniform4f(U(p, 'uRn'), still ? 0 : S.rain, Math.floor(t * 12), 0.18 * windDir, 0);
     gl.uniform3fv(U(p, 'uRnC'), S.rainC);
     draw(p, null, canvas.width, canvas.height);
   }
-  function rectOf(r, m) { return r ? [r[0] - m, r[1] - m, r[2] + m, r[3] + m] : [0, 0, 0, 0]; }
+  /* how often the window is drawn: on twos while it rains, else less; less still on a long visit */
+  function rate(S) { return S.rain > 0.01 ? DRAW_FPS[0] : (t > THIN ? DRAW_FPS[2] : DRAW_FPS[1]); }
 
   /* ---------------- the words' colours, from what was drawn where they stand ---------------- */
 
-  var pbo = null, sync = null, statsOut = new Uint8Array(32), statsFor = null, meta = document.querySelector('meta[name="theme-color"]');
-  var trusted = false, doubts = 0, waited = 0;
+  var pbo = null, sync = null, statsOut = new Uint8Array(32), statsFor = null, pending = null, asked = false, meta = document.querySelector('meta[name="theme-color"]');
+  var themeOpen = meta ? meta.getAttribute('content') : '', themeWas = '';
+  var trusted = false, doubts = 0, waited = 0, fadeUntil = 0;
   /* the sky's light where the words stand, as the gradient alone would have it */
   function expected(S) {
     var R = wordsR || stackR, d, e, c;
@@ -1107,22 +1176,33 @@
     return lumOf(c);
   }
   function sstep(a, b, x) { x = clamp((x - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); }
+  /* shown, once the first frame is read and looks like the sky it should (or let go) */
   function trust(ok) {
     trusted = true;
-    if (ok) { canvas.classList.add('on'); return; }
-    canvas.classList.remove('on'); unwords(); gl = null;
+    if (ok) { canvas.classList.add('on'); fadeUntil = lastNow + 2100; return; }
+    hide();
+    var lc = gl.getExtension('WEBGL_lose_context');
+    gl = null;
+    if (lc) lc.loseContext();                             // (its memory freed)
     if (window.console) console.warn('sky: the drawn sky did not look right; the still sky stays');
   }
-  function readStats(src, S) {
-    var R = wordsR || stackR;
-    if (!R || sync) return;
-    statsFor = S;
-    var p = progs.stats;
-    if (!fb.st) { tex.st = texture2(8, 1, 'rgba8', gl.NEAREST); fb.st = target(tex.st); pbo = gl.createBuffer(); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo); gl.bufferData(gl.PIXEL_PACK_BUFFER, 32, gl.STREAM_READ); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null); }
+  function distrust() { trusted = false; doubts = 0; waited = 0; asked = false; seen = seenT = null; lastSteer = -1; }
+  function hide() {
+    canvas.classList.remove('on'); unwords();
+    if (meta && themeOpen) { meta.setAttribute('content', themeOpen); themeWas = ''; }
+  }
+  function readStats(f, S) {
+    var R = wordsR || stackR, lk = links.length ? union(links[0], links[1] || null) : null, p = progs.stats;
+    if (!R) return;
+    if (sync) { pending = { f: f, S: S }; return; }       // (one at a time: this one when the last is in)
+    pending = null; statsFor = S; asked = true;
+    if (!work.st) { work.st = pair(8, 1, 'rgba8'); pbo = gl.createBuffer(); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo); gl.bufferData(gl.PIXEL_PACK_BUFFER, 32, gl.STREAM_READ); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null); }
+    lk = lk || R;
     gl.useProgram(p);
-    bind(p, 0, 'uF', src);
+    bind(p, 0, 'uF', f.t);
     gl.uniform4f(U(p, 'uRs'), R[0] / W, 1 - R[1] / H, R[2] / W, 1 - R[3] / H);
-    draw(p, fb.st, 8, 1);
+    gl.uniform4f(U(p, 'uRl'), (lk[0] - 4) / W, 1 - (lk[1] - 4) / H, (lk[2] + 4) / W, 1 - (lk[3] + 4) / H);
+    draw(p, work.st.f, 8, 1);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
     gl.readPixels(0, 0, 8, 1, gl.RGBA, gl.UNSIGNED_BYTE, 0);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
@@ -1131,160 +1211,235 @@
   }
   function pollStats() {
     if (!sync) return;
-    var st = gl.clientWaitSync(sync, 0, 0);
+    var st = gl.clientWaitSync(sync, 0, 0), y, sq, top = '#', i, v;
     if (st !== gl.ALREADY_SIGNALED && st !== gl.CONDITION_SATISFIED) return;
     gl.deleteSync(sync); sync = null;
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
     gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, statsOut);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-    var sq = function (i) { var v = statsOut[i * 4] / 255; return v * v; };
-    seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4) };
+    sq = function (i) { var v = statsOut[i * 4] / 255; return v * v; };
+    seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4), lmn: sq(5), lmx: sq(7) };
     if (!trusted) {                                       // the sky drawn as it should be? (a GPU or driver that draws
-      var y = expected(statsFor);                         //  nonsense is let go, and the stylesheet's sky stays)
+      y = expected(statsFor);                             //  nonsense is let go, and the stylesheet's sky stays)
       if (y < 0 || (seenT.mean > y / 4 && seenT.mean < y * 4 + 0.05)) trust(true);
       else if (++doubts >= 2) { trust(false); return; }
+      else { seenT = null; if (still) redo = true; return; }   // (doubted once: drawn and read again)
     }
-    var top = '#', i, v;
     for (i = 0; i < 3; i++) { v = statsOut[12 + i]; top += (v < 16 ? '0' : '') + v.toString(16); }
     if (meta && top !== themeWas) { meta.setAttribute('content', top); themeWas = top; }
+    if (pending && gl.isTexture(pending.f.t)) readStats(pending.f, pending.S);
+    else pending = null;
   }
-  var themeWas = '', TEXT_LIGHT = [0.99, 0.006, 95], TEXT_LIGHT_Y = lumOf(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]))), tokensWere = {};
+  var TEXT_LIGHT = [0.99, 0.006, 95], TEXT_LIGHT_Y = lumOf(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]))), tokensWere = {}, tokensKey = '';
   var HI_MAX = (TEXT_LIGHT_Y + 0.05) / RATIO - 0.05;   // the lightest sky light words read on
-  /* the band: the ground the words are held to, followed smoothly from what
-     was drawn. Dark words want it no darker than FLIP, light words no
-     lighter than HI_MAX; the bio's ground sets its dimmed grey. Near the
-     crossing the band pinches toward the one ground both read on, the
-     words flip there, and it opens again: nothing jumps but the words */
-  var seen = null, seenT = null, band = { lo: FLIP, hi: 1, tlo: FLIP, thi: 1, mode: 0 };
+  /* the bands: the grounds the words are held to, followed smoothly from
+     what was drawn. Dark words want their ground no darker than FLIP,
+     light words no lighter than HI_MAX; the bio's ground sets the dimmed
+     grey, the links' the focus ring. Near the crossing the bands pinch
+     toward the one ground both read on, the words flip there (on the
+     cycle's own time), and they open again: nothing jumps but the words */
+  var seen = null, seenT = null, band = { lo: FLIP, hi: 1, mode: 0 }, bandN = { lo: FLIP, hi: 1 }, bandL = { lo: FLIP, hi: 1 };
   function steer(dt, S) {
-    var f, k, m, lo, hi, w, mode = S.words >= 0.5 ? 1 : 0;   // (the words flip at the twilight, on the cycle's own time)
-    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, Math.max(0.004, S.flipW)); return; }
+    var f, k, m, w = Math.max(0.004, S.flipW), mode = S.words >= 0.5 ? 1 : 0;
+    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, mode ? 0 : FLIP, mode ? HI_MAX : 1, w); return; }
     if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
     k = still ? 1 : 1 - Math.exp(-dt / 0.6);
     for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
-    m = seen.mean; lo = Math.max(seen.mn, m - 3 * seen.sd); hi = Math.min(seen.mx, m + 3 * seen.sd);
-    w = Math.max(0.004, S.flipW);
-    opened(mode, lo, hi, w);
+    m = seen.mean;
+    opened(mode, Math.max(seen.mn, m - 3 * seen.sd), Math.min(seen.mx, m + 3 * seen.sd), seen.lmn, seen.lmx, w);
   }
-  function opened(mode, lo, hi, w) {
+  function opened(mode, lo, hi, llo, lhi, w) {
     band.mode = mode;
     if (mode === 0) {
       band.lo = Math.max(FLIP, lo * 0.97); band.hi = Math.max(band.lo + 0.004, FLIP + w);
-      band.tlo = FLIP; band.thi = FLIP + w;
+      bandN.lo = FLIP; bandN.hi = FLIP + w;
+      bandL.lo = Math.max(FLIP, llo * 0.97); bandL.hi = Math.max(bandL.lo + 0.004, FLIP + w);
     } else {
       band.hi = Math.min(HI_MAX, hi * 1.03); band.lo = Math.min(band.hi - 0.004, Math.max(0, HI_MAX - w));
-      band.tlo = Math.max(0, HI_MAX - w); band.thi = HI_MAX;
+      bandN.lo = Math.max(0, HI_MAX - w); bandN.hi = HI_MAX;
+      bandL.hi = Math.min(HI_MAX, lhi * 1.03); bandL.lo = Math.min(bandL.hi - 0.004, Math.max(0, HI_MAX - w));
     }
   }
-  /* the words' colours for the band: black and a grey on a light sky; a near-white and a lighter grey on a dark one */
-  function words() {
-    var Yd, Yf, tk = {};
+  /* the words' colours for the bands: black, a warm grey and a dark ochre on a light sky; a near-white, a cool
+     grey and a light gold on a dark one. While the drawn sky fades in over the stylesheet's, the safer of the
+     two sets (and only while the drawn sky shows at all) */
+  var cssTok = null;
+  function words(now) {
+    var Yd, Yf, tk, key = band.mode + ':' + band.lo.toFixed(4) + ':' + band.hi.toFixed(4) + ':' + bandL.lo.toFixed(4) + ':' + bandL.hi.toFixed(4) + (now < fadeUntil ? 'f' : '');
+    if (!canvas.classList.contains('on')) { unwords(); return; }
+    if (key === tokensKey) return;
+    tokensKey = key; tk = {};
     if (band.mode === 0) {
       Yd = Math.min(0.108, (band.lo + 0.05) / RATIO - 0.05);
-      Yf = Math.min(0.155, (band.lo + 0.05) / RING - 0.05);
+      Yf = Math.min(0.155, (bandL.lo + 0.05) / RING - 0.05);
       tk['--color-text'] = '#000000';
       tk['--color-dimmed'] = hex(ofLum(Math.max(Yd, 0), 0.009, 85));
       tk['--color-focus'] = hex(ofLum(Math.max(Yf, 0.004), 0.12, 75));
       tk['--color-selection'] = '#e6e2d6';
     } else {
       Yd = Math.min(TEXT_LIGHT_Y, Math.max(0.4, RATIO * (band.hi + 0.05) - 0.05));
-      Yf = Math.min(TEXT_LIGHT_Y, Math.max(0.45, RING * (band.hi + 0.05) - 0.05));
+      Yf = Math.min(TEXT_LIGHT_Y, Math.max(0.45, RING * (bandL.hi + 0.05) - 0.05));
       tk['--color-text'] = hex(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2])));
       tk['--color-dimmed'] = hex(ofLum(Yd, 0.014, 255));
       tk['--color-focus'] = hex(ofLum(Yf, 0.11, 85));
       tk['--color-selection'] = '#3b3f55';
     }
+    if (now < fadeUntil && cssTok && (cssTok.mode === band.mode)) {   // (darker on a light sky, lighter on a dark one: safe on both)
+      ['--color-dimmed', '--color-focus'].forEach(function (k) {
+        var a = lumHex(tk[k]), b = lumHex(cssTok[k]);
+        if (b >= 0 && (band.mode === 0 ? b < a : b > a)) tk[k] = cssTok[k];
+      });
+    }
     for (var k in tk) if (tokensWere[k] !== tk[k]) { root.style.setProperty(k, tk[k]); tokensWere[k] = tk[k]; }
   }
-  function unwords() { for (var k in tokensWere) root.style.removeProperty(k); tokensWere = {}; }
+  function unwords() { for (var k in tokensWere) root.style.removeProperty(k); tokensWere = {}; tokensKey = ''; }
+  function lumHex(h) {
+    var m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(h).trim()), i, c = [];
+    if (!m) return -1;
+    for (i = 1; i < 4; i++) { c[i - 1] = parseInt(m[i], 16) / 255; c[i - 1] = c[i - 1] <= 0.04045 ? c[i - 1] / 12.92 : Math.pow((c[i - 1] + 0.055) / 1.055, 2.4); }
+    return lumOf(c);
+  }
+  /* the stylesheet's own words for its still sky (read before any are set here) */
+  function readCss() {
+    var cs = window.getComputedStyle(root), o = {};
+    ['--color-text', '--color-dimmed', '--color-focus'].forEach(function (k) { o[k] = cs.getPropertyValue(k).trim(); });
+    o.mode = lumHex(o['--color-text']) > 0.5 ? 1 : 0;
+    return o;
+  }
 
   /* ---------------- the loop ---------------- */
 
-  var raf = 0, last = 0, still = false, frozen = false, base = 0, slow = 0, settled = 0, nameWas = '';
+  var raf = 0, last = 0, still = false, frozen = false, forcedOn = false, nameWas = '', afterTick = false, nudge = false;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)'), forced = window.matchMedia('(forced-colors: active)');
   function frame(now) {
     raf = 0;
-    if (lost || forced.matches) return;
+    if (lost || forcedOn || !gl) return;
     if (!ready) {
       var l = linked();
       if (l < 0) { gl = null; return; }
       if (l === 0) { raf = requestAnimationFrame(frame); return; }
-      ready = true; bakeNoise();
+      ready = true;
     }
-    var dt = last ? Math.min((now - last) / 1000, 1) : 0, step = Math.min(dt, STEP_MAX);
-    last = now;
-    if (dirty) { measure(); if (!cam.lent) ownCamera(); aimWind(); buffers(); }
-    if (!still) { t += step; govern(dt); }
-    var S = blend(t);
-    tendTowers(still ? 0 : step, S, still || frames === 0);
-    if (S.name !== nameWas) { root.setAttribute('data-sky', S.name); nameWas = S.name; }
-    /* all the GPU's work is done on the sky's drawing ticks (12 a second),
-       each ending with the window drawn: a browser may show the canvas
-       after any frame that drew at all (until the first sky is drawn, the
-       canvas is unseen, and the work goes on every frame) */
-    if (!shown[1] || still || now - lastShow >= 1000 / DRAW_FPS - 4) {
-      if (!job && (!still || !shown[1])) startJob(!shown[1]);
+    if (baked < 9) { bakeStep(); raf = requestAnimationFrame(frame); return; }
+    var dt = last ? Math.min((now - last) / 1000, 1) : 0, step = Math.min(dt, STEP_MAX), fps;
+    last = now; lastNow = now;
+    if (dirty) relayout();
+    if (!still) { t += step; acc += step; blow(step); govern(dt, now); }
+    fps = rate(NOW.sky ? NOW : blend(t, NOW));
+    /* all the GPU's work is done on the sky's drawing ticks, each ending with
+       the window drawn: a browser may show the canvas after any frame that
+       drew at all (until the first sky is drawn the canvas is unseen, and the
+       work goes on every frame) */
+    afterTick = false;
+    if (nudge && shown[1] && trusted && !(still || redo || now - lastShow >= 1000 / fps - 4)) {   // (the words moved: the veil with them, now)
+      nudge = false;
+      if (maskDirty) drawMask();
+      steer(0, NOW); words(now); show(NOW); lastShow = now;
+    }
+    if (!shown[1] || still || redo || now - lastShow >= 1000 / fps - 4) {
+      nudge = false;
+      afterTick = true;
+      lagCheck(now, fps);
+      blend(t, NOW);
+      tendTowers(still ? 0 : acc, NOW, still || frames === 0); acc = 0;
+      if (NOW.name !== nameWas) { root.setAttribute('data-sky', NOW.name); nameWas = NOW.name; }
+      if (redo || (!job && (fresh || !still || !shown[1]))) { redo = false; startJob(fresh || !shown[1]); fresh = false; }
       if (job) {
-        slice(job.fast || still ? Math.ceil(ch / 4) : Math.max(4, Math.ceil(ch * clamp((now - lastShow) / 1000, 0, 0.25) / (period * 0.85))));
+        slice(job.fast || still ? Math.ceil(ch / 4) : Math.ceil(ch / (job.period * fps) * 1.08));
         if (job.row >= ch) finishJob();
       }
       pollStats();
       if (!gl) return;
+      if (maskDirty) drawMask();
       if (shown[1]) {
-        steer(lastSteer < 0 ? 0 : Math.min((now - lastSteer) / 1000, 0.25), S); lastSteer = now;
-        words(); show(S); lastShow = now;
-        if (!trusted && ++waited > 3 * DRAW_FPS) trust(true);   // (no read-back at all: shown on the veil's word)
+        steer(lastSteer < 0 ? 0 : Math.min((now - lastSteer) / 1000, 0.5), NOW); lastSteer = now;
+        words(now); show(NOW); lastShow = now;
+        lagMark(now);
+        if (!trusted && !asked && ++waited > 3 * fps) trust(true);   // (nothing to read: no words on the page)
       }
     }
-    if (!still || job || sync || !trusted) raf = requestAnimationFrame(frame);
+    if (!still || job || sync || pending || redo || nudge || !trusted || now < fadeUntil) raf = requestAnimationFrame(frame);
   }
-  /* a slow device: a longer frame period first, then a smaller frame */
-  function govern(dt) {
-    if (dt <= 0 || dt > 0.25) return;
-    settled += dt;
-    base = base ? Math.min(base * 1.002, dt, base) : dt;
-    if (settled < 3) return;
-    slow = dt > base * 1.6 ? slow + dt : Math.max(0, slow - dt * 0.5);
-    if (slow > 2) {
-      slow = 0;
-      if (period < PERIOD_MAX) period = Math.min(PERIOD_MAX, period * 1.4);
-      else if (scale > SCALE_MIN) { scale = Math.max(SCALE_MIN, scale * 0.8); period = PERIOD * 1.4; buffers(); }
-      else { frozen = still = true; }                    // (too slow even so: the still sky, as it stands)
+  function relayout() {
+    measure(); if (!cam.lent) ownCamera(); aimWind(); buffers();
+    maskDirty = true; dirty = false;
+  }
+
+  /* a slow device, read two ways: the frame after each drawing tick coming
+     late (against the display's own pace, learnt and relearnt), and the GPU
+     still busy with one tick's work at the next. Slow for a while: a rung
+     down the ladder (and, at its foot, the still sky); easy for EASE: a
+     rung back up */
+  var base = 0, tickLate = 0, gpuLate = 0, since = 0, lagSync = null, lagAt = 0;
+  function govern(dt, now) {
+    if (dt <= 0 || dt > 0.25) return;                     // (a hidden tab, a pause: not slowness)
+    since += dt;
+    if (!base || dt < base) base = base ? base * 0.8 + dt * 0.2 : dt;
+    else base += (dt - base) * 0.03;                      // (the display's pace: falls fast, rises slowly)
+    if (afterTick) tickLate = tickLate * 0.9 + (dt > base * 1.7 ? 0.1 : 0);
+    if (since < 4) return;
+    if (tickLate > 0.5 || gpuLate > 0.5) {
+      if (level < LADDER.length - 1 || since > 10) { since = 0; tickLate = gpuLate = 0; }
+      if (level < LADDER.length - 1) { level++; buffers(); }
+      else if (since > 10) { frozen = still = true; }     // (slow even at the foot, a while: the still sky)
+      else return;
+    } else if (level > 0 && since > EASE && tickLate < 0.05 && gpuLate < 0.05) {
+      since = 0; level--; buffers();
     }
   }
-  function run() { if (!raf && gl && !lost) raf = requestAnimationFrame(frame); }
+  function lagMark(now) { if (!lagSync) { lagSync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0); lagAt = now; } }
+  function lagCheck(now, fps) {
+    if (!lagSync) return;
+    var st = gl.clientWaitSync(lagSync, 0, 0), done = st === gl.ALREADY_SIGNALED || st === gl.CONDITION_SATISFIED;
+    if (done || now - lagAt > 1000 / fps * 1.6) {
+      gpuLate = gpuLate * 0.85 + (done ? 0 : 0.15);
+      gl.deleteSync(lagSync); lagSync = null;
+    }
+  }
+  function run() { if (!raf && gl && !lost && !forcedOn) raf = requestAnimationFrame(frame); }
 
   /* the birds lend their camera */
   window.skyAir = {
     aim: function (f, th, w, h) {
       setCamera(f, th, w, h); cam.lent = true;
-      if (gl && ready) { aimWind(); job = null; shown[1] && (shown = [shown[1], shown[1]]); }
+      if (gl && ready) { aimWind(); job = null; fresh = true; }
       run();
     }
   };
 
-  function onLayout() { dirty = true; run(); }
+  function onLayout() { dirty = true; nudge = true; run(); }
   function onPref() {
     still = reduce.matches || frozen;
-    if (forced.matches) { canvas.classList.remove('on'); unwords(); return; }
-    job = null; run();
+    forcedOn = forced.matches;
+    if (forcedOn) { hide(); return; }
+    if (gl && !canvas.classList.contains('on')) distrust();   // (shown again once read again)
+    job = null; fresh = true; run();
   }
 
+  cssTok = readCss();
   if (!setup()) return;
   still = reduce.matches || frozen;
+  forcedOn = forced.matches;
   measure();
   if (!aimed) ownCamera();
   aimWind();
   buffers();
   dirty = false;
-  canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); lost = true; canvas.classList.remove('on'); unwords(); if (raf) cancelAnimationFrame(raf); raf = 0; });
+  canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); lost = true; hide(); if (raf) cancelAnimationFrame(raf); raf = 0; });
   canvas.addEventListener('webglcontextrestored', function () {
-    lost = false; ready = false; progs = {}; tex = {}; fb = {}; sync = null; pbo = null; cw = ch = 0; job = null; shown = [null, null];
-    if (setup()) { buffers(); run(); }
+    if (!gl) return;                                      // (let go on purpose: stays gone)
+    lost = false; ready = false; progs = {}; tex = {}; work = {}; finals = []; stale = []; shown = [null, null];
+    sync = null; pbo = null; pending = null; lagSync = null; cw = ch = 0; job = null; baked = 0; frames = 0;
+    distrust();
+    if (setup()) { still = reduce.matches || frozen; buffers(); run(); }
   });
   window.addEventListener('resize', onLayout);
   window.addEventListener('scroll', onLayout, { passive: true });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(onLayout);
+  if (window.ResizeObserver) {                            // (the words reflowed without the window changing: text spacing, zoom)
+    var watch = new ResizeObserver(onLayout);
+    ['.stack', 'footer'].forEach(function (q) { var e = document.querySelector(q); if (e) watch.observe(e); });
+  }
   if (reduce.addEventListener) { reduce.addEventListener('change', onPref); forced.addEventListener('change', onPref); }
   run();
 })();
