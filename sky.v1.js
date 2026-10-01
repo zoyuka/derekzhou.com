@@ -220,12 +220,12 @@
       sky: [[0.42, 0.07, 256], [0.37, 0.08, 260], [0.32, 0.088, 264], [0.27, 0.088, 266], [0.22, 0.08, 268]],
       tint: [0.38, 0.06, 250], tintAmt: 0.2, tintPow: 2, deep: 0.05,
       lightC: [0.8, 0.03, 250], lightI: 0.38, light: 'disc',
-      disc: { x: 0.18, y: 0.12, r: 0.6, i: 1.7, halo: 34, haloI: 0.16, wide: 0.012, c: [0.94, 0.02, 245] },
+      disc: { x: 0.18, y: 0.1, r: 0.6, i: 1.7, halo: 70, haloI: 0.2, wide: 0.01, c: [0.94, 0.02, 245] },
       ambU: [0.3, 0.08, 265], ambUI: 0.7, ambD: [0.36, 0.06, 255], ambDI: 0.5, alb: [0.95, 0.01, 250],
       sea: [1, 0.62, 0.05, 0.55], fog: 0.02, mist: 0.5, fogC: [0.4, 0.07, 258],
       deck: [7, 0.2, 0.4, 0.05], deckC: [0.38, 0.05, 260],
       towers: 0.5, tall: 0.85, stars: 1, rain: 0, rainC: [0.9, 0.02, 220],
-      shafts: 0.06, shaftC: [0.9, 0.02, 245], bloom: 0.1, exposure: 1.0, sat: 1.0
+      shafts: 0, shaftC: [0.9, 0.02, 245], bloom: 0.05, exposure: 1.0, sat: 1.0
     }
   };
   var COLOURS = ['tint', 'lightC', 'ambU', 'ambD', 'alb', 'fogC', 'deckC', 'rainC', 'shaftC'];
@@ -830,6 +830,8 @@
     ext.float = !!gl.getExtension('EXT_color_buffer_float');
     FORMATS = { rgba8: [gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE], rgba16f: [gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT], srgb: [gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE] };
     ext.par = gl.getExtension('KHR_parallel_shader_compile');
+    var info = gl.getExtension('WEBGL_debug_renderer_info'), who = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(who)) { frozen = true; scale = SCALE_MIN; }   // (drawn on the CPU: the still sky, drawn once)
     var codec = ext.float ? '#define ENC(c) (c)\n#define DEC(c) (c)\n'
                           : '#define ENC(c) sqrt(clamp((c) / (1.0 + (c)), 0.0, 1.0))\n#define DEC(c) ((c) * (c) / max(1.0 - (c) * (c), 1e-4))\n';
     var vs = compile(gl.VERTEX_SHADER, VERT);
@@ -1043,7 +1045,7 @@
     draw(p, fb[f], cw, ch);
     shown = shown[1] ? [shown[1], f] : [f, f];
     doneAt = t; frames++;
-    readStats(tex[f]);
+    readStats(tex[f], S);
     job = null;
   }
   function nextFinal() { var k; for (k = 0; k < 3; k++) if (shown[0] !== 'f' + k && shown[1] !== 'f' + k) return 'f' + k; return 'f0'; }
@@ -1093,10 +1095,28 @@
 
   /* ---------------- the words' colours, from what was drawn where they stand ---------------- */
 
-  var pbo = null, sync = null, statsOut = new Uint8Array(32), meta = document.querySelector('meta[name="theme-color"]');
-  function readStats(src) {
+  var pbo = null, sync = null, statsOut = new Uint8Array(32), statsFor = null, meta = document.querySelector('meta[name="theme-color"]');
+  var trusted = false, doubts = 0, waited = 0;
+  /* the sky's light where the words stand, as the gradient alone would have it */
+  function expected(S) {
+    var R = wordsR || stackR, d, e, c;
+    if (!R || !S) return -1;
+    d = fromWindow((R[0] + R[2]) / 2, (R[1] + R[3]) / 2); e = Math.max(0, Math.asin(clamp(d[1], -1, 1)) / DEG);
+    c = lerp3(S.sky[0], S.sky[1], sstep(0, 5, e)); c = lerp3(c, S.sky[2], sstep(5, 15, e));
+    c = lerp3(c, S.sky[3], sstep(15, 32, e)); c = lerp3(c, S.sky[4], sstep(32, 60, e));
+    return lumOf(c);
+  }
+  function sstep(a, b, x) { x = clamp((x - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); }
+  function trust(ok) {
+    trusted = true;
+    if (ok) { canvas.classList.add('on'); return; }
+    canvas.classList.remove('on'); unwords(); gl = null;
+    if (window.console) console.warn('sky: the drawn sky did not look right; the still sky stays');
+  }
+  function readStats(src, S) {
     var R = wordsR || stackR;
     if (!R || sync) return;
+    statsFor = S;
     var p = progs.stats;
     if (!fb.st) { tex.st = texture2(8, 1, 'rgba8', gl.NEAREST); fb.st = target(tex.st); pbo = gl.createBuffer(); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo); gl.bufferData(gl.PIXEL_PACK_BUFFER, 32, gl.STREAM_READ); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null); }
     gl.useProgram(p);
@@ -1119,6 +1139,11 @@
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     var sq = function (i) { var v = statsOut[i * 4] / 255; return v * v; };
     seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4) };
+    if (!trusted) {                                       // the sky drawn as it should be? (a GPU or driver that draws
+      var y = expected(statsFor);                         //  nonsense is let go, and the stylesheet's sky stays)
+      if (y < 0 || (seenT.mean > y / 4 && seenT.mean < y * 4 + 0.05)) trust(true);
+      else if (++doubts >= 2) { trust(false); return; }
+    }
     var top = '#', i, v;
     for (i = 0; i < 3; i++) { v = statsOut[12 + i]; top += (v < 16 ? '0' : '') + v.toString(16); }
     if (meta && top !== themeWas) { meta.setAttribute('content', top); themeWas = top; }
@@ -1137,7 +1162,7 @@
     if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
     k = still ? 1 : 1 - Math.exp(-dt / 0.6);
     for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
-    m = seen.mean; lo = Math.max(seen.mn, m - 2.2 * seen.sd); hi = Math.min(seen.mx, m + 2.2 * seen.sd);
+    m = seen.mean; lo = Math.max(seen.mn, m - 3 * seen.sd); hi = Math.min(seen.mx, m + 3 * seen.sd);
     w = Math.max(0.004, S.flipW);
     opened(mode, lo, hi, w);
   }
@@ -1175,7 +1200,7 @@
 
   /* ---------------- the loop ---------------- */
 
-  var raf = 0, last = 0, still = false, base = 0, slow = 0, settled = 0, nameWas = '';
+  var raf = 0, last = 0, still = false, frozen = false, base = 0, slow = 0, settled = 0, nameWas = '';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)'), forced = window.matchMedia('(forced-colors: active)');
   function frame(now) {
     raf = 0;
@@ -1193,20 +1218,25 @@
     var S = blend(t);
     tendTowers(still ? 0 : step, S, still || frames === 0);
     if (S.name !== nameWas) { root.setAttribute('data-sky', S.name); nameWas = S.name; }
-    if (!job && (!still || !shown[1])) startJob(!shown[1]);
-    if (job) {
-      slice(job.fast || still ? Math.ceil(ch / 4) : Math.max(4, Math.ceil(ch * step / (period * 0.85))));
-      if (job.row >= ch) {
-        finishJob();
-        if (!canvas.classList.contains('on')) canvas.classList.add('on');
+    /* all the GPU's work is done on the sky's drawing ticks (12 a second),
+       each ending with the window drawn: a browser may show the canvas
+       after any frame that drew at all (until the first sky is drawn, the
+       canvas is unseen, and the work goes on every frame) */
+    if (!shown[1] || still || now - lastShow >= 1000 / DRAW_FPS - 4) {
+      if (!job && (!still || !shown[1])) startJob(!shown[1]);
+      if (job) {
+        slice(job.fast || still ? Math.ceil(ch / 4) : Math.max(4, Math.ceil(ch * clamp((now - lastShow) / 1000, 0, 0.25) / (period * 0.85))));
+        if (job.row >= ch) finishJob();
+      }
+      pollStats();
+      if (!gl) return;
+      if (shown[1]) {
+        steer(lastSteer < 0 ? 0 : Math.min((now - lastSteer) / 1000, 0.25), S); lastSteer = now;
+        words(); show(S); lastShow = now;
+        if (!trusted && ++waited > 3 * DRAW_FPS) trust(true);   // (no read-back at all: shown on the veil's word)
       }
     }
-    pollStats();
-    if (shown[1] && (now - lastShow >= 1000 / DRAW_FPS - 4 || still)) {
-      steer(lastSteer < 0 ? 0 : Math.min((now - lastSteer) / 1000, 0.25), S); lastSteer = now;
-      words(); show(S); lastShow = now;
-    }
-    if (!still || job || sync) raf = requestAnimationFrame(frame);
+    if (!still || job || sync || !trusted) raf = requestAnimationFrame(frame);
   }
   /* a slow device: a longer frame period first, then a smaller frame */
   function govern(dt) {
@@ -1219,6 +1249,7 @@
       slow = 0;
       if (period < PERIOD_MAX) period = Math.min(PERIOD_MAX, period * 1.4);
       else if (scale > SCALE_MIN) { scale = Math.max(SCALE_MIN, scale * 0.8); period = PERIOD * 1.4; buffers(); }
+      else { frozen = still = true; }                    // (too slow even so: the still sky, as it stands)
     }
   }
   function run() { if (!raf && gl && !lost) raf = requestAnimationFrame(frame); }
@@ -1234,13 +1265,13 @@
 
   function onLayout() { dirty = true; run(); }
   function onPref() {
-    still = reduce.matches;
+    still = reduce.matches || frozen;
     if (forced.matches) { canvas.classList.remove('on'); unwords(); return; }
     job = null; run();
   }
 
   if (!setup()) return;
-  still = reduce.matches;
+  still = reduce.matches || frozen;
   measure();
   if (!aimed) ownCamera();
   aimWind();
