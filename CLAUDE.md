@@ -5,9 +5,11 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v10.css          All styles (versioned name — see Caching)
+/style.v11.css          All styles (versioned name — see Caching), the still sky of each hour
 /site.js                Email obfuscation only
-/birds.v8.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
+/hour.v1.js             The hour: which time of day the sky opens on (the page's one clock read)
+/sky.v1.js              The sky — light and cloud behind the page, cycling through the day (see Sky)
+/birds.v9.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -19,7 +21,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /robots.txt             Allow search engines, block AI crawlers
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security + caching + Early Hints headers
-/\_redirects             HTTPS enforcement
+/\_redirects             HTTPS enforcement; /CLAUDE.md and /.github/* are not served (to /)
 /\_routes.json           Scopes Pages Functions to /api/* only
 /.github/workflows/validate.yml  CI checks
 
@@ -74,8 +76,8 @@ Both live in the footer as the plain underlined words "Email" and
 
 ## Design
 
-One non-scrolling viewport: the typography on a light ground, and a sky:
-birds crossing the window in flights. The owner's briefs, verbatim:
+One non-scrolling viewport: the typography on a sky, birds crossing it in
+flights, light and cloud behind. The owner's briefs, verbatim:
 first "copy exactly how they did the dots here on Samara.com/jobs.
 Except instead of dots use birds and don't use dark background should be
 light."; then, of Samara's dots drifting and bouncing inside the window:
@@ -89,17 +91,35 @@ trying to do?"; then, of v5's pace (a phone's sky crossed in 10-17 s):
 "Are you sure everything should be moving this fast tho?"; then, of v7's
 flat sky, every lane drawn on the window's plane: "Y is the movement so 2D
 though. Did you even research as comprehensively as possible? Test using
-the most complex tools etc."
+the most complex tools etc."; then, of the background, paraphrased (the
+reference is a game the owner named; at the owner's word its name stays
+out of the repo, its commits and its PRs): make the background as like
+that game's luminous sky and cloud as it can be made, from the most
+comprehensive research and plan; and, choosing among the plan's options,
+every time of day in turn, the opening one by the visitor's own clock
+("All. Cycle through. The scene that users starts on depends on their
+system time"), the sky behind the words too ("Full sky."), and as close
+to the reference as possible ("You can do it - no shortcuts!"). So the
+first brief's light ground gives way, at the owner's choice, to a sky
+that is dark at dusk and at night.
 
-Light only (color-scheme: light). Tokens: bg #f9f8f1 (Samara's cream),
-text #000 (19.7:1), dimmed #5f5c56 (6.3:1), focus #8a6417 (a dark
-ochre, 5.0:1), selection ground #e6e2d6 under the black text (16.2:1).
-Type is matte: no text-shadow, no glow. Links are plain underlined words
-(1px, dimmed underline, .18em offset); nothing reacts to hover; OS
-cursors only. The type is present at first paint in its final place.
-Print hides the birds and the footer.
+The words' colours follow the sky (see Sky). On a light sky: text #000,
+the dimmed grey a warm grey worked out for 4.6:1 on the bio's own ground
+(never lighter than #5f5c56), focus a dark ochre for 3:1, selection
+#e6e2d6 under the black text; on a dark sky (dusk, night): text #fdfcf7,
+the dimmed grey a cool light grey for 4.6:1, focus a light gold,
+selection #3b3f55. The stylesheet carries each hour's colours for its
+still sky; the script refines them for the sky it drew (CSSOM custom
+properties on the root). bg #f9f8f1 (Samara's cream) stays the paper:
+print, and the colour under everything. color-scheme stays light (no
+form controls, no scrollbars); theme-color follows the top of the drawn
+sky. Type is matte: no text-shadow, no glow. Links are plain underlined
+words (1px, dimmed underline, .18em offset); nothing reacts to hover; OS
+cursors only. The type is present at first paint in its final place,
+in its hour's colours (hour.v1.js runs before the first paint). Print
+hides the sky, the birds and the footer, on white.
 
-## Birds (birds.v8.js)
+## Birds (birds.v9.js)
 
 The page is a sky, seen in depth. Birds cross it the way birds cross a
 real sky, built from field data (RESEARCH below) and nothing like v1/v2's
@@ -109,9 +129,13 @@ identical mark all moving alike ("Y they all look same and move all the
 same?"), or v5-v7's flat sky, every lane drawn on the window's own plane
 ("Y is the movement so 2D though.").
 
-THE SKY IN DEPTH (v8): the window is a camera looking out and up at the
-sky (FOV 60 degrees across its longer side, pitched up so the horizon lies
-HORIZON 0.08 of its height below its bottom edge), and every flight flies
+THE SKY IN DEPTH (v8): the window is a camera looking out over a sea of
+cloud and up at the sky (FOV 60 degrees across its longer side, pitched so
+the horizon lies HORIZON 0.2 of its height above its bottom edge (v9), or
+lower where the words come down that far: SEA_CLEAR 60 px below their
+margin, with SEA_MIN 5% of the height of sea at least), and lends that
+camera to the sky (skyAir.aim), so cloud and bird share one air; every
+flight flies
 a path in the air in front of it (x right, y up from the eye's level, z out
 along the ground, in px at nearness 1); all that is seen is that air in
 perspective (proj: nearness n = f / depth, px on the window a unit in the
@@ -140,11 +164,15 @@ is its kind's, held (paced) where it passes nearest so it never rushes
 across the window, never grows by more than GROW 1.2% of its size a
 second (looming captures attention) nor shrinks by more than SHRINK 3%
 (receding does not), never turns faster than TURN_SEEN 18 degrees a second
-on the window (a turn seen heading away sweeps round), and never crawls
-under SLOWEST 5 px/s; a path that would slow it below 0.45 of its pace is
-not flown. What moves a bird in seconds (its drift, a gust, a glide's
-sink) is gentled as far again, and as far as it is seen slower where it
-heads away (q). Two birds of one flight are never closer than SPACE_SEEN 2
+on the window (a turn seen heading away sweeps round; measured at the
+flight's widest birds as well as its leader, v9), and never crawls under
+SLOWEST 5 px/s; a path that would slow it below 0.45 of its pace is not
+flown. What moves a bird in seconds (its drift, a gust, a glide's sink)
+is gentled as far again, and as far as its slowest bird is seen slower
+where it heads away (q); and no path is flown on which any bird, as it
+will be drawn (drift, wander, gusts and all), turns faster than TURN_MAX
+22 degrees a second on the window (the planner's check, every STEP; a
+finch's bound and a thermal aside). Two birds of one flight are never closer than SPACE_SEEN 2
 px on the window (a near one passing a far one) nor SPACE 4 px in the air.
 
 THE DRAWING (every bird its own): the tattoo is the hand, not a stamp.
@@ -163,7 +191,8 @@ down.) Size and ink are distance: SPAN 22 px for a mid bird at nearness 1
 on a large window (x0.72-1.12 by the window), each kind crossing at its own
 nearness (SORTS depth, 0.6-1.3); a stroke of LINE 1.5-2.5 px by its size on
 the window, ink TONE 0.62-1 by its nearness, times its fade (the polyline's
-stroke-opacity; 1 under forced colors).
+stroke-opacity; 1 under forced colors). The ink is the words' colour
+(--color-text): black on a light sky, near-white on a dark one.
 
 THE KINDS (SORTS, and which patterns each flies: SORT_OF): geese (skeins,
 lines), ibis (lines, skeins), gulls (pairs, lone, lines), herons (lone:
@@ -288,7 +317,7 @@ visit is still everywhere), the season, and each flight's own stream
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v8.js sets each one's viewBox and size (room for the bird
+birds); birds.v9.js sets each one's viewBox and size (room for the bird
 at its nearest), polyline, stroke width and stroke opacity (attributes,
 the last two only when they change), and moves it with a CSSOM
 transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
@@ -360,27 +389,143 @@ frames rendered in Chromium with the page's clock stepped exactly
 then a browser pass checks the same live (in WebKit, Safari's engine,
 too, with the window's height changed as the page loads), and film
 strips, time-lapses and whole-page sheets across seeds are looked at by
-eye.
+eye. v9's raised horizon and turn check: the 10-minute suite on every
+viewport and scenario, all passing.
+
+## Sky (sky.v1.js, hour.v1.js)
+
+THE CAMERA is the birds' (above): the window looks out over a sea of
+cloud, the horizon a fifth of the way up from its bottom edge, and the
+sky is drawn through the camera the birds lend (skyAir.aim; without the
+birds, the same worked out here). Units: the sea's tops lie 1 below the
+eye; everything a bird flies is nearer than any cloud.
+
+WHAT IS DRAWN (WebGL2, one fragment shader, per pixel, back to front):
+the sky's light (a gradient by height above the horizon: 0, 5, 15, 32,
+60 degrees; warmed toward the light's side, deepened away from it, a
+haze band toward the horizon; the sun or the moon, their halos and a
+wider glow); a high deck at 5-7 (thin streaks, or a whole overcast with
+rain under it), fogged toward its own sky; cumulus towers rising out of
+the sea (TOWERS 6 slots: a two-sphere core and nine lobes on the dome's
+envelope, joined by a smooth minimum and eroded by tiling 3D noise, soft
+edged; lit by a wrapped sun, shadowed toward it by two looks along the
+light, bases darker, thin edges glowing when the light is behind them;
+each builds out of the sea or sinks back over BUILD 90 s, and gives way
+where it would rise behind the words); and the sea of cloud below the
+eye (a heightfield of domes, round caps smoothly joined, two sizes, the
+small only near; soft as cloud, self-shadowed at a low sun, rims lit
+against it; ending in the horizon's haze). Shadows take the sky's colour
+(ambient from above and below), lit faces the light's. Aerial
+perspective: everything fades with distance into the horizon's haze,
+and a low mist lies on the sea. Then light shafts (radial, from the sky
+seen near the sun), a soft glow (dual-filter bloom) and a shoulder for
+the highlights. The noise (64 cubed 3D, 256 square 2D) is baked on the
+GPU at start.
+
+THE DAY (SCENES; the round 14 minutes): dawn (75 s held, 55 s into the
+next), day (110, 60), rain (80, 60), sunset (80, 60), dusk (50, 60),
+night (90, 60); colours blended in OKLab, the sun and moon fading where
+they stand (the outgoing gone by the middle of a change, the incoming
+from it). Each time of day is the page's own, worked out from the light
+(a low sun golden, the air away from it deep; the cream at the haze),
+never taken from a picture: dawn lavender above, rose, peach at the
+rising sun; day azure, the sun behind and to the side, white cumulus
+with blue shadows; rain an overcast, teal-slate, rain falling; sunset
+mauve to rose to gold, the sun on the horizon, rays; dusk an olive
+murk, an amber glow under the horizon; night deep indigo, the moon, the
+stars. A visit opens on the visitor's hour (hour.v1.js: night 21-05,
+dawn 05-08, day 08-13, rain 13-16, sunset 16-19, dusk 19-21), as far
+through that time of day's hold as the hour is through its span.
+
+THE WORDS on every sky (the veil and the band): a frame's light where
+the words stand is read back (8 numbers: the bio's ground, its mean,
+spread, darkest and lightest; the window's top colour for theme-color;
+a PBO and a fence, never a stall) and followed smoothly; dark words
+want their ground no darker than FLIP 0.18, light words no lighter than
+HI_MAX (0.17); the dimmed grey is worked out for RATIO 4.6:1 on the
+bio's ground (mean +- 3 sd), the focus ring for RING 3.1:1. Where the
+words stand (their boxes grown WORDS_CORE 8 px, a Gaussian feather of
+WORDS_FEATHER 110 px; the links LINKS_CORE 6, LINKS_FEATHER 40) the
+composite holds the light inside the band, lifting or dimming only what
+would break it: contrast holds whatever the read-back says. The flip
+from dark words to light (sunset to dusk) and back (night to dawn)
+happens at a twilight: a change that flips the words eases into a
+waypoint where the sky behind the words, and the sea under the links,
+stand evenly at the crossing (TWILIGHT, calibrated as drawn), flips the
+words there on the cycle's own time, and eases out; the band pinches
+toward the crossing on the same schedule, so nothing jumps but the
+words. Measured (Chromium, SwiftShader; 3 viewports x 6 hours x 2
+moments, each text element's own colour against every ground pixel
+under its line boxes, the words hidden): every role at 4.5:1 or more,
+the dimmed grey 4.52-4.97.
+
+CALM AND COST: the clouds drift with one wind (SEA_DRIFT 0.45-0.8 px/s
+where the sea is nearest, less far off, the deck faster aloft) and the
+towers build and sink over minutes; the light changes over a minute;
+rain falls on twos (DRAW_FPS 12). A cloud frame (the window at SCALE 0.5
+of its CSS px, never over PX_MAX 640,000 px) is drawn in row slices over
+PERIOD 1.5 s and crossfaded into; the window is drawn 12 times a second
+(canvas at most CANVAS_DPR 1.5); all GPU work happens on those drawing
+ticks, each ending with the window drawn (a browser may present the
+canvas after any frame that drew at all: WebKit showed black). A slow
+device lengthens the period (to PERIOD_MAX 3.5 s), then draws smaller
+(to SCALE_MIN 0.3), then keeps the still sky; a renderer on the CPU
+(SwiftShader, llvmpipe and the like, by its name) gets the still sky
+from the start.
+
+FALLBACKS: the canvas shows only once its first frame's read-back looks
+like the sky it should be (a GPU or driver that draws nonsense is let
+go: the stylesheet's sky stays); a lost context hides it (the still sky
+of the hour) until restored; no WebGL2: the stylesheet's still sky of
+the hour (data-sky, by hour.v1.js), its colours and words; no script:
+the still day sky. prefers-reduced-motion: the hour's sky, drawn once,
+still (live both ways). forced-colors: no sky. A hidden tab draws
+nothing; the sky's clock steps at most 50 ms. A resize re-aims and
+redraws.
+
+THE WEATHER: one crypto.getRandomValues above sky.v1.js's INIT-END
+marker (the cloud field, the towers, the wind, the stars), and no clock:
+hour.v1.js reads the clock, once, and marks the page (data-sky,
+data-sky-at). No DOM is built: the canvas is in index.html.
+
+VERIFY before changing the sky: stills of every hour at 1440x900,
+390x844, 844x390 and 768x1024 (Chromium with SwiftShader, the page's
+clock faked); time-lapses of the round and stepped, frame-exact renders
+of each flip (the words hidden, the light measured where they stand);
+the contrast audit above; reduced motion, a lost and restored context,
+rotation, print, forced colours, the 404 page, no WebGL, no script; a
+forced-black sky (the fallback takes it); WebKit (Safari's engine); the
+bird suite and the live bird pass with the sky running.
 
 ## CSS
 
-One file: style.v10.css. Plain CSS. Custom properties for theming.
+One file: style.v11.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
-WCAG AA contrast on all dimmed text over the light ground.
-One keyframe, `appear` (a bird's 1 s fade-in, Samara's), off under
-prefers-reduced-motion; no transitions. :focus-visible is a 2px ochre
-outline, offset 3px, on every focusable.
+WCAG AA contrast on all dimmed text over every sky (the script holds it
+on the drawn sky; the stylesheet's still skies carry colours of their
+own). The still skies: a gradient per hour on the body (the sky to the
+horizon at four fifths of the way down, then the sea), :root[data-sky]
+choosing it and the words' colours. The canvas (.sky) is fixed behind
+everything (z-index -1), unseen until drawn. One keyframe, `appear` (a
+bird's 1 s fade-in, Samara's, off under prefers-reduced-motion; the
+sky's 2 s dissolve over the still sky, kept: a dissolve is not motion);
+no transitions. :focus-visible is a 2px outline in the focus colour,
+offset 3px, on every focusable.
 
 ## JS
 
-Two files, one job each:
+Four files, one job each:
 
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. birds.v8.js — the sky (see above). Progressive enhancement: with JS
-   off, the page is simply the typography on the light ground.
+2. hour.v1.js — the hour (in the head, before the first paint: tiny,
+   Early-Hinted): which time of day the sky opens on.
+3. sky.v1.js — the sky (see Sky), deferred, before the birds.
+4. birds.v9.js — the birds (see Birds), deferred. Progressive
+   enhancement throughout: with JS off, the page is the typography on
+   the still day sky.
 
 ## Type
 
@@ -433,18 +578,19 @@ preloaded in index.html and Early-Hinted via Link headers on / in
 \_headers. Never preload a font no rule uses (Chrome warns, and every
 first visit pays for it).
 
-Single light theme-color (#f9f8f1). The favicon is SVG-first
-with PNG fallback.
+theme-color opens at the cream (#f9f8f1) and follows the top of the drawn
+sky. The favicon is SVG-first with PNG fallback.
 
 ## Caching
 
 HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump
-style.vN.css → style.vN+1.css, birds.vN.js → birds.vN+1.js, .subN → .subN+1,
-and update every reference in the same commit — five files, nine edit
-points: index.html (stylesheet, script), 404.html (stylesheet),
-\_headers (the style Link preload, the style cache block, the birds cache
-block, the "next name" comment), .github/workflows/validate.yml
+style.vN.css → style.vN+1.css, birds.vN.js → birds.vN+1.js, sky.vN.js →
+sky.vN+1.js, hour.vN.js → hour.vN+1.js, .subN → .subN+1, and update every
+reference in the same commit — five files: index.html (stylesheet, hour,
+sky, birds), 404.html (stylesheet, hour), \_headers (the style and hour
+Link preloads, each file's cache block, the "next name" comment),
+.github/workflows/validate.yml
 (required files only — the Absences step resolves the shipped
 versioned names itself with ls, so it never needs editing), and this
 file (grep it for the old name). validate.yml's
@@ -467,19 +613,21 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v8.js, plus style.v10.css for cursors — never to this prose) fails
-on: arrows/cookie/analytics/Loading/navigation-role vocabulary in the
-HTML; any exit, idle, hover-position, key, blur, title, favicon-swap or
-storage handler in the JS; any DOM building in birds.v8.js; more or
-fewer than one getRandomValues in it, or one below its INIT-END marker;
-any Math.random or clock read (Date) in it; any URL hook
+birds.v9.js, sky.v1.js, hour.v1.js, plus style.v11.css for cursors —
+never to this prose) fails on: arrows/cookie/analytics/Loading/
+navigation-role vocabulary in the HTML; any exit, idle, hover-position,
+key, blur, title, favicon-swap or storage handler in the JS; any DOM
+building in the birds, the sky or the hour; more or fewer than one
+getRandomValues in the birds or the sky, or one below its INIT-END
+marker; any Math.random or clock read (Date) in either; anything in the
+hour but its one `new Date(` (no entropy); any URL hook
 (location.search/hash/href, URLSearchParams) or sound (Audio,
 AudioContext, <audio>, speechSynthesis) in the JS or HTML; and any
 `cursor:` rule in the stylesheet (OS cursors only).
 Trusted Types is NOT enabled, deliberately: Cloudflare Rocket Loader
 rewrites the script tags and re-executes them through dynamic .src
 assignment — a TT sink — so require-trusted-types-for 'script' kills
-site.js AND birds.v8.js on every TT-enforcing browser (verified by
+every script on the page on every TT-enforcing browser (verified by
 reproduction). If Rocket Loader is ever disabled in the Cloudflare
 dashboard, re-add to the three home-scope CSP blocks:
   ; require-trusted-types-for 'script'; trusted-types
@@ -494,6 +642,9 @@ header (the /404.html rule matches only direct requests), so 404.html
 carries the same policy in a meta http-equiv tag — keep the two in sync;
 frame-ancestors cannot ride the meta tag, X-Frame-Options on /* covers
 framing.
+The sky needs no CSP change: WebGL2 from a same-origin script, no
+workers, no blobs, no fetches. \_redirects sends /CLAUDE.md and
+/.github/* to / (they were served as static files).
 robots.txt blocks: GPTBot, ClaudeBot, CCBot, Google-Extended, ChatGPT-User,
 Bytespider, anthropic-ai, cohere-ai, FacebookBot.
 
