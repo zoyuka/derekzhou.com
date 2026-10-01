@@ -16,9 +16,12 @@
    and then a tail, in its kind's proportions (a gull long in the wing, a
    finch small and neat, a heron trailing its legs).
 
-   THE SKY IN DEPTH. The window is a camera looking out and up at the sky
-   (FOV across its longer side, the horizon a little below its bottom
-   edge), and every flight flies a path in the air in front of it:
+   THE SKY IN DEPTH. The window is a camera looking out over a sea of
+   cloud and up at the sky (FOV across its longer side, the horizon a
+   fifth of the window's height above its bottom edge, or lower where the
+   words come down that far), and every flight flies a path in the air
+   in front of it, nearer than any cloud; the sky behind (the sky's script) is
+   drawn through the same camera, lent to it (skyAir.aim):
    straight, or wheeling through a banked turn, climbing or sinking a
    little; across the window mostly, now and then angling away from it,
    seldom coming nearer. All that is seen is that air in perspective. A
@@ -102,7 +105,9 @@
 
   /* the depth: the window is a camera looking out and up at the sky */
   var FOV = 60 * DEG;          // across the window's longer side
-  var HORIZON = 0.08;          // the horizon this share of the window's height below its bottom edge (the camera looks up)
+  var HORIZON = -0.2;          // the horizon this share of the window's height above its bottom edge (-): the eye is above a sea of cloud
+  var SEA_CLEAR = 60;          // px: the horizon at least this far below the words' margin...
+  var SEA_MIN = 0.05;          // ...but never less than this share of the window's height of sea showing
   var FAR = 0.42;              // nearness (1: SPAN): a bird this far off is gone into the distance ...
   var FADE = 0.54;             // ... fading from here (the air between), never popping out
   var NEAR_MAX = 1.7;          // none nearer than this in view
@@ -119,7 +124,8 @@
   var UP_V = 0.06;             // spans: a V lies level in the air, give or take this
   var SPACE_SEEN = 2;          // px: two birds of a flight never closer than this on the window (a near one passing a far one)
   var SLOWEST = 5;             // px/s: nor slower than this anywhere in view (far off, going away)
-  var TURN_SEEN = 18;          // degrees a second: nor turning faster than this on the window (a turn seen heading away sweeps round)
+  var TURN_SEEN = 18;          // degrees a second: nor any bird of it turning faster than this on the window (a turn seen heading away sweeps round)
+  var TURN_MAX = 22;           // degrees a second: and no bird, as it will be drawn (its drift, the wander, a gust), ever turning faster (the planner's check)
 
   /* the sky */
   var OUT = 70;                // px beyond the window where a path begins and ends
@@ -292,14 +298,14 @@
 
   /* ---------------- the page: the window and the words ---------------- */
 
-  var W = 0, H = 0, words = [], dirty = true, wordsY = 0, view = 1;
+  var W = 0, H = 0, words = [], dirty = true, wordsY = 0, stackB = 0, view = 1;
   function measure() {
     W = window.innerWidth; H = window.innerHeight;
     view = clamp(Math.pow(Math.min(W, 1.6 * H) / 1100, 0.4), 0.72, 1.12);   // a small window shows its birds a little smaller
     words = [];
     var s = document.querySelector('.stack'), a = document.querySelectorAll('footer a'), i, r;
-    if (s) { r = s.getBoundingClientRect(); keep(r, WORDS); wordsY = (r.top + r.bottom) / 2; }
-    else wordsY = H / 2;
+    if (s) { r = s.getBoundingClientRect(); keep(r, WORDS); wordsY = (r.top + r.bottom) / 2; stackB = r.bottom; }
+    else { wordsY = H / 2; stackB = 0; }
     for (i = 0; i < a.length; i++) keep(a[i].getBoundingClientRect(), LINKS);
     dirty = false;
   }
@@ -391,14 +397,19 @@
 
   /* the air in front of the window: x to the right, y up from the eye's
      level, z out from the window along the ground, in px at nearness 1.
-     The camera looks up by the angle that puts the horizon HORIZON of the
-     window's height below its bottom edge. Aimed when a sky begins, and
-     held through small changes of the window's height (a phone's bar) */
-  var cam = { f: 1, c: 1, s: 0, x0: 0, y0: 0 };
+     The camera looks out over a sea of cloud: the horizon lies HORIZON of
+     the window's height above its bottom edge, or lower where the words
+     come down that far (SEA_CLEAR below them, a strip of SEA_MIN of the
+     sea at least), so the birds keep the open sky above it. Aimed when a
+     sky begins, and held through small changes of the window's height (a
+     phone's bar); the sky behind is drawn through the same camera */
+  var cam = { f: 1, c: 1, s: 0, x0: 0, y0: 0, hy: 0 };
   function camera() {
     cam.f = Math.max(W, H) / (2 * Math.tan(FOV / 2));
-    var th = Math.atan(H * (0.5 + HORIZON) / cam.f);
+    cam.hy = clamp(Math.max(H * (1 + HORIZON), stackB + WORDS + SEA_CLEAR), H * (1 + HORIZON), H * (1 - SEA_MIN));
+    var th = Math.atan((cam.hy - H / 2) / cam.f);
     cam.c = Math.cos(th); cam.s = Math.sin(th); cam.x0 = W / 2; cam.y0 = H / 2;
+    if (window.skyAir) window.skyAir.aim(cam.f, th, W, H);
   }
   /* a point in the air on the window (x, y) and its nearness n (px on the window a unit in the air) */
   function proj(x, y, z, o) {
@@ -1100,19 +1111,33 @@
      shrinking (coming nearer, going away) faster than GROW or SHRINK a
      second; a path that would slow it by more than half: not this one */
   function paced(F) {
-    var a = entering(F), b = leaving(F), ds = Math.max(4, (b - a) / 24), s, e, sig = 0, slow = Infinity, gr = 0, sh = 0, tr = 0, x0, y0, n0, d, g, g0 = NaN;
+    var a = entering(F), b = leaving(F), ds = Math.max(4, (b - a) / 24), s, e, sig = 0, slow = Infinity, gr = 0, sh = 0, tr = 0, x0, y0, n0, d, g, g0 = NaN, L = 0, i, k, seen = Infinity;
     path3(F, F.sa + a, wp); proj(wp.x, wp.y, wp.z, pp); x0 = pp.x; y0 = pp.y; n0 = pp.n;
     for (s = a + ds; s <= b + 1e-6; s += ds) {
       path3(F, F.sa + s, wp); proj(wp.x, wp.y, wp.z, pp);
       d = Math.sqrt((pp.x - x0) * (pp.x - x0) + (pp.y - y0) * (pp.y - y0)) / ds;   // px on the window a unit of path
       sig = Math.max(sig, d); slow = Math.min(slow, d);
       e = Math.log(pp.n / n0) / ds; gr = Math.max(gr, e); sh = Math.max(sh, -e);
-      g = Math.atan2(pp.y - y0, pp.x - x0);                // the way it runs on the window, and how fast that turns a unit of path
-      if (g0 === g0) { g0 = g - g0; tr = Math.max(tr, Math.abs(Math.atan2(Math.sin(g0), Math.cos(g0))) / ds); }
-      g0 = g; x0 = pp.x; y0 = pp.y; n0 = pp.n;
+      x0 = pp.x; y0 = pp.y; n0 = pp.n;
+    }
+    for (i = 0; i < F.m.length; i++) L = Math.max(L, Math.abs(F.m[i].lat), Math.abs(F.m[i].ly || 0));
+    L += DRIFT_P[1] * F.span;
+    for (k = -1; k <= 1; k++) {                           // how fast the way it runs on the window turns, a unit of path: the leader's,
+      g0 = x0 = NaN;                                      //  and a bird at either side of the flight's widest (perspective turns them unalike)
+      for (s = Math.max(0, a - L - ds); s <= Math.min(F.len, b + L + ds) + 1e-6; s += ds / 2) {
+        path3(F, F.sa + s, wp); proj(wp.x - Math.sin(wp.h) * k * L, wp.y, wp.z + Math.cos(wp.h) * k * L, pp);
+        if (!(pp.n > 0 && fadeOf(pp.n) >= 0.02 && inView(pp.x, pp.y, 0, 0))) { g0 = x0 = NaN; continue; }
+        if (x0 === x0) {
+          d = Math.sqrt((pp.x - x0) * (pp.x - x0) + (pp.y - y0) * (pp.y - y0)) / (ds / 2); seen = Math.min(seen, d);
+          g = Math.atan2(pp.y - y0, pp.x - x0);
+          if (g0 === g0) { g0 = g - g0; tr = Math.max(tr, Math.abs(Math.atan2(Math.sin(g0), Math.cos(g0))) / (ds / 2)); }
+          g0 = g;
+        }
+        x0 = pp.x; y0 = pp.y;
+      }
     }
     F.v = Math.min(F.vw, 0.92 * topSpeed() / (sig || 1), gr > 0 ? 0.9 * GROW / gr : Infinity, sh > 0 ? 0.9 * SHRINK / sh : Infinity, tr > 0 ? TURN_SEEN * DEG / tr : Infinity);
-    F.q = F.v / F.vw * Math.min(1, slow / F.n0);          // what moves it in seconds, gentled as far again, and as far as it is seen slower where it heads away: its path turns no sharper
+    F.q = F.v / F.vw * Math.min(1, Math.min(slow, seen) / F.n0);   // what moves it in seconds, gentled as far again, and as far as any bird of it is seen slower where it heads away: its path turns no sharper
     return F.v >= 0.45 * F.vw && F.v * slow >= SLOWEST;   // (and never so far off and slow that it seems to hang still)
   }
   /* the leader where it is in view: never growing or shrinking faster
@@ -1137,7 +1162,7 @@
      more, the calmer), -1 */
   function trialRun(F, it, A, budget) {
     var M = F.m, probe = it.probe ? F.probe : null, cnt = probe ? probe.length : M.length, bx = it.bx,
-        c0 = A ? A.cost : 0, i, j, m, row, g, gx, gy, e, tau, hw, hh;
+        c0 = A ? A.cost : 0, i, j, m, row, g, gx, gy, e, tau, hw, hh, tp = it.tp, turns = !F.soar && !F.still;
     it.spent = 0;
     for (;;) {
       tau = it.from + it.k * STEP;
@@ -1150,11 +1175,20 @@
         bx[4 * i] = NaN;
         spot(F, m, tau, tmp);
         if (tmp.x !== tmp.x || tmp.y !== tmp.y) return -1;
-        if (tmp.a < 0.02) continue;                       // gone into the distance
+        if (tmp.a < 0.02) { tp[5 * i] = NaN; continue; }   // gone into the distance
         hw = m.d.hw * tmp.n; hh = (m.d.hh + BOB * m.d.span) * tmp.n;   // its ink at its nearness, and the room its bob takes
         e = F.soar && tau >= m.tj && tau < m.tx ? 0 : F.edges;   // a soaring bird circles wholly inside the window
-        if (!inView(tmp.x, tmp.y, hw, hh)) { if (!e) return -1; continue; }
+        if (!inView(tmp.x, tmp.y, hw, hh)) { if (!e) return -1; tp[5 * i] = NaN; continue; }
         if (tmp.n > NEAR_MAX || !clearOfWords(tmp.x, tmp.y, hw, hh) || !withinEdges(tmp.x, tmp.y, hw, hh, e)) return -1;
+        if (turns && !m.w.bound) {                        // never turning sharply on the window, all it does in seconds and all (but a finch's bound)
+          j = 5 * i; gx = tmp.x - tp[j]; gy = tmp.y - tp[j + 1];  // (the way it went since it last moved half a px, and when: the middle of that)
+          if (gx !== gx) { tp[j] = tmp.x; tp[j + 1] = tmp.y; tp[j + 2] = NaN; tp[j + 3] = tau; }
+          else if (gx * gx + gy * gy > 0.25) {
+            g = Math.atan2(gy, gx); gx = g - tp[j + 2]; gy = (tp[j + 3] + tau) / 2;
+            if (Math.abs(Math.atan2(Math.sin(gx), Math.cos(gx))) > TURN_MAX * DEG * (gy - tp[j + 4])) return -1;
+            tp[j] = tmp.x; tp[j + 1] = tmp.y; tp[j + 2] = g; tp[j + 3] = tau; tp[j + 4] = gy;
+          }
+        }
         it.near = Math.min(it.near, room(tmp.x, tmp.y, hw, hh, e));
         it.yLo = Math.min(it.yLo, tmp.y - hh); it.yHi = Math.max(it.yHi, tmp.y + hh);   // the band it flies in (and how far across)
         it.xLo = Math.min(it.xLo, tmp.x - hw); it.xHi = Math.max(it.xHi, tmp.x + hw);
@@ -1180,7 +1214,7 @@
       c0 = A ? A.cost : 0;
     }
   }
-  function trialIt(from, probe) { return { from: from, k: 0, near: ROOMY, apart: 200, probe: probe, spent: 0, yLo: Infinity, yHi: -Infinity, xLo: Infinity, xHi: -Infinity, bx: new Float64Array(48) }; }
+  function trialIt(from, probe) { return { from: from, k: 0, near: ROOMY, apart: 200, probe: probe, spent: 0, yLo: Infinity, yHi: -Infinity, xLo: Infinity, xHi: -Infinity, bx: new Float64Array(48), tp: new Float64Array(60).fill(NaN) }; }
   /* the whole trial at once (a flight re-checked after the page moved) */
   function trial(F, from) {
     var it = trialIt(from, false);

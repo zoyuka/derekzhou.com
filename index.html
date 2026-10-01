@@ -20,7 +20,8 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Derek Zhou — Technology Leader">
   <meta name="twitter:description" content="Hands-on technology leader with genuine enthusiasm for AI products and the outcomes they enable.">
-  <link rel="stylesheet" href="/style.v10.css">
+  <link rel="stylesheet" href="/style.v11.css">
+  <script data-cfasync="false" src="/hour.v1.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -34,6 +35,8 @@
   </script>
 </head>
 <body>
+  <!-- The sky, drawn behind everything by the sky's script (hidden until it is drawn). -->
+  <canvas class="sky" aria-hidden="true"></canvas>
 
   <main>
     <div class="stack">
@@ -55,7 +58,7 @@
     <noscript><p class="noscript-email">hello&#64;derekzhou&#46;com</p></noscript>
   </footer>
 
-  <!-- The sky: up to twelve birds, drawn and flown by birds.v8.js (hidden until they fly). -->
+  <!-- Up to twelve birds, drawn and flown by the birds' script (hidden until they fly). -->
   <svg class="bird" aria-hidden="true" focusable="false"><polyline points="0,0"/></svg>
   <svg class="bird" aria-hidden="true" focusable="false"><polyline points="0,0"/></svg>
   <svg class="bird" aria-hidden="true" focusable="false"><polyline points="0,0"/></svg>
@@ -70,6 +73,7 @@
   <svg class="bird" aria-hidden="true" focusable="false"><polyline points="0,0"/></svg>
 
   <script src="/site.js"></script>
-  <script src="/birds.v8.js" defer></script>
+  <script src="/sky.v1.js" defer></script>
+  <script src="/birds.v9.js" defer></script>
 </body>
 </html>

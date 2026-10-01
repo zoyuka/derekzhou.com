@@ -82,9 +82,11 @@
 }
 
 /* ------------------------------------------------
-   Tokens — black ink on Samara's cream (#f9f8f1).
-   Text 19.7:1, dimmed 6.3:1, focus (a dark ochre) 5.0:1 on the ground;
-   selection is a light warm grey under the black text (16.2:1).
+   Tokens — the paper: black ink on Samara's cream (#f9f8f1), text
+   19.7:1, dimmed 6.3:1, focus (a dark ochre) 5.0:1, selection a light
+   warm grey under the black text (16.2:1). The page's ground is a sky
+   now (below): each time of day sets its own words' colours (the still
+   skies), and the drawn sky sets them afresh from what it drew.
    ------------------------------------------------ */
 
 :root {
@@ -138,10 +140,86 @@ body {
 }
 
 /* ------------------------------------------------
+   The sky — behind everything, the whole window. The sky's script draws it
+   (WebGL2) and fades it in over the stylesheet's still sky of the hour
+   (data-sky, set by the hour's script before the first paint). The words'
+   colours follow the sky: dark on a light one, light on a dark one; the
+   script refines them for the sky it drew (4.7:1 for the dimmed words).
+   With no script the page is the still day sky.
+   ------------------------------------------------ */
+
+.sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sky.on {
+  opacity: 1;
+  animation: appear 2s;
+}
+
+/* the still skies: the sky from the top edge to the horizon (four
+   fifths of the way down), then the sea of cloud */
+body {
+  background: linear-gradient(to bottom, #70b6ea 0%, #7dbde6 26%, #a4d6ef 52%, #cce8f3 72%, #e2f1f6 78%, #f1f6f7 82%, #dce9f1 92%, #cddff0 100%) #a4d6ef;
+}
+
+:root[data-sky="dawn"] body {
+  background: linear-gradient(to bottom, #b0a9d3 0%, #b9a9cc 26%, #dcbccd 52%, #f0c9c7 72%, #f8d6c6 78%, #fbe9dd 82%, #ead7da 92%, #dccbd9 100%) #dcbccd;
+}
+
+:root[data-sky="rain"] body {
+  background: linear-gradient(to bottom, #809aa9 0%, #7f9aa6 26%, #829fa7 52%, #98b5b8 72%, #a9c4c4 78%, #b9cccd 82%, #9eb3b8 92%, #8aa1aa 100%) #829fa7;
+}
+
+:root[data-sky="sunset"] body {
+  background: linear-gradient(to bottom, #c5a4c4 0%, #c9a5b6 26%, #ebbfba 52%, #f8d0b4 72%, #fddcb1 78%, #fde8cc 82%, #efd2c4 92%, #dfc0be 100%) #ebbfba;
+}
+
+:root[data-sky="dusk"] body {
+  background: linear-gradient(to bottom, #1a3132 0%, #263c30 26%, #3b4730 52%, #504f2b 72%, #5f4a1d 78%, #554d29 82%, #4f4c38 92%, #3d3d32 100%) #3b4730;
+}
+
+:root[data-sky="night"] body {
+  background: linear-gradient(to bottom, #0d1842 0%, #132556 26%, #1c3160 52%, #283f69 72%, #314c71 78%, #364e72 82%, #2a3d63 92%, #20325a 100%) #1c3160;
+}
+
+/* the words on the still skies: each colour holds against its sky's whole
+   gradient, wherever a window puts the words (CI checks it: text and the
+   dimmed grey 4.5:1, the focus ring 3:1) */
+:root[data-sky="rain"] {
+  --color-dimmed: #2d2c2a;
+  --color-focus: #5b3e0c;
+}
+
+:root[data-sky="dusk"],
+:root[data-sky="night"] {
+  --color-text: #fdfcf7;
+  --color-dimmed: #bcc3cb;
+  --color-focus: #d4ae5c;
+  --color-selection: #3b3f55;
+}
+
+:root:not([data-sky]),
+:root[data-sky="day"],
+:root[data-sky="dawn"],
+:root[data-sky="sunset"] {
+  --color-dimmed: #413f3d;
+  --color-focus: #734f12;
+}
+
+/* ------------------------------------------------
    The birds — samara.com/jobs's dots (body > .dot), as birds: fixed to
    the window, over the page like Samara's, fading in over a second when
-   each appears. birds.v1.js moves them; without it they never show.
-   They never take a click: links under a bird still work.
+   each appears. The birds' script moves them; without it they never show.
+   They never take a click: links under a bird still work. Their ink is
+   the words' (dark on a light sky, light on a dark one).
    ------------------------------------------------ */
 
 .bird {
@@ -261,6 +339,7 @@ footer a, .back-link {
 
 @media (forced-colors: active) {
   .bird { stroke: CanvasText; }
+  .sky { display: none; }
 }
 
 /* ------------------------------------------------
@@ -269,11 +348,14 @@ footer a, .back-link {
 
 @media print {
   .bird,
+  .bird.on,
+  .sky,
   footer {
     display: none;
   }
 
-  body {
+  body,
+  :root[data-sky] body {
     color: #000;
     background: #fff;
   }

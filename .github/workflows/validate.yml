@@ -16,9 +16,11 @@ jobs:
         run: |
           files=(
             index.html
-            style.v10.css
+            style.v11.css
             site.js
-            birds.v8.js
+            hour.v1.js
+            sky.v1.js
+            birds.v9.js
             robots.txt
             _headers
             _redirects
@@ -115,9 +117,13 @@ jobs:
           done
           # And the reverse: the versioned css/js the repo ships must be the
           # ones index.html loads.
-          for f in style.v*.css birds.v*.js; do
+          for f in style.v*.css birds.v*.js sky.v*.js hour.v*.js; do
             if [ -f "$f" ] && ! grep -q "\"/$f\"" index.html; then
               echo "::error::$f exists but index.html does not reference it"
+              fail=1
+            fi
+            if [ -f "$f" ] && ! grep -qx "/$f" _headers; then
+              echo "::error::$f has no immutable cache block in _headers"
               fail=1
             fi
           done
@@ -138,8 +144,8 @@ jobs:
 
       - name: Absences are enforced
         run: |
-          JS=$(ls birds.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
-          echo "checking $JS and $CSS"
+          JS=$(ls birds.v*.js | head -1); SKY=$(ls sky.v*.js | head -1); HOUR=$(ls hour.v*.js | head -1); CSS=$(ls style.v*.css | head -1)
+          echo "checking $JS, $SKY, $HOUR and $CSS"
           # The page has none of the internet's body language, and CI fails
           # (rather than remembers) if any of it comes back. Scoped to the
           # shipped files only — never to CLAUDE.md prose.
@@ -150,36 +156,44 @@ jobs:
             fail=1
           fi
           # (2) behaviour: no exit, idle, pointer-position, key or title handlers
-          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage|localStorage' site.js $JS; then
+          if grep -nE 'beforeunload|[^a-z]unload|mouseleave|mouseout|onblur|\bblur\(|document\.title|rel="icon"|pointermove|mousemove|keydown|IdleDetector|sessionStorage|localStorage' site.js $JS $SKY $HOUR; then
             echo "::error::a needy behaviour (exit/idle/title/pointer handler or storage) was introduced"
             fail=1
           fi
-          # (3) the birds add no DOM: they are the SVGs in index.html
-          if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS; then
-            echo "::error::$JS builds DOM — the birds live in index.html"
+          # (3) the birds and the sky add no DOM: the SVGs and the canvas are in index.html
+          if grep -nE 'createElement|innerHTML|insertAdjacentHTML|appendChild' $JS $SKY $HOUR; then
+            echo "::error::DOM built in script — the birds and the sky's canvas live in index.html"
             fail=1
           fi
-          # (4) the weather (=rand()): ONE entropy read, above INIT-END; no clock; never Math.random
-          if [ "$(grep -c 'getRandomValues(' $JS)" != "1" ]; then
-            echo "::error::$JS must draw entropy exactly once (getRandomValues( count != 1)"
-            fail=1
-          fi
-          if grep -nE 'Math\.random|new Date|Date\.now' $JS; then
-            echo "::error::Math.random or a clock read in $JS — the only randomness is the visit seed"
-            fail=1
-          fi
-          if ! grep -q -- '---- INIT-END:' $JS; then
-            echo "::error::INIT-END marker missing from $JS"
-            fail=1
-          fi
-          bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date/{print NR": "$0}' $JS)
-          if [ -n "$bad" ]; then
-            echo "$bad"
-            echo "::error::an entropy or clock read below the INIT-END marker"
+          # (4) the weather (=rand()): ONE entropy read each in the birds and the sky, above
+          # INIT-END; no clock but the hour's one read; never Math.random
+          for f in $JS $SKY; do
+            if [ "$(grep -o 'getRandomValues(' $f | wc -l)" != "1" ]; then
+              echo "::error::$f must draw entropy exactly once (getRandomValues( count != 1)"
+              fail=1
+            fi
+            if grep -nE 'Math\.random|\bDate\b|randomUUID' $f; then
+              echo "::error::Math.random or a clock read in $f — the only randomness is the visit seed"
+              fail=1
+            fi
+            if ! grep -q -- '---- INIT-END:' $f; then
+              echo "::error::INIT-END marker missing from $f"
+              fail=1
+            fi
+            bad=$(awk '/---- INIT-END:/{p=1;next} p && /getRandomValues|Math\.random|Date|randomUUID|performance\.now/{print NR": "$0}' $f)
+            if [ -n "$bad" ]; then
+              echo "$bad"
+              echo "::error::an entropy or clock read below the INIT-END marker in $f"
+              fail=1
+            fi
+          done
+          # the hour reads the clock exactly once, and draws no entropy
+          if [ "$(grep -o 'new Date(' $HOUR | wc -l)" != "1" ] || [ "$(grep -oE '\bDate\b' $HOUR | wc -l)" != "1" ] || grep -nE 'Math\.random|getRandomValues|randomUUID|performance\.now' $HOUR; then
+            echo "::error::$HOUR must read the clock exactly once (new Date) and nothing else"
             fail=1
           fi
           # (5) no URL hook, no sound, no custom cursor
-          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS index.html 404.html; then
+          if grep -nE 'location\.(search|hash|href)|URLSearchParams|new Audio\(|AudioContext|<audio|speechSynthesis' site.js $JS $SKY $HOUR index.html 404.html; then
             echo "::error::a URL hook or sound was introduced"
             fail=1
           fi
@@ -189,6 +203,57 @@ jobs:
           fi
           [ "$fail" -eq 0 ] && echo "All absences hold"
           exit $fail
+
+      - name: Still skies keep the words legible
+        run: |
+          # The stylesheet's still skies (no WebGL2, no script, the moment
+          # before the sky is drawn) must hold their words' colours against
+          # the whole gradient, wherever a window puts the words: text and
+          # the dimmed grey 4.5:1, the focus ring 3:1 (WCAG 1.4.3, 1.4.11).
+          CSS=$(ls style.v*.css | head -1)
+          python3 - "$CSS" <<'EOF'
+          import re, sys
+          css = re.sub(r'/\*.*?\*/', '', open(sys.argv[1]).read(), flags=re.S)
+          def lin(v): v /= 255; return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+          def rgb(h): h = h.lstrip('#'); return [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+          def Y(c): r, g, b = [lin(x) for x in c]; return 0.2126 * r + 0.7152 * g + 0.0722 * b
+          def ratio(a, b): a, b = Y(a), Y(b); return (max(a, b) + .05) / (min(a, b) + .05)
+          rules = re.findall(r'([^{}]+)\{([^{}]*)\}', css)
+          def tokens(name):
+              out = {}
+              for sel, body in rules:
+                  sels = [x.strip() for x in sel.split(',')]
+                  if ':root' in sels or ':root[data-sky="%s"]' % name in sels or (name == 'day' and ':root:not([data-sky])' in sels):
+                      out.update(dict(re.findall(r'(--color-[a-z]+):\s*(#[0-9a-fA-F]{6})', body)))
+              return out
+          def gradient(name):
+              sel = 'body' if name == 'day' else ':root[data-sky="%s"] body' % name
+              for s_, body in rules:
+                  if s_.strip() == sel:
+                      m = re.search(r'linear-gradient\(to bottom, ([^)]*)\)\s*(#[0-9a-fA-F]{6})?', body)
+                      if m:
+                          stops = [(float(p.rstrip('%')) / 100, rgb(c)) for c, p in (x.split() for x in m.group(1).split(','))]
+                          return stops, (rgb(m.group(2)) if m.group(2) else None)
+              return None, None
+          fail = 0
+          for name in ['day', 'dawn', 'rain', 'sunset', 'dusk', 'night']:
+              stops, solid = gradient(name); t = tokens(name)
+              if not stops: print('::error::no still sky for', name); fail = 1; continue
+              ground = [solid] if solid else []
+              for k in range(201):
+                  y = k / 200
+                  for (p0, c0), (p1, c1) in zip(stops, stops[1:]):
+                      if p0 <= y <= p1:
+                          f = (y - p0) / (p1 - p0) if p1 > p0 else 0
+                          ground.append([c0[i] + (c1[i] - c0[i]) * f for i in range(3)])
+                          break
+              for role, need in [('--color-text', 4.5), ('--color-dimmed', 4.5), ('--color-focus', 3.0)]:
+                  worst = min(ratio(rgb(t[role]), g) for g in ground)
+                  print('%-7s %-15s %5.2f' % (name, role, worst))
+                  if worst < need:
+                      print('::error::%s on the %s still sky falls to %.2f:1 (needs %.1f)' % (role, name, worst, need)); fail = 1
+          sys.exit(fail)
+          EOF
 
       - name: Validate HTML
         run: |
