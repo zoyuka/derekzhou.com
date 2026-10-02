@@ -42,7 +42,7 @@
    frame is stored in 8 bits (no bands).
 
    THE SKIES (the cycle). Thirteen skies, each a time of day, a weather and
-   what its light does: sunrise, the glory, the cloud prairie, the halo,
+   what its light does: sunrise, the glory, fair weather, the halo,
    silver rain, the rainbow, golden hour, the afterglow, the blue hour, a
    moonlit sea, the Milky Way, the aurora, and the light before sunrise. A
    visit opens on a sky of the visitor's hour (hour.v2.js marks it), part
@@ -119,6 +119,9 @@
   var AIR = 0.578;            // the words' own air: under dark words the bio's ground no darker than this, so the
                               //  bold black stays 2.6:1 against the dimmed grey (relaxed as a change nears the flip,
                               //  and never lifted past the mean of the sky's own light there)
+  var AIR_LIGHT = 0.095;      // ... and under light words no lighter than this, so the near-white keeps 1.5:1 from
+                              //  the dimmed grey (relaxed the same way, and never dimmed below the sky's own mean:
+                              //  on a phone turned sideways the words come down onto the glow at the horizon)
   var DEG = Math.PI / 180;
 
   /* ---------------- the visit's streams (splitmix32) ---------------- */
@@ -227,7 +230,7 @@
       deck: [7, 0.2, 0.45, 0.04], deckC: [0.93, 0.03, 30], towers: 0.55, tall: 0.8, bloom: 0.12,
       glory: 1, belt: 0.25, motes: 0.3
     },
-    day: {      // the cloud prairie: azure, big round cumulus, shadows the sky's own blue
+    day: {      // fair weather: azure, big round cumulus, shadows the sky's own blue
       group: 'day', words: 0, hold: 110, move: 60, near: ['halo', 'rain', 'rainbow', 'sunset', 'glory'],
       sky: [[0.95, 0.022, 212], [0.925, 0.035, 220], [0.89, 0.058, 228], [0.805, 0.09, 236], [0.745, 0.105, 240]],
       tint: [0.975, 0.02, 100], tintAmt: 0.32, tintPow: 2.5, deep: 0.1,
@@ -1651,7 +1654,8 @@
       bandN.lo = FLIP; bandN.hi = FLIP + w;
       bandL.lo = Math.max(FLIP, llo * 0.97); bandL.hi = Math.max(bandL.lo + 0.004, FLIP + w);
     } else {
-      band.hi = Math.min(HI_MAX, hi * 1.03); band.lo = Math.min(band.hi - 0.004, Math.max(0, HI_MAX - w));
+      band.hi = Math.min(HI_MAX, hi * 1.03, Math.max(mix(HI_MAX, AIR_LIGHT, clamp(w * 1.5 - 0.5, 0, 1)), m));
+      band.lo = Math.min(band.hi - 0.004, Math.max(0, HI_MAX - w));
       bandN.lo = Math.max(0, HI_MAX - w); bandN.hi = HI_MAX;
       bandL.hi = Math.min(HI_MAX, lhi * 1.03); bandL.lo = Math.min(bandL.hi - 0.004, Math.max(0, HI_MAX - w));
     }

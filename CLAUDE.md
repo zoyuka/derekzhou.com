@@ -462,8 +462,8 @@ and deck against the towers).
 
 THE SKIES (SCENES, thirteen; no round, no clock): sunrise (lavender
 above, peach at the rising sun, mist, the Belt of Venus opposite), the
-glory (the sun low behind the eye, the cloud sea lit full on), the cloud
-prairie (azure, big round cumulus, shadows the sky's own blue), the halo
+glory (the sun low behind the eye, the cloud sea lit full on), fair
+weather (azure, big round cumulus, shadows the sky's own blue), the halo
 (a high veil of ice), silver rain (a light overcast, showers far off),
 the rainbow (after the rain, the sun low behind the eye), golden hour
 (the sun on the sea, rim-lit towers, rays, a pillar), the afterglow (tops
@@ -479,7 +479,13 @@ into most naturally (near). A visit opens on a sky of the visitor's hour
 nine tenths as far through its hold as the hour is through its span; the
 light before sunrise is never a landing. After that the order is the
 weather's, with no clock (the owner's word): each next sky is drawn from
-its near ones, or (FAR 28%) from any, never one of the last RECENT 3.
+its near ones, or (FAR 38%) from any, never one of the last RECENT 3; a
+sky not yet seen this visit weighs more (1 / (1 + 2 x its visits)), and
+after a run of skies of one kind of words the other kind weighs four
+times as much, so a stay sees day and night. Simulated (the real file,
+400 visits from each hour, a stay of 15 minutes): about 6.5 skies; both
+kinds of words in 88-98% of stays, the other kind after a median of
+265-415 s; about 1.6 passes through the cloud and 1.7 flips.
 Colours blend in OKLab; a sun or moon fades where it stands (the outgoing
 gone by the middle of a change, the incoming from it); light and sun
 directions pass over the top where two skies face apart. A change
@@ -510,7 +516,19 @@ LINKS_CORE 6, LINKS_FEATHER 40; drawn into a mask texture when the page
 moves, a ResizeObserver catching reflows that move no window: text
 spacing, zoom) the composite holds the light inside each band, lifting
 or dimming only what would break it: contrast holds whatever the
-read-back says. A scroll redraws the veil on the next frame. The words'
+read-back says. The hold is full in the core and eased out across the
+feather by the mask's strength (the clamped light mixed with the sky's
+own; a threshold scaled by the mask, v2's first cut, is crossed only
+near the core and drew the veil's edge as a box). Under dark words the
+bio's ground is held no darker than AIR 0.578 too, so the black stays
+2.6:1 from the dimmed grey: relaxed as a change nears a flip, and never
+lifted past the mean of the sky's own light there (ramped on the
+change's schedule it ran ahead of a sky still brightening out of the
+twilight, and showed). Where the words stand the sky's events step back
+to a fifth (the bow, the halo and sun dogs, the belt, a pillar, the
+galaxy, the aurora, the wisps): no word is set on a phenomenon. Light
+words keep the dimmed grey 1.7:1 or more from the near-white: the skies
+after sunset and before sunrise hold their glow low, below the words. A scroll redraws the veil on the next frame. The words'
 colours are set only while the drawn sky shows (otherwise the
 stylesheet's are left alone); while it fades in over the still sky (2 s)
 they take the safer of the two sets (darker on a light sky, lighter on a
@@ -528,7 +546,7 @@ under its line boxes, the words hidden; the ring against the ground 2-6
 px about each link): settled, 3 viewports x 6 hours, every text role
 4.6:1 or more and the ring 3.23 or more; through the fade-in (0, 0.7,
 1.4 s), 3 viewports x 6 hours, the dimmed grey 4.70 or more, the ring
-3.34 or more.
+3.34 or more (v1's figures; v2's: AUDIT_V2).
 
 CALM AND COST: the clouds drift with one wind (SEA_DRIFT 0.45-0.8 px/s
 where the sea is nearest, less far off, the deck faster aloft; the
@@ -583,6 +601,10 @@ written into the page in flight) and every hour at 1440x900, 390x844,
 844x390 and 768x1024 (Chromium with SwiftShader, the page's clock
 faked); time-lapses of the random order over 15 minutes and more, and
 stepped, frame-exact renders of each flip (the words hidden, the light measured where they stand);
+a probe through each flip (the served file patched in flight to expose
+the read-back and the bands: no lift past the sky's own mean after a
+flip, 1.04-1.08 at the crossing); the still skies re-derived from renders
+when the skies change (the towers left out);
 the contrast audit above, settled and through the fade-in; reduced
 motion, a lost and restored context, rotation (no blank frame), print,
 forced colours, the 404 page, no WebGL, no script; a forced-black sky
@@ -597,9 +619,12 @@ One file: style.v12.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
 WCAG AA contrast on all text over every sky (the script holds it on the
-drawn sky). The still skies: a gradient per hour on the body (the sky to
-the horizon at four fifths of the way down, then the sea), :root[data-sky]
-choosing it and the words' colours; each sky's colours hold against its
+drawn sky). The still skies: a gradient per time of day on the body (the
+sky to the horizon at four fifths of the way down, then the sea), each
+the drawn skies of that time of day taken row by row (1440x900, the words
+hidden, the towers left out) and averaged in OKLab, so the drawn sky
+dissolves in over its own; :root[data-sky] choosing it and the words'
+colours, per time of day; each sky's colours hold against its
 whole gradient, wherever a window puts the words (text and the dimmed
 grey 4.7:1 or more, the focus ring 3.3:1; CI samples every gradient as
 the browser draws it and fails below 4.5 and 3). The canvas (.sky) is fixed behind
