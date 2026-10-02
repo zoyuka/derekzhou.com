@@ -393,13 +393,17 @@
   /* the order the skies come in: the visit opens on a sky of the visitor's
      hour (hour.v1.js marks it), part way through it; after that, wherever
      the weather goes: mostly into a neighbouring sky, now and then (FAR)
-     into any other through the cloud, never back into one of the last few */
-  var FAR = 0.28, RECENT = 3;
+     into any other through the cloud, never back into one of the last few;
+     skies not yet seen this visit come sooner, and after a run of skies of
+     one kind of words (all light skies, or all dark) the other kind is
+     likelier, so a stay of a quarter of an hour sees day and night */
+  var FAR = 0.38, RECENT = 3;
   var LAND = {};
   IDS.forEach(function (n) { var S = SCENES[n]; if (S.land !== false) (LAND[S.group] = LAND[S.group] || []).push(n); });
   var root = document.documentElement;
   var rCycle = stream(front() * 4294967296);
   var openGroup = root.getAttribute('data-sky'), openAt = parseFloat(root.getAttribute('data-sky-at')), seq = [];
+  var visits = {}, run = 0;                             // (how often each sky has come; the run of one kind of words)
   if (!LAND[openGroup]) openGroup = 'day';
   if (!(openAt >= 0 && openAt <= 1)) openAt = 0.5;
   var opening = root.getAttribute('data-sky-scene');   // (the studio's: which sky to open on)
@@ -408,6 +412,7 @@
   seq[0].at = -seq[0].hold * openAt * 0.9;
   function pushSky(id) {
     var S = SCENES[id], prev = seq[seq.length - 1];
+    visits[id] = (visits[id] || 0) + 1;
     seq.push({ id: id, at: prev ? prev.at + prev.hold + prev.move : 0, hold: S.hold * mix(0.9, 1.15, rCycle()), move: S.move,
                far: false, ev: mix(0.25, 0.6, rCycle()) });
   }
@@ -432,11 +437,19 @@
   var BRK = (function () { var z = mix(18, 34, rSky()), a = mix(-0.22, 0.22, rSky()); return { x: z * Math.tan(a), z: z, r: mix(4, 6.5, rSky()) }; })();
   function cross3(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
   function nextSky() {
-    var last = seq[seq.length - 1], recent = seq.slice(-RECENT).map(function (e) { return e.id; }), far = rCycle() < FAR, c, id;
+    var last = seq[seq.length - 1], recent = seq.slice(-RECENT).map(function (e) { return e.id; }), far = rCycle() < FAR, c, id, w, sum = 0, i, x;
     c = (far ? IDS : SCENES[last.id].near).filter(function (n) { return recent.indexOf(n) < 0; });
     if (!c.length) c = IDS.filter(function (n) { return n !== last.id; });
-    id = c[Math.floor(rCycle() * c.length)];
+    w = c.map(function (n) {
+      var v = 1 / (1 + 2 * (visits[n] || 0));               // (a sky not yet seen, likelier)
+      if (run >= 4 && SCENES[n].words !== SCENES[last.id].words) v *= 4;   // (after a run of one kind, the other)
+      sum += v; return v;
+    });
+    x = rCycle() * sum;
+    for (i = 0; i < c.length - 1 && x >= w[i]; i++) x -= w[i];
+    id = c[i];
     last.far = SCENES[last.id].near.indexOf(id) < 0;
+    run = SCENES[id].words === SCENES[last.id].words ? run + 1 : 1;
     pushSky(id);
   }
 
