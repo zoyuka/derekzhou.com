@@ -403,7 +403,7 @@
   var root = document.documentElement;
   var rCycle = stream(front() * 4294967296);
   var openGroup = root.getAttribute('data-sky'), openAt = parseFloat(root.getAttribute('data-sky-at')), seq = [];
-  var visits = {}, run = 0;                             // (how often each sky has come; the run of one kind of words)
+  var visits = {}, streak = 0;                          // (how often each sky has come; the run of one kind of words)
   if (!LAND[openGroup]) openGroup = 'day';
   if (!(openAt >= 0 && openAt <= 1)) openAt = 0.5;
   var opening = root.getAttribute('data-sky-scene');   // (the studio's: which sky to open on)
@@ -442,14 +442,14 @@
     if (!c.length) c = IDS.filter(function (n) { return n !== last.id; });
     w = c.map(function (n) {
       var v = 1 / (1 + 2 * (visits[n] || 0));               // (a sky not yet seen, likelier)
-      if (run >= 4 && SCENES[n].words !== SCENES[last.id].words) v *= 4;   // (after a run of one kind, the other)
+      if (streak >= 4 && SCENES[n].words !== SCENES[last.id].words) v *= 4;   // (after a run of one kind, the other)
       sum += v; return v;
     });
     x = rCycle() * sum;
     for (i = 0; i < c.length - 1 && x >= w[i]; i++) x -= w[i];
     id = c[i];
     last.far = SCENES[last.id].near.indexOf(id) < 0;
-    run = SCENES[id].words === SCENES[last.id].words ? run + 1 : 1;
+    streak = SCENES[id].words === SCENES[last.id].words ? streak + 1 : 1;
     pushSky(id);
   }
 
