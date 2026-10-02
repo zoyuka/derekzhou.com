@@ -8,7 +8,7 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /style.v11.css          All styles (versioned name — see Caching), the still sky of each hour
 /site.js                Email obfuscation only
 /hour.v1.js             The hour: which time of day the sky opens on (the page's one clock read)
-/sky.v1.js              The sky — light and cloud behind the page, cycling through the day (see Sky)
+/sky.v2.js              The sky — light and cloud behind the page: thirteen skies in a random order (see Sky)
 /birds.v9.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
@@ -101,7 +101,20 @@ every time of day in turn, the opening one by the visitor's own clock
 system time"), the sky behind the words too ("Full sky."), and as close
 to the reference as possible ("You can do it - no shortcuts!"). So the
 first brief's light ground gives way, at the owner's choice, to a sky
-that is dark at dusk and at night.
+that is dark at dusk and at night. Then, asked to use Unreal Engine and
+to go further on every level (environment design, light and colour from
+the micro to the macro, a feng shui feel, sound and music, a tool to rig
+and tune the environment), and shown the research's answer (the page
+cannot run Unreal: no web export; streaming costs a GPU server per
+visitor and fails in iOS in-app browsers), the owner chose no Unreal, an
+opt-in generative score, and a studio on the site behind Cloudflare
+Access (Sysco Trace behind Access too); and, of the plan's flat palette
+strips: "All those mocks look so plain wtf. It should be a lot more
+complex than a palette lol." with the reference's own creative techniques
+(paraphrased: its name stays out), and "Only the starting landing scene
+should depend on the system time. The rest should cycle through smoothly
+randomly non-time-dependent." Hence thirteen skies in a random order
+(see Sky).
 
 The words' colours follow the sky (see Sky). On a light sky: text #000,
 the dimmed grey a warm grey worked out for 4.7:1 on the bio's own ground
@@ -393,7 +406,7 @@ strips, time-lapses and whole-page sheets across seeds are looked at by
 eye. v9's raised horizon and turn check: the 10-minute suite on every
 viewport and scenario, all passing.
 
-## Sky (sky.v1.js, hour.v1.js)
+## Sky (sky.v2.js, hour.v1.js)
 
 THE CAMERA is the birds' (above): the window looks out over a sea of
 cloud, the horizon a fifth of the way up from its bottom edge, and the
@@ -403,41 +416,83 @@ eye; everything a bird flies is nearer than any cloud.
 
 WHAT IS DRAWN (WebGL2, one fragment shader, per pixel, back to front):
 the sky's light (a gradient by height above the horizon: 0, 5, 15, 32,
-60 degrees; warmed toward the light's side, deepened away from it, a
-haze band toward the horizon; the sun or the moon, their halos and a
-wider glow); a high deck at 5-7 (thin streaks, or a whole overcast with
-rain under it), fogged toward its own sky; cumulus towers rising out of
-the sea (TOWERS 6 slots: a three-sphere core and nine lobes on the dome's
+49 degrees, the old 60 degree stop moved down as no window shows it;
+warmed toward the light's side, deepened away from it, a haze band toward
+the horizon; the sun or the moon, their halos and a wider glow); a high
+deck at 5-7 (thin streaks, an overcast with rain under it, or a veil of
+ice), fogged toward its own sky; cumulus towers rising out of the sea
+(TOWERS 6 slots: a three-sphere core and nine lobes on the dome's
 envelope, joined by a smooth minimum and eroded by tiling 3D noise, soft
-edged; lit by a wrapped sun, shadowed toward it by two looks along the
-light, bases darker, thin edges glowing when the light is behind them;
-each builds out of the sea over BUILD 90 s, sinks back in about a minute
-(1.6x), and gives way where it would rise behind the words; with no room,
-a slot looks again in 2-5 s); and the sea of cloud below the
-eye (a heightfield of domes, round caps smoothly joined, two sizes, the
-small only near; soft as cloud, self-shadowed at a low sun, rims lit
-against it; ending in the horizon's haze). Shadows take the sky's colour
-(ambient from above and below), lit faces the light's. Aerial
-perspective: everything fades with distance into the horizon's haze,
-and a low mist lies on the sea. Then light shafts (radial, from the sky
-seen near the sun), a soft glow (dual-filter bloom) and a shoulder for
-the highlights. The noise (64 cubed 3D, 256 square 2D) is baked on the
-GPU over the first nine frames (eight layers a frame).
+edged; each builds out of the sea over BUILD 90 s, sinks back in about a
+minute (1.6x), and gives way where it would rise behind the words or over
+a sun or moon in view; with no room, a slot looks again in 2-5 s); and
+the sea of cloud below the eye (a heightfield of domes, round caps
+smoothly joined, two sizes, the small only near; ending in the horizon's
+haze). Cloud is lit as cloud, the reference's way: light carried on
+through it (octaves of scattering, each dimmer, deeper and less forward:
+the depth toward the light from two looks along it), its colour the
+light's where thin and the sky's own saturated blue where deep (thick,
+per sky; never grey), crevices lit by the cloud about them (powder)
+rather than darkened, the edge toward the light silvered (a forward
+phase), thin cloud beside the sun in pastel (iri). Aerial perspective:
+everything fades with distance into the horizon's haze (the near towers
+at 0.4 of the sea's fog, so they keep their form; the haze takes a third
+of the glow about the sun), and a low mist lies on the sea. And what the
+light does in the air, sky by sky (FX): a rainbow and its fainter twin
+with the dark band between and the supernumeraries inside, opposite a low
+sun, standing on distant showers (bow, curtain); a glory's rings on the
+cloud sea about the antisolar point (glory); the 22 degree halo and a sun
+dog in a veil of ice (halo, dogs); the Earth's shadow and the Belt of
+Venus opposite a low sun (belt); a pillar over it (pillar); noctilucent
+wisps low on the side the sun set (nlc); the moon's corona (corona); the
+Milky Way, its core low, its dark lanes, and a crowd of faint stars along
+it (galaxy, its lie drawn per visit so the band crosses the window); the
+aurora, three curtains folding slowly, rayed, green below and red above,
+its light on the cloud (aurora); once in a rain's hold, about 26 s of sun
+breaking through onto the sea (sbreak); light drifting in the air near
+the sun (motes, in the window pass, never over the words); the stars
+twinkling slowly. Then light shafts (radial, from the sky seen near the
+sun), a soft glow (dual-filter bloom), a shoulder for the highlights by
+the brightest channel (a hue keeps its hue as it brightens, and past
+white eases toward white), and a triangular dither before the frame is
+stored in 8 bits (no bands). The noise (64 cubed 3D, 256 square 2D) is
+baked on the GPU over the first nine frames (eight layers a frame). One
+wind moves everything the same way (towers, sea, deck; v1 sent the sea
+and deck against the towers).
 
-THE DAY (SCENES; the round 14 minutes): dawn (75 s held, 55 s into the
-next), day (110, 60), rain (80, 60), sunset (80, 60), dusk (50, 60),
-night (90, 60); colours blended in OKLab, the sun and moon fading where
-they stand (the outgoing gone by the middle of a change, the incoming
-from it). Each time of day is the page's own, worked out from the light
-(a low sun golden, the air away from it deep; the cream at the haze),
-never taken from a picture: dawn lavender above, rose, peach at the
-rising sun; day azure, the sun behind and to the side, white cumulus
-with blue shadows; rain an overcast, teal-slate, rain falling; sunset
-mauve to rose to gold, the sun on the horizon, rays; dusk an olive
-murk, an amber glow under the horizon; night deep indigo, the moon, the
-stars. A visit opens on the visitor's hour (hour.v1.js: night 21-05,
-dawn 05-08, day 08-13, rain 13-16, sunset 16-19, dusk 19-21), nine tenths
-as far through that time of day's hold as the hour is through its span.
+THE SKIES (SCENES, thirteen; no round, no clock): sunrise (lavender
+above, peach at the rising sun, mist, the Belt of Venus opposite), the
+glory (the sun low behind the eye, the cloud sea lit full on), the cloud
+prairie (azure, big round cumulus, shadows the sky's own blue), the halo
+(a high veil of ice), silver rain (a light overcast, showers far off),
+the rainbow (after the rain, the sun low behind the eye), golden hour
+(the sun on the sea, rim-lit towers, rays, a pillar), the afterglow (tops
+still pink over a sea in the Earth's shadow, the purple light), the blue
+hour (over an amber band, noctilucent wisps, the first stars), a moonlit
+sea, the Milky Way, the aurora, and the light before sunrise (tops lit
+first). Each has a group (the time of day it belongs to: dawn, day, rain,
+sunset, dusk, night), its words (dark or light), a hold of 70-110 s
+(x0.9-1.15 by the visit), a change of 55-60 s, and the skies it passes
+into most naturally (near). A visit opens on a sky of the visitor's hour
+(hour.v1.js: night 21-05, dawn 05-08, day 08-13, rain 13-16, sunset
+16-19, dusk 19-21; any landing sky of that group, by the visit's draw),
+nine tenths as far through its hold as the hour is through its span; the
+light before sunrise is never a landing. After that the order is the
+weather's, with no clock (the owner's word): each next sky is drawn from
+its near ones, or (FAR 28%) from any, never one of the last RECENT 3.
+Colours blend in OKLab; a sun or moon fades where it stands (the outgoing
+gone by the middle of a change, the incoming from it); light and sun
+directions pass over the top where two skies face apart. A change
+between skies of different words passes a twilight waypoint (below); a
+change between skies that are not neighbours passes through the cloud
+(the sea swells into mist, the towers sink, the deck closes, and it all
+clears into the next sky: the reference's own way of passing between its
+places); both can be one waypoint. data-sky carries the group (the
+stylesheet's still sky and words for it); skyAir.cycle() reports the
+sky, the next, the change's progress and the words (read only, for the
+score); data-sky-scene on the root (the studio's) opens on a named sky.
+Each sky is the page's own, worked out from the light, never taken from
+a picture.
 
 THE WORDS on every sky (the veil and the bands): a frame's light where
 the words stand is read back (8 numbers: the bio's ground, its mean,
@@ -459,12 +514,14 @@ read-back says. A scroll redraws the veil on the next frame. The words'
 colours are set only while the drawn sky shows (otherwise the
 stylesheet's are left alone); while it fades in over the still sky (2 s)
 they take the safer of the two sets (darker on a light sky, lighter on a
-dark one). The flip from dark words to light (sunset to dusk) and back
-(night to dawn) happens at a twilight: a change that flips the words
-eases into a waypoint where the sky behind the words, and the sea under
-the links, stand evenly at the crossing (TWILIGHT and TWILIGHT_SEA,
-calibrated as drawn: 0.165-0.19 there), flips the words there on the
-cycle's own time, and eases out; the bands pinch toward the crossing on
+dark one). The flip from dark words to light and back happens at a
+twilight: any change between skies of different words eases into a
+waypoint where the sky behind the words, and the sea under the links,
+stand evenly at the crossing (TWILIGHT and TWILIGHT_SEA, calibrated as
+drawn: 0.165-0.19 there; its hue the two skies' between, its chroma at
+least 0.045, a twilight purple where their hues cancel, so a crossing is
+never grey), flips the words there on the change's own time, and eases
+out; the bands pinch toward the crossing on
 the same schedule, so nothing jumps but the words. Measured (Chromium,
 SwiftShader; each text element's own colour against every ground pixel
 under its line boxes, the words hidden; the ring against the ground 2-6
@@ -514,15 +571,18 @@ resize re-aims and redraws. The sky animates for as long as the page is
 open, as the birds do: WCAG 2.2.2 asks for a pause control, and the
 owner chose none; prefers-reduced-motion is the stop.
 
-THE WEATHER: one crypto.getRandomValues above sky.v1.js's INIT-END
-marker (the cloud field, the towers, the wind, the stars), and no clock:
+THE WEATHER: one crypto.getRandomValues above sky.v2.js's INIT-END
+marker (the cloud field, the towers, the wind, the stars, the order of
+the skies, the galaxy's lie, the aurora's folds, where the sun breaks
+through), and no clock:
 hour.v1.js reads the clock, once, and marks the page (data-sky,
 data-sky-at). No DOM is built: the canvas is in index.html.
 
-VERIFY before changing the sky: stills of every hour at 1440x900,
-390x844, 844x390 and 768x1024 (Chromium with SwiftShader, the page's
-clock faked); time-lapses of the round and stepped, frame-exact renders
-of each flip (the words hidden, the light measured where they stand);
+VERIFY before changing the sky: stills of every sky (data-sky-scene
+written into the page in flight) and every hour at 1440x900, 390x844,
+844x390 and 768x1024 (Chromium with SwiftShader, the page's clock
+faked); time-lapses of the random order over 15 minutes and more, and
+stepped, frame-exact renders of each flip (the words hidden, the light measured where they stand);
 the contrast audit above, settled and through the fade-in; reduced
 motion, a lost and restored context, rotation (no blank frame), print,
 forced colours, the 404 page, no WebGL, no script; a forced-black sky
@@ -558,7 +618,7 @@ Four files, one job each:
    address. A \<noscript\> fallback shows the email in HTML entities.
 2. hour.v1.js — the hour (in the head, before the first paint: tiny,
    Early-Hinted): which time of day the sky opens on.
-3. sky.v1.js — the sky (see Sky), deferred, before the birds.
+3. sky.v2.js — the sky (see Sky), deferred, before the birds.
 4. birds.v9.js — the birds (see Birds), deferred. Progressive
    enhancement throughout: with JS off, the page is the typography on
    the still day sky.
@@ -649,7 +709,7 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v9.js, sky.v1.js, hour.v1.js, plus style.v11.css for cursors —
+birds.v9.js, sky.v2.js, hour.v1.js, plus style.v11.css for cursors —
 never to this prose) fails on: arrows/cookie/analytics/Loading/
 navigation-role vocabulary in the HTML; any exit, idle, hover-position,
 key, blur, title, favicon-swap or storage handler in the JS; any DOM
