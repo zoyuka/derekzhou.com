@@ -116,6 +116,8 @@
   var RATIO = 4.7;            // the words' contrast on the sky (WCAG's 4.5, with room for rounding and dither)
   var RING = 3.3;             // the focus ring's (3)
   var FLIP = 0.186;           // the darkest sky black words read on at RATIO
+  var AIR = 0.578;            // the words' own air: under dark words the bio's ground no darker than this, so the
+                              //  bold black stays 2.6:1 against the dimmed grey (relaxed as a change nears the flip)
   var DEG = Math.PI / 180;
 
   /* ---------------- the visit's streams (splitmix32) ---------------- */
@@ -275,7 +277,7 @@
     },
     afterglow: {  // the sun just down: tops still pink, the sea in the Earth's shadow, the purple light
       group: 'dusk', words: 1, hold: 70, move: 60, near: ['bluehour', 'sunset', 'milkyway', 'moonlit'],
-      sky: [[0.66, 0.1, 52], [0.44, 0.065, 26], [0.4, 0.06, 330], [0.37, 0.062, 290], [0.33, 0.06, 274]],
+      sky: [[0.64, 0.1, 52], [0.4, 0.065, 26], [0.355, 0.06, 330], [0.33, 0.062, 290], [0.3, 0.06, 274]],
       tint: [0.7, 0.12, 48], tintAmt: 0.5, tintPow: 5, deep: 0.12,
       lightC: [0.78, 0.12, 40], lightI: 0.75, light: { az: 62, el: -2 },
       disc: { az: 62, el: -3, r: 0.5, i: 0, halo: 9, haloI: 0.12, wide: 0.03, c: [0.75, 0.12, 45] },
@@ -325,7 +327,7 @@
     },
     firstlight: { // before the sunrise: tops lit first over a sea still in the Earth's shadow
       group: 'night', words: 1, hold: 70, move: 55, near: ['dawn', 'glory', 'moonlit'], land: false,
-      sky: [[0.64, 0.085, 58], [0.43, 0.055, 24], [0.39, 0.052, 320], [0.36, 0.056, 286], [0.32, 0.054, 274]],
+      sky: [[0.62, 0.085, 58], [0.39, 0.055, 24], [0.35, 0.052, 320], [0.325, 0.056, 286], [0.295, 0.054, 274]],
       tint: [0.75, 0.1, 58], tintAmt: 0.45, tintPow: 5, deep: 0.1,
       lightC: [0.82, 0.1, 50], lightI: 0.6, light: { az: -62, el: -3 },
       disc: { az: -62, el: -3, r: 0.5, i: 0, halo: 10, haloI: 0.12, wide: 0.03, c: [0.8, 0.1, 55] },
@@ -732,7 +734,8 @@
     'uniform vec4 uDa; uniform vec4 uDaP; uniform vec3 uDaC; uniform vec4 uDb; uniform vec4 uDbP; uniform vec3 uDbC;',
     'uniform vec3 uAmbU; uniform vec3 uAmbD; uniform vec3 uAlb; uniform vec3 uThick; uniform vec4 uMs;',
     'uniform vec4 uSea; uniform vec4 uFog; uniform vec3 uFogC; uniform vec4 uDeck; uniform vec3 uDeckC;',
-    'uniform vec4 uFx1; uniform vec4 uFx2; uniform vec4 uFx3; uniform vec3 uGal; uniform vec3 uGc; uniform vec4 uAur; uniform vec4 uBrk;',
+    'uniform vec4 uFx1; uniform vec4 uFx2; uniform vec4 uFx3; uniform vec3 uGal; uniform vec3 uGc; uniform vec4 uAur; uniform vec4 uBrk; uniform sampler2D uMk;',
+    'float gWk = 1.0;',
     'uniform int uTwN; uniform vec4 uTw[72]; uniform vec4 uTb[6]; uniform vec4 uTx[6];',
     'out vec4 oC;',
     'const vec3 LUM = vec3(0.2126, 0.7152, 0.0722);',
@@ -775,7 +778,7 @@
     '  float hs = 1.0 + max(-se, 0.0) * 1.1;',
     '  float sh = 1.0 - smoothstep(hs - 0.8, hs + 1.2, e), bl = smoothstep(hs - 0.4, hs + 2.0, e) * (1.0 - smoothstep(hs + 5.0, hs + 13.0, e));',
     '  c = mix(c, c * vec3(0.72, 0.78, 0.95), sh * side * 0.55);',
-    '  c += vec3(0.95, 0.6, 0.66) * bl * side * dot(c, LUM) * 0.35;',
+    '  c += vec3(0.95, 0.6, 0.66) * bl * side * dot(c, LUM) * 0.35 * gWk;',
     '}',
     /* the 22 degree halo and the sun dogs, in a high veil of ice */
     'vec3 ice(vec3 rd, float e, out float dim) {',
@@ -841,7 +844,7 @@
     '  c = mix(c, uFogC, 0.5 * (1.0 - smoothstep(0.0, 5.0, max(e, 0.0))));',
     '  belt(rd, e, c);',
     '  float dim; vec3 ic = ice(rd, e, dim);',
-    '  return c * (1.0 - dim) + ic + pillar(rd, e) + galaxy(rd, e) + aurora(rd, e) + nlc(rd, e);',
+    '  return c * (1.0 - dim * gWk) + (ic + pillar(rd, e) + galaxy(rd, e) + aurora(rd, e) + nlc(rd, e)) * gWk;',
     '}',
     'vec3 sky(vec3 rd) { return skyBase(rd) + halo(rd, uDa, uDaP, uDaC) + halo(rd, uDb, uDbP, uDbC); }',
     /* the haze far clouds fade into: the horizon's sky, with a third of the glow about the sun */
@@ -1020,6 +1023,7 @@
     '  vec3 dc = vec3(s.x - uC0.x, uC0.y - s.y, uCam.x);',
     '  vec3 rd = normalize(vec3(dc.x, dc.y * uCam.y + dc.z * uCam.z, dc.z * uCam.y - dc.y * uCam.z));',
     '  float jit = ign(gl_FragCoord.xy);',
+    '  vec3 mk = texture(uMk, fc).rgb; gWk = 1.0 - 0.8 * max(mk.r, max(mk.g, mk.b));',   // (behind the words the sky's events step back)
     '  vec3 hz = haze(rd);',
     '  vec3 sAcc; float sT, tSea;',
     '  sea(rd, hz, jit, sAcc, sT, tSea);',
@@ -1031,7 +1035,7 @@
     '  float e = elev(rd), sw = showers(rd, e), lift;',            // the showers far off, and the bow standing on them
     '  vec3 bw = bow(rd, lift);',
     '  bg = mix(bg, uDeckC * 0.82, sw * 0.45);',
-    '  bg = bg * (1.0 + lift) + bw * (1.0 - dk.a * 0.5) * (0.6 + 0.6 * sw);',
+    '  bg = bg * (1.0 + lift * gWk) + bw * gWk * (1.0 - dk.a * 0.5) * (0.6 + 0.6 * sw);',
     '  vec3 far = sAcc + sT * bg + bw * 0.5 * smoothstep(15.0, 60.0, tSea) * step(rd.y, 0.0);',
     '  vec3 col = acc + T * far;',
     '  oC = vec4(ENC(col), T * sT * (1.0 - dk.a));',
@@ -1438,6 +1442,7 @@
     gl.useProgram(p);
     bind(p, 0, 'uN3', tex.n3, gl.TEXTURE_3D);
     bind(p, 1, 'uN2', tex.n2);
+    bind(p, 2, 'uMk', work.m.t);
     gl.bindFramebuffer(gl.FRAMEBUFFER, work.s.f);
     gl.viewport(0, 0, cw, ch);
     gl.enable(gl.SCISSOR_TEST);
@@ -1626,7 +1631,7 @@
   function opened(mode, lo, hi, llo, lhi, w) {
     band.mode = mode;
     if (mode === 0) {
-      band.lo = Math.max(FLIP, lo * 0.97); band.hi = Math.max(band.lo + 0.004, FLIP + w);
+      band.lo = Math.max(FLIP, lo * 0.97, AIR * clamp(w * 1.5 - 0.5, 0, 1)); band.hi = Math.max(band.lo + 0.004, FLIP + w);
       bandN.lo = FLIP; bandN.hi = FLIP + w;
       bandL.lo = Math.max(FLIP, llo * 0.97); bandL.hi = Math.max(bandL.lo + 0.004, FLIP + w);
     } else {
