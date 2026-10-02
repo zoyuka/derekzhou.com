@@ -80,14 +80,44 @@ jobs:
           # menu endpoint into an open proxy.
           node --test "functions/api/lib/*.test.js"
           node --test "functions/api/search.test.js"
+          # The private pages' guard (Access checked again at the origin): a
+          # regression here opens /sysco, /studio and /api to anyone.
+          node --test "functions/lib/*.test.js"
 
-      - name: API routes must be wired
+      - name: Functions routes guard the private pages and spare the home page
         run: |
-          if [ -d functions/api ] && ! grep -q '"/api/\*"' _routes.json; then
-            echo "::error::functions/api exists but _routes.json does not route /api/*"
-            exit 1
-          fi
-          echo "API routing OK"
+          # _routes.json sends every request through the middleware (which lets
+          # a private path on only with a valid Access token) except the files
+          # the home page loads: those stay static, no Function runs for them.
+          # So: every private path routed, however spelled; none excluded; every
+          # file index.html and 404.html load excluded; /CLAUDE.md and /.github/*
+          # excluded (_redirects does not apply to what a Function handles);
+          # patterns exact or ending in /* (mid-name wildcards are undocumented).
+          python3 - <<'PY'
+          import json, re, sys
+          r = json.load(open('_routes.json'))
+          def hit(pat, path):
+              return path.startswith(pat[:-1]) if pat.endswith('/*') else (pat == '/*' or path == pat)
+          def routed(path):
+              return any(hit(p, path) for p in r['include']) and not any(hit(p, path) for p in r['exclude'])
+          fail = 0
+          for pat in r['include'] + r['exclude']:
+              if '*' in pat[:-1] or (pat.endswith('*') and not pat.endswith('/*')):
+                  print('::error::_routes.json pattern', pat, 'is not exact or /*'); fail = 1
+          for path in ['/sysco', '/sysco/', '/sysco/app.js', '/sysco%2Fapp.js', '/sysc%6F%2Fapp.js', '/studio', '/studio/',
+                       '/studio%2F', '/api/search', '/SYSCO/']:
+              if not routed(path):
+                  print('::error::private path', path, 'is not routed through the guard'); fail = 1
+          home = set(re.findall(r'(?:href|src)="(/[^"#?]*)"', open('index.html').read() + open('404.html').read()))
+          home |= {'/', '/index.html', '/404.html', '/CLAUDE.md', '/.github/workflows/validate.yml'}
+          for path in sorted(home):
+              if routed(path):
+                  print('::error::', path, 'would run a Function: exclude it in _routes.json'); fail = 1
+          src = open('functions/_middleware.js').read()
+          if 'isPrivate' not in src or 'verify' not in src:
+              print('::error::functions/_middleware.js no longer checks private paths'); fail = 1
+          print('routes OK' if not fail else 'routes FAILED'); sys.exit(fail)
+          PY
 
       - name: security.txt not expired
         run: |
