@@ -55,8 +55,8 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Sysco Trace. Publicly reachable but not advertised: X-Robots-Tag keeps it out of
-# search results while leaving the URL usable by anyone who has it.
+# Sysco Trace. Private: behind Cloudflare Access, and checked again at the origin
+# (functions/_middleware.js). X-Robots-Tag keeps it out of search results as well.
 # Its CSP needs connect-src 'self' so the app can fetch its own JSON and /api/*.
 /sysco/*
   X-Robots-Tag: noindex, nofollow

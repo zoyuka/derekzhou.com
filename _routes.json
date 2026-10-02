@@ -1,5 +1,22 @@
 {
   "version": 1,
-  "include": ["/api/*"],
-  "exclude": []
+  "include": ["/*"],
+  "exclude": [
+    "/",
+    "/index.html",
+    "/404.html",
+    "/robots.txt",
+    "/site.js",
+    "/style.v12.css",
+    "/hour.v2.js",
+    "/sky.v2.js",
+    "/birds.v9.js",
+    "/assets/*",
+    "/.well-known/*",
+    "/CLAUDE.md",
+    "/.github/*",
+    "/favicon.ico",
+    "/apple-touch-icon.png",
+    "/apple-touch-icon-precomposed.png"
+  ]
 }

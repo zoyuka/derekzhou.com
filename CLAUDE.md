@@ -22,29 +22,50 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 /.well-known/security.txt  Vulnerability reporting
 /\_headers               Cloudflare Pages security + caching + Early Hints headers
 /\_redirects             HTTPS enforcement; /CLAUDE.md and /.github/* redirected to / (exact paths: see Security)
-/\_routes.json           Scopes Pages Functions to /api/* only
+/\_routes.json           Sends every request but the home page's own files through the private pages' guard
 /.github/workflows/validate.yml  CI checks
 
-Side project, publicly reachable but not linked from the home page:
+Side project, private (behind Cloudflare Access), not linked from the home page:
 
 /sysco/                 Sysco Trace app (see sysco/README.md)
 /functions/api/         Live search endpoint backing it
+/functions/\_middleware.js  The private pages' guard (Access checked again at the origin)
+/functions/lib/access.js     Its checks: which paths are private, and the Access token
 
-Reachable by anyone with the URL. Kept out of search results via X-Robots-Tag in
-\_headers plus a noindex meta tag; delete both to make it indexable. It needs
+Private, as the studio (/studio/) will be: Cloudflare Access (Zero Trust team
+icy-scene-dab5; one self-hosted application on derekzhou.com covering the paths
+sysco, sysco/\*, api/\*, studio, studio/\*; its policy allows the owner's email)
+asks for a sign-in at the edge. Access matches the path as it arrives, but Pages
+serves the path it decodes: /sysco%2Fapp.js (and /sysc%6F%2Fapp.js) passed Access
+and were served, and the project's own derekzhou-com.pages.dev host has no Access
+at all. So the guard checks again at the origin: \_routes.json sends it every
+request except the files the home page loads, and a private path (/sysco, /studio,
+/api; judged as sent and as decoded, slashes merged, dot segments resolved, case
+folded) passes only with a valid Access token (the header Access adds, or its
+CF\_Authorization cookie: a JWT signed RS256 by a key from the team's
+/cdn-cgi/access/certs, its aud the application's AUD tag, not expired), else 403;
+a private response is marked private (no shared cache keeps a signed-in copy) and
+gets noindex and the private CSP where \_headers did not set them. If the Access
+application is ever recreated, its AUD tag changes: add it to AUDS in
+functions/lib/access.js, or the private pages answer 403 even after signing in.
+Kept out of search results too (X-Robots-Tag, a noindex meta tag). /sysco/ needs
 connect-src 'self' in its CSP block because the site-wide policy sets
 connect-src 'none', which would block it fetching its own JSON.
 
-The home page stays pure static HTML/CSS/JS with no build step. Functions exist only
-to back /sysco/, which \_routes.json enforces by scoping them to /api/\*.
+The home page stays pure static HTML/CSS/JS with no build step, and no Function
+runs for it: \_routes.json excludes every file it loads by exact name (CI checks
+that each file index.html and 404.html load is excluded, every private spelling
+routed, and patterns exact or ending /\*). \_redirects does not apply to what a
+Function handles, so /CLAUDE.md and /.github/\* stay excluded (their redirects
+hold) and the guard sends http to https itself.
 
 The /api/search menu parameter fetches a URL supplied by the visitor. Every guard in
 functions/api/lib/http.js is load-bearing — https only, no private or link-local hosts,
 redirects re-validated per hop, byte ceiling while streaming. Without them the endpoint
-is an SSRF pivot and an open proxy. Never relax them, and never return the fetched body. If this page ever
-needs real access control, it must be enforced at the edge (Cloudflare Access, or a
-Pages Function) — never with a client-side password check, because static content
-reaches the browser before any client-side check can run.
+is an SSRF pivot and an open proxy. Never relax them, and never return the fetched body. Its access
+control is enforced at the edge and at the origin (Cloudflare Access, and the guard
+above) — never with a client-side password check, because static content reaches the
+browser before any client-side check can run.
 
 ## Content
 
@@ -723,9 +744,11 @@ HTML: max-age=0, must-revalidate. Everything else: max-age=31536000,
 immutable. Immutable means CHANGED BYTES NEED A NEW FILENAME: bump
 style.vN.css → style.vN+1.css, birds.vN.js → birds.vN+1.js, sky.vN.js →
 sky.vN+1.js, hour.vN.js → hour.vN+1.js, .subN → .subN+1, and update every
-reference in the same commit — five files: index.html (stylesheet, hour,
+reference in the same commit — six files: index.html (stylesheet, hour,
 sky, birds), 404.html (stylesheet, hour), \_headers (the style and hour
 Link preloads, each file's cache block, the "next name" comment),
+\_routes.json (its exclude list names each one, so no Function runs for
+the home page; CI fails on a file the home page loads that is not excluded),
 .github/workflows/validate.yml
 (required files only — the Absences step resolves the shipped
 versioned names itself with ls, so it never needs editing), and this
