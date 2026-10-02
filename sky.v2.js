@@ -277,10 +277,10 @@
     },
     afterglow: {  // the sun just down: tops still pink, the sea in the Earth's shadow, the purple light
       group: 'dusk', words: 1, hold: 70, move: 60, near: ['bluehour', 'sunset', 'milkyway', 'moonlit'],
-      sky: [[0.64, 0.1, 52], [0.4, 0.065, 26], [0.355, 0.06, 330], [0.33, 0.062, 290], [0.3, 0.06, 274]],
-      tint: [0.7, 0.12, 48], tintAmt: 0.5, tintPow: 5, deep: 0.12,
+      sky: [[0.64, 0.1, 52], [0.4, 0.065, 26], [0.34, 0.06, 330], [0.315, 0.062, 290], [0.29, 0.06, 274]],
+      tint: [0.7, 0.12, 48], tintAmt: 0.42, tintPow: 8, deep: 0.12,
       lightC: [0.78, 0.12, 40], lightI: 0.75, light: { az: 62, el: -2 },
-      disc: { az: 62, el: -3, r: 0.5, i: 0, halo: 9, haloI: 0.12, wide: 0.03, c: [0.75, 0.12, 45] },
+      disc: { az: 62, el: -3, r: 0.5, i: 0, halo: 9, haloI: 0.12, wide: 0.02, c: [0.75, 0.12, 45] },
       ambU: [0.48, 0.06, 290], ambUI: 0.65, ambD: [0.5, 0.05, 270], ambDI: 0.45, alb: [0.95, 0.02, 40],
       thick: [0.55, 0.08, 300], g: 0.7, powder: 0.5, fog: 0.026, mist: 0.55, fogC: [0.55, 0.06, 300],
       deck: [7, 0.4, 0.6, 0.1], deckC: [0.6, 0.08, 20], towers: 0.7, tall: 0.95, stars: 0.05,
@@ -327,10 +327,10 @@
     },
     firstlight: { // before the sunrise: tops lit first over a sea still in the Earth's shadow
       group: 'night', words: 1, hold: 70, move: 55, near: ['dawn', 'glory', 'moonlit'], land: false,
-      sky: [[0.62, 0.085, 58], [0.39, 0.055, 24], [0.35, 0.052, 320], [0.325, 0.056, 286], [0.295, 0.054, 274]],
-      tint: [0.75, 0.1, 58], tintAmt: 0.45, tintPow: 5, deep: 0.1,
+      sky: [[0.62, 0.085, 58], [0.39, 0.055, 24], [0.335, 0.052, 320], [0.31, 0.056, 286], [0.285, 0.054, 274]],
+      tint: [0.75, 0.1, 58], tintAmt: 0.38, tintPow: 8, deep: 0.1,
       lightC: [0.82, 0.1, 50], lightI: 0.6, light: { az: -62, el: -3 },
-      disc: { az: -62, el: -3, r: 0.5, i: 0, halo: 10, haloI: 0.12, wide: 0.03, c: [0.8, 0.1, 55] },
+      disc: { az: -62, el: -3, r: 0.5, i: 0, halo: 10, haloI: 0.12, wide: 0.02, c: [0.8, 0.1, 55] },
       ambU: [0.46, 0.05, 285], ambUI: 0.65, ambD: [0.5, 0.04, 280], ambDI: 0.45, alb: [0.95, 0.015, 50],
       thick: [0.5, 0.06, 290], g: 0.7, powder: 0.5, fogC: [0.52, 0.05, 290],
       deck: [7, 0.35, 0.55, 0.1], deckC: [0.6, 0.07, 30], stars: 0.12, shafts: 0.15, shaftC: [0.8, 0.1, 55], bloom: 0.14, belt: 0.6
