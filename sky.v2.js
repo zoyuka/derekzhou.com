@@ -117,7 +117,8 @@
   var RING = 3.3;             // the focus ring's (3)
   var FLIP = 0.186;           // the darkest sky black words read on at RATIO
   var AIR = 0.578;            // the words' own air: under dark words the bio's ground no darker than this, so the
-                              //  bold black stays 2.6:1 against the dimmed grey (relaxed as a change nears the flip)
+                              //  bold black stays 2.6:1 against the dimmed grey (relaxed as a change nears the flip,
+                              //  and never lifted past the mean of the sky's own light there)
   var DEG = Math.PI / 180;
 
   /* ---------------- the visit's streams (splitmix32) ---------------- */
@@ -1222,10 +1223,11 @@
     '  if (uMo.x > 0.0) col += uMoC * motes(p) * uMo.x * 0.25 * (0.35 + 0.65 * exp(-length(p - uMo.zw) / (0.45 * uVp.z))) * (1.0 - m);',
     '  if (uRn.x > 0.0) { float r = rain(p, 0.0) * 0.6 + rain(p, 1.0); col = mix(col, uRnC, clamp(r * uRn.x * 0.32 * (1.0 - m), 0.0, 1.0)); }',
     '  float Y = dot(col, vec3(0.2126, 0.7152, 0.0722));',
-    '  float lo = max(uBand.x * mk.r, max(uBandN.x * mk.g, uBandL.x * mk.b));',
-    '  float hi = min(mix(1.0, uBand.y, mk.r), min(mix(1.0, uBandN.y, mk.g), mix(1.0, uBandL.y, mk.b)));',
-    '  if (Y < lo) col *= lo / max(Y, 1e-4);',
-    '  else if (Y > hi) col *= hi / Y;',
+    /* (held to the band where the words stand, and the hold eased out across the feather by its strength: a
+       threshold scaled by the mask, as at first, only crossed near the core and drew the veil's edge) */
+    '  float up = max(mix(Y, max(Y, uBand.x), mk.r), max(mix(Y, max(Y, uBandN.x), mk.g), mix(Y, max(Y, uBandL.x), mk.b)));',
+    '  float dn = min(mix(up, min(up, uBand.y), mk.r), min(mix(up, min(up, uBandN.y), mk.g), mix(up, min(up, uBandL.y), mk.b)));',
+    '  col *= dn / max(Y, 1e-4);',
     '  col = clamp(col, 0.0, 1.0);',
     '  vec3 e = mix(col * 12.92, 1.055 * pow(col, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, col));',
     '  float n = ign(gl_FragCoord.xy) + ign(gl_FragCoord.xy + vec2(17.0, 59.0)) - 1.0;',
@@ -1634,17 +1636,18 @@
   var seen = null, seenT = null, band = { lo: FLIP, hi: 1, mode: 0 }, bandN = { lo: FLIP, hi: 1 }, bandL = { lo: FLIP, hi: 1 };
   function steer(dt, S) {
     var f, k, m, w = Math.max(0.004, S.flipW), mode = S.words >= 0.5 ? 1 : 0;
-    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, mode ? 0 : FLIP, mode ? HI_MAX : 1, w); return; }
+    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, mode ? 0 : FLIP, mode ? HI_MAX : 1, w, 1); return; }
     if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
     k = still ? 1 : 1 - Math.exp(-dt / 0.6);
     for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
     m = seen.mean;
-    opened(mode, Math.max(seen.mn, m - 3 * seen.sd), Math.min(seen.mx, m + 3 * seen.sd), seen.lmn, seen.lmx, w);
+    opened(mode, Math.max(seen.mn, m - 3 * seen.sd), Math.min(seen.mx, m + 3 * seen.sd), seen.lmn, seen.lmx, w, m);
   }
-  function opened(mode, lo, hi, llo, lhi, w) {
+  function opened(mode, lo, hi, llo, lhi, w, m) {
     band.mode = mode;
-    if (mode === 0) {
-      band.lo = Math.max(FLIP, lo * 0.97, AIR * clamp(w * 1.5 - 0.5, 0, 1)); band.hi = Math.max(band.lo + 0.004, FLIP + w);
+    if (mode === 0) {                                     // (the words' air no higher than the sky's own light about
+      band.lo = Math.max(FLIP, lo * 0.97, Math.min(AIR * clamp(w * 1.5 - 0.5, 0, 1), m));   //  them: never a box)
+      band.hi = Math.max(band.lo + 0.004, FLIP + w);
       bandN.lo = FLIP; bandN.hi = FLIP + w;
       bandL.lo = Math.max(FLIP, llo * 0.97); bandL.hi = Math.max(bandL.lo + 0.004, FLIP + w);
     } else {
