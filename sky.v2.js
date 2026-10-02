@@ -1040,7 +1040,7 @@
     '  vec3 dc = vec3(s.x - uC0.x, uC0.y - s.y, uCam.x);',
     '  vec3 rd = normalize(vec3(dc.x, dc.y * uCam.y + dc.z * uCam.z, dc.z * uCam.y - dc.y * uCam.z));',
     '  float jit = ign(gl_FragCoord.xy);',
-    '  vec3 mk = texture(uMk, fc).rgb; gWk = 1.0 - 0.8 * max(mk.r, max(mk.g, mk.b));',   // (behind the words the sky's events step back)
+    '  gWk = 1.0 - 0.8 * texture(uMk, fc).a;',   // (behind the words the sky's events step back, fading out well beyond them)
     '  vec3 hz = haze(rd);',
     '  vec3 sAcc; float sT, tSea;',
     '  sea(rd, hz, jit, sAcc, sT, tSea);',
@@ -1154,13 +1154,16 @@
     '  o = vec4(sqrt(v), 0.0, 0.0, 1.0);',
     '}'
   ].join('\n');
-  /* where the words stand, for the veil: the bio (r), the name (g), the links (b); drawn when the page moves */
+  /* where the words stand, for the veil: the bio (r), the name (g), the links (b); and (a) the calm about the
+     bio and name that the sky's events step back in, its feather up to two and a half times the veil's on a
+     wide window (so a curtain or a band fades out toward the words, not at an edge); drawn when the page moves */
   var MASK = [
-    'uniform vec4 uVp; uniform vec4 uR[4]; uniform vec2 uFe; out vec4 o;',
+    'uniform vec4 uVp; uniform vec4 uR[4]; uniform vec3 uFe; out vec4 o;',
     'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float q = length(max(d, 0.0)) / fe; return exp(-4.5 * q * q); }',
     'void main() {',
     '  vec2 fc = gl_FragCoord.xy / uVp.xy, p = vec2(fc.x * uVp.z, (1.0 - fc.y) * uVp.w);',
-    '  o = vec4(box(p, uR[0], uFe.x), box(p, uR[1], uFe.x), max(box(p, uR[2], uFe.y), box(p, uR[3], uFe.y)), 1.0);',
+    '  o = vec4(box(p, uR[0], uFe.x), box(p, uR[1], uFe.x), max(box(p, uR[2], uFe.y), box(p, uR[3], uFe.y)),',
+    '    max(box(p, uR[0], uFe.z), box(p, uR[1], uFe.z)));',   // (a: the words' calm, wider and softer)
     '}'
   ].join('\n');
   /* the window: two cloud frames crossfaded, the stars (twinkling slowly; crowded in the galaxy's band), light
@@ -1529,7 +1532,8 @@
     gl.useProgram(p);
     gl.uniform4f(U(p, 'uVp'), cw, ch, W, H);
     gl.uniform4fv(U(p, 'uR'), rectOf(wordsR, WORDS_CORE).concat(rectOf(nameR, NAME_CORE), rectOf(links[0], LINKS_CORE), rectOf(links[1], LINKS_CORE)));
-    gl.uniform2f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER);
+    gl.uniform3f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER, WORDS_FEATHER * clamp(W / 400, 1, 2.5));   // (the calm: as the
+                                                         //  veil on a phone, where the words fill the sky, 2.5x on a wide window)
     draw(p, work.m.f, cw, ch);
     maskDirty = false;
   }

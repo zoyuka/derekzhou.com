@@ -526,9 +526,22 @@ lifted past the mean of the sky's own light there (ramped on the
 change's schedule it ran ahead of a sky still brightening out of the
 twilight, and showed). Where the words stand the sky's events step back
 to a fifth (the bow, the halo and sun dogs, the belt, a pillar, the
-galaxy, the aurora, the wisps): no word is set on a phenomenon. Light
-words keep the dimmed grey 1.7:1 or more from the near-white: the skies
-after sunset and before sunrise hold their glow low, below the words. A scroll redraws the veil on the next frame. The words'
+galaxy, the aurora, the wisps): no word is set on a phenomenon. They
+step back in a calm of their own about the bio and the name (the mask's
+alpha), its feather the veil's on a phone and up to 2.5 times it on a
+wide window (W / 400), so a curtain or the galaxy's band fades out
+toward the words instead of stopping at an edge (with the veil's own
+feather a desktop aurora showed a dark panel). On a phone held upright
+the words cover most of the sky, so the aurora and the galaxy show there
+mostly as their light on the cloud and above the name. Under
+light words the bio's ground is held no lighter than AIR_LIGHT 0.095, so
+the near-white keeps 1.5:1 from the dimmed grey (the emphasis the type is
+built on), relaxed near a flip the same way and never dimmed below the
+sky's own mean: it acts on a phone turned sideways, where the words come
+down onto the glow at the horizon; on a desktop or an upright phone the
+skies after sunset and before sunrise hold their glow low, below the
+words, and the grey stays 1.68:1 or more from the near-white unaided. A
+scroll redraws the veil on the next frame. The words'
 colours are set only while the drawn sky shows (otherwise the
 stylesheet's are left alone); while it fades in over the still sky (2 s)
 they take the safer of the two sets (darker on a light sky, lighter on a
@@ -543,10 +556,12 @@ out; the bands pinch toward the crossing on
 the same schedule, so nothing jumps but the words. Measured (Chromium,
 SwiftShader; each text element's own colour against every ground pixel
 under its line boxes, the words hidden; the ring against the ground 2-6
-px about each link): settled, 3 viewports x 6 hours, every text role
-4.6:1 or more and the ring 3.23 or more; through the fade-in (0, 0.7,
-1.4 s), 3 viewports x 6 hours, the dimmed grey 4.70 or more, the ring
-3.34 or more (v1's figures; v2's: AUDIT_V2).
+px about each link): settled, 3 viewports (1440x900, 390x844, 844x390)
+x 13 skies, every text role 4.60:1 or more and the ring 3.24 or more (on
+a phone turned sideways the links are below the fold), the bold over the
+dimmed grey 2.56-3.15:1 under dark words and 1.50-2.28 under light;
+through the fade-in (0, 0.7, 1.4 s), the same 3 viewports x a sky of
+each time of day, every text role 4.68 or more, the ring 3.33 or more.
 
 CALM AND COST: the clouds drift with one wind (SEA_DRIFT 0.45-0.8 px/s
 where the sea is nearest, less far off, the deck faster aloft; the
