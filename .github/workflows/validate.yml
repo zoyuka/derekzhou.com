@@ -16,9 +16,9 @@ jobs:
         run: |
           files=(
             index.html
-            style.v11.css
+            style.v12.css
             site.js
-            hour.v1.js
+            hour.v2.js
             sky.v2.js
             birds.v9.js
             robots.txt

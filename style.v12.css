@@ -165,37 +165,58 @@ body {
 }
 
 /* the still skies: the sky from the top edge to the horizon (four
-   fifths of the way down), then the sea of cloud */
+   fifths of the way down), then the sea of cloud. Each is the drawn
+   skies of its time of day (data-sky) taken row by row, without their
+   towers, and averaged: day (the cloud prairie, the halo), dawn
+   (sunrise, the glory), rain (silver rain, the rainbow), sunset (golden
+   hour), dusk (the afterglow, the blue hour), night (a moonlit sea, the
+   Milky Way, the aurora); so the drawn sky dissolves in over its own */
 body {
-  background: linear-gradient(to bottom, #70b6ea 0%, #7dbde6 26%, #a4d6ef 52%, #cce8f3 72%, #e2f1f6 78%, #f1f6f7 82%, #dce9f1 92%, #cddff0 100%) #a4d6ef;
+  background: linear-gradient(to bottom, #a5d5f8 0%, #b9e0fa 26%, #c6e8f9 52%, #d6f0f8 72%, #dbf2f7 78%, #dbf1f5 82%, #dceef1 92%, #d9e9eb 100%) #c6e8f9;
 }
 
 :root[data-sky="dawn"] body {
-  background: linear-gradient(to bottom, #b0a9d3 0%, #b9a9cc 26%, #dcbccd 52%, #f0c9c7 72%, #f8d6c6 78%, #fbe9dd 82%, #ead7da 92%, #dccbd9 100%) #dcbccd;
+  background: linear-gradient(to bottom, #cdc9e6 0%, #e4cfe0 26%, #f3d3d8 52%, #fcd4ca 72%, #fad4c9 78%, #f4d1c8 82%, #e5c8c2 92%, #d6bdb9 100%) #f3d3d8;
 }
 
 :root[data-sky="rain"] body {
-  background: linear-gradient(to bottom, #809aa9 0%, #7f9aa6 26%, #829fa7 52%, #98b5b8 72%, #a9c4c4 78%, #b9cccd 82%, #9eb3b8 92%, #8aa1aa 100%) #829fa7;
+  background: linear-gradient(to bottom, #9fbecd 0%, #aecad5 26%, #b7d1db 52%, #c5dee5 72%, #c9e2e7 78%, #c6d9db 82%, #bfcbca 92%, #bdc8c5 100%) #b7d1db;
 }
 
 :root[data-sky="sunset"] body {
-  background: linear-gradient(to bottom, #c5a4c4 0%, #c9a5b6 26%, #ebbfba 52%, #f8d0b4 72%, #fddcb1 78%, #fde8cc 82%, #efd2c4 92%, #dfc0be 100%) #ebbfba;
+  background: linear-gradient(to bottom, #f4c1c6 0%, #fdc7b7 26%, #feccb3 52%, #fed3b4 72%, #fed2b5 78%, #fccbae 82%, #f1bca1 92%, #e3b39c 100%) #feccb3;
 }
 
 :root[data-sky="dusk"] body {
-  background: linear-gradient(to bottom, #1a3132 0%, #263c30 26%, #3b4730 52%, #504f2b 72%, #5f4a1d 78%, #554d29 82%, #4f4c38 92%, #3d3d32 100%) #3b4730;
+  background: linear-gradient(to bottom, #35304e 0%, #44344e 26%, #563a48 52%, #6c423c 72%, #6b4242 78%, #684347 82%, #5d4656 92%, #594556 100%) #563a48;
 }
 
 :root[data-sky="night"] body {
-  background: linear-gradient(to bottom, #0d1842 0%, #132556 26%, #1c3160 52%, #283f69 72%, #314c71 78%, #364e72 82%, #2a3d63 92%, #20325a 100%) #1c3160;
+  background: linear-gradient(to bottom, #282c3e 0%, #2c3144 26%, #2c3f4c 52%, #2f4250 72%, #314453 78%, #3c5058 82%, #3d5155 92%, #3c5054 100%) #2c3f4c;
 }
 
 /* the words on the still skies: each colour holds against its sky's whole
-   gradient, wherever a window puts the words (CI checks it: text and the
-   dimmed grey 4.5:1, the focus ring 3:1) */
+   gradient, wherever a window puts the words (4.7:1 for text and the
+   dimmed grey, 3.3:1 for the focus ring; CI checks 4.5 and 3) */
+:root:not([data-sky]),
+:root[data-sky="day"] {
+  --color-dimmed: #575652;
+  --color-focus: #91641a;
+}
+
+:root[data-sky="dawn"] {
+  --color-dimmed: #4f4d4a;
+  --color-focus: #865c17;
+}
+
 :root[data-sky="rain"] {
-  --color-dimmed: #2d2c2a;
-  --color-focus: #5b3e0c;
+  --color-dimmed: #494744;
+  --color-focus: #7d5615;
+}
+
+:root[data-sky="sunset"] {
+  --color-dimmed: #4c4a47;
+  --color-focus: #815916;
 }
 
 :root[data-sky="dusk"],
@@ -204,14 +225,6 @@ body {
   --color-dimmed: #bcc3cb;
   --color-focus: #d4ae5c;
   --color-selection: #3b3f55;
-}
-
-:root:not([data-sky]),
-:root[data-sky="day"],
-:root[data-sky="dawn"],
-:root[data-sky="sunset"] {
-  --color-dimmed: #413f3d;
-  --color-focus: #734f12;
 }
 
 /* ------------------------------------------------

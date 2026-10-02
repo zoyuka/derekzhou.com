@@ -5,9 +5,9 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v11.css          All styles (versioned name — see Caching), the still sky of each hour
+/style.v12.css          All styles (versioned name — see Caching), the still sky of each hour
 /site.js                Email obfuscation only
-/hour.v1.js             The hour: which time of day the sky opens on (the page's one clock read)
+/hour.v2.js             The hour: which time of day the sky opens on (the page's one clock read)
 /sky.v2.js              The sky — light and cloud behind the page: thirteen skies in a random order (see Sky)
 /birds.v9.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
@@ -129,7 +129,7 @@ form controls, no scrollbars); theme-color follows the top of the drawn
 sky. Type is matte: no text-shadow, no glow. Links are plain underlined
 words (1px, dimmed underline, .18em offset); nothing reacts to hover; OS
 cursors only. The type is present at first paint in its final place,
-in its hour's colours (hour.v1.js runs before the first paint). Print
+in its hour's colours (hour.v2.js runs before the first paint). Print
 hides the sky, the birds and the footer, on white.
 
 ## Birds (birds.v9.js)
@@ -406,7 +406,7 @@ strips, time-lapses and whole-page sheets across seeds are looked at by
 eye. v9's raised horizon and turn check: the 10-minute suite on every
 viewport and scenario, all passing.
 
-## Sky (sky.v2.js, hour.v1.js)
+## Sky (sky.v2.js, hour.v2.js)
 
 THE CAMERA is the birds' (above): the window looks out over a sea of
 cloud, the horizon a fifth of the way up from its bottom edge, and the
@@ -474,7 +474,7 @@ first). Each has a group (the time of day it belongs to: dawn, day, rain,
 sunset, dusk, night), its words (dark or light), a hold of 70-110 s
 (x0.9-1.15 by the visit), a change of 55-60 s, and the skies it passes
 into most naturally (near). A visit opens on a sky of the visitor's hour
-(hour.v1.js: night 21-05, dawn 05-08, day 08-13, rain 13-16, sunset
+(hour.v2.js: night 21-05, dawn 05-08, day 08-13, rain 13-16, sunset
 16-19, dusk 19-21; any landing sky of that group, by the visit's draw),
 nine tenths as far through its hold as the hour is through its span; the
 light before sunrise is never a landing. After that the order is the
@@ -563,7 +563,7 @@ twice, a GPU or driver that draws nonsense is let go, its context freed:
 the stylesheet's sky stays); a lost context hides it (the still sky of
 the hour, its own colours) until restored, then read again and shown;
 no WebGL2: the stylesheet's still sky of the hour (data-sky, by
-hour.v1.js), its colours and words; no script: the still day sky.
+hour.v2.js), its colours and words; no script: the still day sky.
 prefers-reduced-motion: the hour's sky, drawn once, still (live both
 ways). forced-colors: no sky (and the sky back, read again, when they
 end). A hidden tab draws nothing; the sky's clock steps at most 50 ms. A
@@ -575,7 +575,7 @@ THE WEATHER: one crypto.getRandomValues above sky.v2.js's INIT-END
 marker (the cloud field, the towers, the wind, the stars, the order of
 the skies, the galaxy's lie, the aurora's folds, where the sun breaks
 through), and no clock:
-hour.v1.js reads the clock, once, and marks the page (data-sky,
+hour.v2.js reads the clock, once, and marks the page (data-sky,
 data-sky-at). No DOM is built: the canvas is in index.html.
 
 VERIFY before changing the sky: stills of every sky (data-sky-scene
@@ -593,7 +593,7 @@ done, or SwiftShader's slowness would rightly get the still sky.)
 
 ## CSS
 
-One file: style.v11.css. Plain CSS. Custom properties for theming.
+One file: style.v12.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
 WCAG AA contrast on all text over every sky (the script holds it on the
@@ -616,7 +616,7 @@ Four files, one job each:
 1. site.js — email obfuscation: HTML has href="#" id="email-link", JS
    assembles mailto from split parts at runtime so bots cannot scrape the
    address. A \<noscript\> fallback shows the email in HTML entities.
-2. hour.v1.js — the hour (in the head, before the first paint: tiny,
+2. hour.v2.js — the hour (in the head, before the first paint: tiny,
    Early-Hinted): which time of day the sky opens on.
 3. sky.v2.js — the sky (see Sky), deferred, before the birds.
 4. birds.v9.js — the birds (see Birds), deferred. Progressive
@@ -674,7 +674,7 @@ preloaded in index.html and Early-Hinted via Link headers on / in
 \_headers. Never preload a font no rule uses (Chrome warns, and every
 first visit pays for it).
 
-theme-color opens at the top of the hour's still sky (hour.v1.js, before
+theme-color opens at the top of the hour's still sky (hour.v2.js, before
 the first paint) and follows the top of the drawn sky. The favicon is SVG-first with PNG fallback.
 
 ## Caching
@@ -709,7 +709,7 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v9.js, sky.v2.js, hour.v1.js, plus style.v11.css for cursors —
+birds.v9.js, sky.v2.js, hour.v2.js, plus style.v12.css for cursors —
 never to this prose) fails on: arrows/cookie/analytics/Loading/
 navigation-role vocabulary in the HTML; any exit, idle, hover-position,
 key, blur, title, favicon-swap or storage handler in the JS; any DOM

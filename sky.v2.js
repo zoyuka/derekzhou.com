@@ -45,7 +45,7 @@
    what its light does: sunrise, the glory, the cloud prairie, the halo,
    silver rain, the rainbow, golden hour, the afterglow, the blue hour, a
    moonlit sea, the Milky Way, the aurora, and the light before sunrise. A
-   visit opens on a sky of the visitor's hour (hour.v1.js marks it), part
+   visit opens on a sky of the visitor's hour (hour.v2.js marks it), part
    way through it; after that the sky goes where the weather goes, with no
    clock: a minute or two in each sky, about a minute's change into the
    next, mostly into a neighbouring sky, now and then into any other
@@ -78,7 +78,7 @@
 
    THE WEATHER: one crypto.getRandomValues at init, above the INIT-END
    marker (the cloud field, the towers, the wind, the stars), and no
-   clock (hour.v1.js read it). No DOM is built: the canvas is in
+   clock (hour.v2.js read it). No DOM is built: the canvas is in
    index.html. */
 (function () {
   'use strict';
@@ -392,7 +392,7 @@
   }
 
   /* the order the skies come in: the visit opens on a sky of the visitor's
-     hour (hour.v1.js marks it), part way through it; after that, wherever
+     hour (hour.v2.js marks it), part way through it; after that, wherever
      the weather goes: mostly into a neighbouring sky, now and then (FAR)
      into any other through the cloud, never back into one of the last few;
      skies not yet seen this visit come sooner, and after a run of skies of
