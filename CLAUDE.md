@@ -5,11 +5,11 @@ Personal site for Derek Zhou. Pure HTML, CSS, JS. No frameworks. No build step.
 ## Structure
 
 /index.html             Home page
-/style.v12.css          All styles (versioned name — see Caching), the still sky of each hour
+/style.v13.css          All styles (versioned name — see Caching), the still sky of each hour
 /site.js                Email obfuscation only
 /hour.v2.js             The hour: which time of day the sky opens on (the page's one clock read)
-/sky.v2.js              The sky — light and cloud behind the page: thirteen skies in a random order (see Sky)
-/birds.v9.js            The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
+/sky.v3.js              The sky — light and cloud behind the page: thirteen skies in a random order (see Sky)
+/birds.v10.js           The birds — a sky in depth: every bird drawn afresh in the tattoo's hand, many kinds flying through it (see Birds)
 /subset-fonts.sh        Regenerates the .sub2 font subsets (manual tooling)
 /download-fonts.sh      Fetches the full source fonts (manual tooling)
 /404.html               Custom 404 page
@@ -69,14 +69,15 @@ browser before any client-side check can run.
 
 ## Content
 
-Name: Derek Zhou
+Name: Derek Zhou, lettered (see Type: the h1 is a drawing, its words kept
+for every reader)
 Role: Technology Leader (title/OG identity; the JSON-LD jobTitle stays
 "Team Lead" — the literal role at Accenture Song)
-Bio first sentence (bold): "Derek is a hands-on technology leader"
-Bio rest (dimmed): "who leads with clarity, empathy, and genuine enthusiasm
-for AI products and the outcomes they enable. He is accountable for solving
-complex design and engineering challenges across systems with the perfect
-balance of user value, business goals, and technical integrity."
+
+No bio. The owner, of the paragraph that followed the name: "remove the
+entire "Derek is a hands-on.." blurb". The page is the name, the credit
+row and the two links. (Its words survive only off the page, in the meta,
+Open Graph and Twitter descriptions: search and share text.)
 
 Experience (one line, the .credit row):
 
@@ -135,12 +136,25 @@ complex than a palette lol." with the reference's own creative techniques
 (paraphrased: its name stays out), and "Only the starting landing scene
 should depend on the system time. The rest should cycle through smoothly
 randomly non-time-dependent." Hence thirteen skies in a random order
-(see Sky).
+(see Sky). Then, shown a hand-lettered brush-script title (the
+reference lettering; the work it comes from stays unnamed, as above):
+"Also draw Derek Zhou in
+this style. Keep iterating until it's 100% exact. And remove the entire
+"Derek is a hands-on.." blurb."; of the first drawing: "The Z is off -
+shouldn't be 2 separate strokes - study similar fonts so u know what to
+do for it. Remove the feather entirely. 1 line layout pls"; and, choosing
+the hooked Z, and asked whether white lettering should stay white over a
+bright sky by darkening the sky behind it or switch to dark ink there:
+"A. Don't darken the background anywhere ever". So the name is lettering
+(see Type), and nothing on the page darkens the sky: where the ground is
+too bright for light ink the words take dark ink (see Sky).
 
-The words' colours follow the sky (see Sky). On a light sky: text #000,
-the dimmed grey a warm grey worked out for 4.7:1 on the bio's own ground
-(never lighter than #5f5c56), focus a dark ochre for 3.3:1, selection
-#e6e2d6 under the black text; on a dark sky (dusk, night): text #fdfcf7,
+The words' colours follow the sky (see Sky), and the sky is never darkened
+for them. On a light sky: text #000 (the lettered name and the links),
+the dimmed grey (the credit) a warm grey worked out for 4.7:1 on the
+credit's own ground (never lighter than #5f5c56), focus a dark ochre for
+3.3:1, selection #e6e2d6 under the black text; on a dark sky (dusk,
+night): text #fdfcf7,
 the dimmed grey a cool light grey for 4.7:1, focus a light gold,
 selection #3b3f55. The stylesheet carries each hour's colours for its
 still sky; the script refines them for the sky it drew (CSSOM custom
@@ -149,11 +163,13 @@ print, and the colour under everything. color-scheme stays light (no
 form controls, no scrollbars); theme-color follows the top of the drawn
 sky. Type is matte: no text-shadow, no glow. Links are plain underlined
 words (1px, dimmed underline, .18em offset); nothing reacts to hover; OS
-cursors only. The type is present at first paint in its final place,
-in its hour's colours (hour.v2.js runs before the first paint). Print
-hides the sky, the birds and the footer, on white.
+cursors only. The name and the type are present at first paint in their
+final place (the drawing's box is reserved by the stylesheet), in their
+hour's colours (hour.v2.js runs before the first paint). Print hides the
+sky, the birds and the footer, on white; the name prints black, 16rem
+wide.
 
-## Birds (birds.v9.js)
+## Birds (birds.v10.js)
 
 The page is a sky, seen in depth. Birds cross it the way birds cross a
 real sky, built from field data (RESEARCH below) and nothing like v1/v2's
@@ -306,9 +322,16 @@ alone or in a pair climbs away or comes down (CLIMB 10-20 degrees) on a
 sky 700 px or wider. Nothing starts, stops, loops, bounces or turns back
 in view: motion onset and sudden reversals are what pull the eye off text
 (Abrams & Christ 2003; Howard & Holcombe 2010). Samara's 1 s fade
-(`appear`) softens each bird's entry at the edge. A path is planned whole
+(`appear`) softens each bird's entry at the edge. A flight is done only
+when every one of its birds is out of view (GONE 8 px beyond the window,
+or faded into the distance), never when its leader leaves (v10: v9 ended
+a flight on its leader, and a receding skein's near-arm bird, nearer the
+eye and still in view, vanished mid-sky once in 47 runs, 1024x768, seed
+3, 457 s); a path on which a bird would stay in view LINGER 30 s past its
+leader is not flown. A path is planned whole
 before its first bird enters: the planner flies the flight forward in
-thought (STEP 0.3 s) and every bird's ink box at its nearness (with room
+thought (STEP 0.3 s), until its last bird has gone, and every bird's ink
+box at its nearness (with room
 for its bob) must stay WORDS 24 px from the .stack box and LINKS 20 px
 from each footer link, EDGE 10 px inside the edges the flight does not
 cross, and APART 48 px from every other flight, for the whole crossing;
@@ -352,7 +375,7 @@ visit is still everywhere), the season, and each flight's own stream
 
 Twelve inline SVGs at the end of index.html are lent to flights (so at
 most twelve birds at once), hidden until a flight shows them (no JS: no
-birds); birds.v9.js sets each one's viewBox and size (room for the bird
+birds); birds.v10.js sets each one's viewBox and size (room for the bird
 at its nearest), polyline, stroke width and stroke opacity (attributes,
 the last two only when they change), and moves it with a CSSOM
 transform. It adds no DOM (CI greps createElement/innerHTML/appendChild).
@@ -405,7 +428,8 @@ VERIFY before changing the flight: a node simulator flies the real file
 against a fake DOM with the real page layouts (12 viewports, rotations,
 scrolls, a phone's browser bar changing the height at load, reduced
 motion both ways) for 10 simulated minutes a run and checks: ink never
-within 12 px of the words (in practice 21 px or more), birds enter and
+within 12 px of the words (in practice 21 px or more; 28 or more about
+the lettered name's smaller stack), birds enter and
 leave only across an edge or out of and into the distance (never popping
 in or out mid-sky), no reversal and no turn over 25 degrees a second
 outside a thermal or a finch's bounding (the path measured without the
@@ -425,9 +449,16 @@ then a browser pass checks the same live (in WebKit, Safari's engine,
 too, with the window's height changed as the page loads), and film
 strips, time-lapses and whole-page sheets across seeds are looked at by
 eye. v9's raised horizon and turn check: the 10-minute suite on every
-viewport and scenario, all passing.
+viewport and scenario, all passing. v10's end of a flight (its last bird
+out of view): the same suite, 3 seeds of 10 minutes each, every viewport
+and scenario, all 47 passing (1024x768 seed 3 included: v9, flown beside
+it, still loses a bird mid-sky there at 457 s); a run's longest frame
+39.6 ms of CPU at most, 18.5 in the median run (on a shared machine
+under load a run's longest frame now and then passes the 40 ms bound,
+v9's as v10's: 50.9 and 40.2 ms in v9's run beside it, 43.8 in an
+earlier run of v10's).
 
-## Sky (sky.v2.js, hour.v2.js)
+## Sky (sky.v3.js, hour.v2.js)
 
 THE CAMERA is the birds' (above): the window looks out over a sea of
 cloud, the horizon a fifth of the way up from its bottom edge, and the
@@ -438,44 +469,59 @@ eye; everything a bird flies is nearer than any cloud.
 WHAT IS DRAWN (WebGL2, one fragment shader, per pixel, back to front):
 the sky's light (a gradient by height above the horizon: 0, 5, 15, 32,
 49 degrees, the old 60 degree stop moved down as no window shows it;
-warmed toward the light's side, deepened away from it, a haze band toward
-the horizon; the sun or the moon, their halos and a wider glow); a high
-deck at 5-7 (thin streaks, an overcast with rain under it, or a veil of
-ice), fogged toward its own sky; cumulus towers rising out of the sea
-(TOWERS 6 slots: a three-sphere core and nine lobes on the dome's
-envelope, joined by a smooth minimum and eroded by tiling 3D noise, soft
-edged; each builds out of the sea over BUILD 90 s, sinks back in about a
-minute (1.6x), and gives way where it would rise behind the words or over
-a sun or moon in view; with no room, a slot looks again in 2-5 s); and
-the sea of cloud below the eye (a heightfield of domes, round caps
-smoothly joined, two sizes, the small only near; ending in the horizon's
-haze). Cloud is lit as cloud, the reference's way: light carried on
-through it (octaves of scattering, each dimmer, deeper and less forward:
-the depth toward the light from two looks along it), its colour the
-light's where thin and the sky's own saturated blue where deep (thick,
-per sky; never grey), crevices lit by the cloud about them (powder)
-rather than darkened, the edge toward the light silvered (a forward
-phase), thin cloud beside the sun in pastel (iri). Aerial perspective:
-everything fades with distance into the horizon's haze (the near towers
-at 0.4 of the sea's fog, so they keep their form; the haze takes a third
-of the glow about the sun), and a low mist lies on the sea. And what the
-light does in the air, sky by sky (FX): a rainbow and its fainter twin
-with the dark band between and the supernumeraries inside, opposite a low
-sun, standing on distant showers (bow, curtain); a glory's rings on the
-cloud sea about the antisolar point (glory); the 22 degree halo and a sun
-dog in a veil of ice (halo, dogs); the Earth's shadow and the Belt of
-Venus opposite a low sun (belt); a pillar over it (pillar); noctilucent
-wisps low on the side the sun set (nlc); the moon's corona (corona); the
-Milky Way, its core low, its dark lanes, and a crowd of faint stars along
-it (galaxy, its lie drawn per visit so the band crosses the window); the
-aurora, three curtains folding slowly, rayed, green below and red above,
-its light on the cloud (aurora); once in a rain's hold, about 26 s of sun
-breaking through onto the sea (sbreak); light drifting in the air near
-the sun (motes, in the window pass, never over the words); the stars
-twinkling slowly. Then light shafts (radial, from the sky seen near the
+warmed toward the light's side, deepened away from it, a haze band
+toward the horizon; the sun or the moon, their halos and a wider glow);
+a high deck at 5-7 (thin streaks, an overcast with rain under it, or a
+veil of ice), fogged toward its own sky; cumulus towers rising out of
+the sea (TOWERS 6 slots: a three-sphere core and nine lobes on the
+dome's envelope, joined by a smooth minimum and eroded by tiling 3D
+noise, soft edged; each builds out of the sea over BUILD 90 s and sinks
+back in about a minute (1.6x); one is placed to rise neither behind the
+words nor over a sun or moon in view, and once risen it is never made to
+sink for the words (v2 sank a tower that drifted toward them: nothing
+steps back about the words), so drifting with the wind it may pass
+behind them; with no room, a slot looks again in 2-5 s); and the sea of
+cloud below the eye (a heightfield of domes, round caps smoothly joined,
+two sizes, the small only near; ending in the horizon's haze; how much
+of the light reaches it per sky, seaLit: 0.45 for the afterglow and 0.6
+for the light before sunrise, whose seas lie in the Earth's shadow, 0.55
+for the moonlit sea's silver, 1 elsewhere; at a twilight lost in a low
+mist, below). Cloud is lit as cloud, the reference's way: light carried
+on through it (octaves of scattering, each dimmer, deeper and less
+forward: the depth toward the light from two looks along it), its colour
+the light's where thin and the sky's own saturated blue where deep
+(thick, per sky; never grey), crevices lit by the cloud about them
+(powder) rather than darkened, the edge toward the light silvered (a
+forward phase), thin cloud beside the sun in pastel (iri). Aerial
+perspective: everything fades with distance into the horizon's haze (the
+near towers at 0.4 of the sea's fog, so they keep their form; the haze
+takes a third of the glow about the sun), and a low mist lies on the
+sea. And what the light does in the air, sky by sky (FX): a rainbow and
+its fainter twin with the dark band between and the supernumeraries
+inside, opposite a low sun, standing on distant showers (bow, curtain);
+a glory's rings on the cloud sea about the antisolar point (glory); the
+22 degree halo and a sun dog in a veil of ice (halo, dogs); the Earth's
+shadow and the Belt of Venus opposite a low sun (belt); a pillar over it
+(pillar); noctilucent wisps low on the side the sun set (nlc); the
+moon's corona (corona); the Milky Way, its core low, its dark lanes, and
+a crowd of faint stars along it (galaxy, its lie drawn per visit so the
+band crosses the window); the aurora, three curtains folding slowly,
+rayed, green below and red above, its light on the cloud (aurora); once
+in a rain's hold, about 26 s of sun breaking through onto the sea
+(sbreak); light drifting in the air near the sun (motes, in the window
+pass); the stars twinkling slowly, their light bounded at the source
+(with the sky's own light under it, a star never above STAR_TOP, OKLab L
+0.45: eased softly into the room the sky leaves under it, one way for
+every star on the whole sky, so a star near the moon or a glow fades as
+it would). The sky's events, the stars, the motes and the rain are drawn
+everywhere alike, about the words as anywhere (KEEPING A GLOW OFF THE
+WORDS, below). Then light shafts (radial, from the sky seen near the
 sun), a soft glow (dual-filter bloom), a shoulder for the highlights by
 the brightest channel (a hue keeps its hue as it brightens, and past
-white eases toward white), and a triangular dither before the frame is
+white eases toward white), on a sky with light words its ceiling (ceil,
+OKLab L 0.525: what passes KNEE 0.08 below it eased under it by a soft
+shoulder, hue kept, the same everywhere on the window but within FOOT
+4.5 degrees of the moon), and a triangular dither before the frame is
 stored in 8 bits (no bands). The noise (64 cubed 3D, 256 square 2D) is
 baked on the GPU over the first nine frames (eight layers a frame). One
 wind moves everything the same way (towers, sea, deck; v1 sent the sea
@@ -487,102 +533,255 @@ glory (the sun low behind the eye, the cloud sea lit full on), fair
 weather (azure, big round cumulus, shadows the sky's own blue), the halo
 (a high veil of ice), silver rain (a light overcast, showers far off),
 the rainbow (after the rain, the sun low behind the eye), golden hour
-(the sun on the sea, rim-lit towers, rays, a pillar), the afterglow (tops
-still pink over a sea in the Earth's shadow, the purple light), the blue
-hour (over an amber band, noctilucent wisps, the first stars), a moonlit
-sea, the Milky Way, the aurora, and the light before sunrise (tops lit
-first). Each has a group (the time of day it belongs to: dawn, day, rain,
-sunset, dusk, night), its words (dark or light), a hold of 70-110 s
-(x0.9-1.15 by the visit), a change of 55-60 s, and the skies it passes
-into most naturally (near). A visit opens on a sky of the visitor's hour
-(hour.v2.js: night 21-05, dawn 05-08, day 08-13, rain 13-16, sunset
-16-19, dusk 19-21; any landing sky of that group, by the visit's draw),
-nine tenths as far through its hold as the hour is through its span; the
-light before sunrise is never a landing. After that the order is the
-weather's, with no clock (the owner's word): each next sky is drawn from
-its near ones, or (FAR 38%) from any, never one of the last RECENT 3; a
-sky not yet seen this visit weighs more (1 / (1 + 2 x its visits)), and
-after a run of skies of one kind of words the other kind weighs four
-times as much, so a stay sees day and night. Simulated (the real file,
-400 visits from each hour, a stay of 15 minutes): about 6.5 skies; both
-kinds of words in 88-98% of stays, the other kind after a median of
-265-415 s; about 1.6 passes through the cloud and 1.7 flips.
-Colours blend in OKLab; a sun or moon fades where it stands (the outgoing
-gone by the middle of a change, the incoming from it); light and sun
-directions pass over the top where two skies face apart. A change
-between skies of different words passes a twilight waypoint (below); a
-change between skies that are not neighbours passes through the cloud
-(the sea swells into mist, the towers sink, the deck closes, and it all
-clears into the next sky: the reference's own way of passing between its
-places); both can be one waypoint. data-sky carries the group (the
-stylesheet's still sky and words for it); skyAir.cycle() reports the
-sky, the next, the change's progress and the words (read only, for the
-score); data-sky-scene on the root (the studio's) opens on a named sky.
-Each sky is the page's own, worked out from the light, never taken from
-a picture.
+(the sun on the sea, rim-lit towers, rays, a pillar), the afterglow
+(tops still pink over a sea in the Earth's shadow, the purple light),
+the blue hour (over an amber band, noctilucent wisps, the first stars),
+a moonlit sea, the Milky Way, the aurora, and the light before sunrise
+(tops lit first). The six skies with light words (the afterglow, the
+blue hour, the moonlit sea, the Milky Way, the aurora, the light before
+sunrise) keep all their own light, everywhere on the window, under the
+light ceiling, OKLab L 0.53 (Y 0.149: near-white reads on it at 5:1),
+but for the moon: their horizons at 0.52 (the afterglow's and the light
+before sunrise's from 0.64 and 0.62, the blue hour's from 0.55), their
+warmth toward the sun at 0.53 (from 0.70, 0.75, 0.62), the haze and the
+high deck of the two at 0.5 (from 0.55, 0.52 and 0.6), and what still
+passes (the lit tops, the moon's silver on the cloud, the aurora's
+folds, the galaxy's core, the wisps, a glow's bloom) eased under it by
+the finish's shoulder (ceil); the stars bounded at the source (above).
+That is the world's own light, the same in every direction, never a
+function of where the words are. Each has a group (the time of day it
+belongs to: dawn, day, rain, sunset, dusk, night), its words (dark or
+light), a hold of 70-110 s (x0.9-1.15 by the visit), a change of 55-60
+s, and the skies it passes into most naturally (near). A visit opens on
+a sky of the visitor's hour (hour.v2.js: night 21-05, dawn 05-08, day
+08-13, rain 13-16, sunset 16-19, dusk 19-21; any landing sky of that
+group, by the visit's draw), nine tenths as far through its hold as the
+hour is through its span; the light before sunrise is never a landing.
+After that the order is the weather's, with no clock (the owner's word):
+each next sky is drawn from its near ones, or (FAR 38%) from any, never
+one of the last RECENT 3; a sky not yet seen this visit weighs more (1 /
+(1 + 2 x its visits)), and after a run of skies of one kind of words the
+other kind weighs four times as much, so a stay sees day and night.
+Simulated (the real file, 400 visits from each hour, a stay of 15
+minutes): about 6.5 skies; both kinds of words in 88-98% of stays, the
+other kind after a median of 265-415 s; about 1.6 passes through the
+cloud and 1.7 flips. Colours blend in OKLab; a sun or moon fades where
+it stands (the outgoing gone by the middle of a change, the incoming
+from it; into or out of a twilight, gone by 0.38 of the change, or from
+0.62); the moon (the moonlit sky's, placed on the window at 0.82 of its
+width and 0.14 of its height, and on a window under 500 px tall higher
+and farther right, at 0.9 and 0.08) has its glare drawn tight (halo 600:
+over the ceiling only within about 4 degrees), and its footprint (FOOT
+4.5 degrees about it) stands KEEP 12 px clear of every block of words;
+should the words reach it on some other window, it is slid out toward
+the window's nearer side, then up, whole (its light never made less);
+light and sun directions pass over the top where two skies face apart. A
+change between skies of different words passes a twilight waypoint
+(below); a change between skies that are not neighbours passes through
+the cloud (the sea swells into mist, the towers sink, the deck closes,
+and it all clears into the next sky: the reference's own way of passing
+between its places); both can be one waypoint. data-sky carries the
+group (the stylesheet's still sky and words for it); skyAir.cycle()
+reports the sky, the next, the change's progress and the name's ink
+(read only, for the score); data-sky-scene on the root (the studio's)
+opens on a named sky. Each sky is the page's own, worked out from the
+light, never taken from a picture.
 
-THE WORDS on every sky (the veil and the bands): a frame's light where
-the words stand is read back (8 numbers: the bio's ground, its mean,
-spread, darkest and lightest; the links' ground, darkest and lightest;
-the window's top colour for theme-color; a PBO and a fence, never a
-stall; one at a time, the next queued) and followed smoothly. Dark words
-want their ground no darker than FLIP 0.186, light words no lighter than
-HI_MAX (0.167): RATIO 4.7:1, room above WCAG's 4.5 for rounding and
-dither. The dimmed grey is worked out for RATIO on the bio's ground
-(mean +- 3 sd), the focus ring for RING 3.3:1 on the links' ground (it
-is drawn around the links). Where the words stand (the bio and credit
-grown WORDS_CORE 8 px, the name NAME_CORE 20 px, as its letters reach
-below its box; a Gaussian feather of WORDS_FEATHER 110 px; the links
-LINKS_CORE 6, LINKS_FEATHER 40; drawn into a mask texture when the page
-moves, a ResizeObserver catching reflows that move no window: text
-spacing, zoom) the composite holds the light inside each band, lifting
-or dimming only what would break it: contrast holds whatever the
-read-back says. The hold is full in the core and eased out across the
-feather by the mask's strength (the clamped light mixed with the sky's
-own; a threshold scaled by the mask, v2's first cut, is crossed only
-near the core and drew the veil's edge as a box). Under dark words the
-bio's ground is held no darker than AIR 0.578 too, so the black stays
-2.6:1 from the dimmed grey: relaxed as a change nears a flip, and never
-lifted past the mean of the sky's own light there (ramped on the
-change's schedule it ran ahead of a sky still brightening out of the
-twilight, and showed). Where the words stand the sky's events step back
-to a fifth (the bow, the halo and sun dogs, the belt, a pillar, the
-galaxy, the aurora, the wisps): no word is set on a phenomenon. They
-step back in a calm of their own about the bio and the name (the mask's
-alpha), its feather the veil's on a phone and up to 2.5 times it on a
-wide window (W / 400), so a curtain or the galaxy's band fades out
-toward the words instead of stopping at an edge (with the veil's own
-feather a desktop aurora showed a dark panel). On a phone held upright
-the words cover most of the sky, so the aurora and the galaxy show there
-mostly as their light on the cloud and above the name. Under
-light words the bio's ground is held no lighter than AIR_LIGHT 0.095, so
-the near-white keeps 1.5:1 from the dimmed grey (the emphasis the type is
-built on), relaxed near a flip the same way and never dimmed below the
-sky's own mean: it acts on a phone turned sideways, where the words come
-down onto the glow at the horizon; on a desktop or an upright phone the
-skies after sunset and before sunrise hold their glow low, below the
-words, and the grey stays 1.68:1 or more from the near-white unaided. A
-scroll redraws the veil on the next frame. The words'
-colours are set only while the drawn sky shows (otherwise the
-stylesheet's are left alone); while it fades in over the still sky (2 s)
-they take the safer of the two sets (darker on a light sky, lighter on a
-dark one). The flip from dark words to light and back happens at a
-twilight: any change between skies of different words eases into a
-waypoint where the sky behind the words, and the sea under the links,
-stand evenly at the crossing (TWILIGHT and TWILIGHT_SEA, calibrated as
-drawn: 0.165-0.19 there; its hue the two skies' between, its chroma at
-least 0.045, a twilight purple where their hues cancel, so a crossing is
-never grey), flips the words there on the change's own time, and eases
-out; the bands pinch toward the crossing on
-the same schedule, so nothing jumps but the words. Measured (Chromium,
-SwiftShader; each text element's own colour against every ground pixel
-under its line boxes, the words hidden; the ring against the ground 2-6
-px about each link): settled, 3 viewports (1440x900, 390x844, 844x390)
-x 13 skies, every text role 4.60:1 or more and the ring 3.24 or more (on
-a phone turned sideways the links are below the fold), the bold over the
-dimmed grey 2.56-3.15:1 under dark words and 1.50-2.28 under light;
-through the fade-in (0, 0.7, 1.4 s), the same 3 viewports x a sky of
-each time of day, every text role 4.68 or more, the ring 3.33 or more.
+THE WORDS on every sky, and never a darkened sky (the owner's word:
+"Don't darken the background anywhere ever"): the window pass has no
+cap, so no pixel anywhere is ever drawn darker than the sky's own light
+(nor does anything about the words draw the sky itself less). Their ink
+follows their ground: dark (black, a warm grey, a dark ochre ring) on a
+light ground, light (#fdfcf7, a cool grey, a light gold ring) on a dark
+one; two groups take theirs each from their own ground, the name and the
+credit (the stack, on the sky; its colours on the root, the birds' ink
+too) and the links (on the sea below the horizon; theirs on the footer:
+their text, underline grey and focus ring). A frame's light where the
+words stand is read back (the darkest and lightest under the name's box,
+the credit and the links, 8 px about them where the ring is drawn; the
+credit's mean and spread; the window's top colour for theme-color: a PBO
+and a fence, never a stall; one at a time, the next queued); each frame
+keeps its own, and since the two frames on show crossfade linearly in
+light, their lightest, mixed at the crossfade's weight, bounds what is
+shown. Light ink needs its ground no lighter than HI_MAX 0.167 (RATIO
+4.7:1, room above WCAG's 4.5 for a pixel the read-back missed, rounding
+and dither: nothing can hold a ground down), so it is set only where the
+read-back shows the ground holds it; and the skies with light words keep
+their own light under the light ceiling (above), so on them it always
+does, a star behind a letter included. Dark ink reads on any ground:
+where a group's ground is darker than FLIP 0.182 (black at 4.64:1; held
+per pixel, so only rounding and the dither take it lower, to 4.55), the
+light is raised by the gain its darkest ground on show needs (FLIP over
+it) and no more, eased out across a field as wide as the window (a
+Gaussian from the group's boxes, LIFT_FEATHER 2.5 times the window's
+longer side: the name and the credit as one group, the links the other),
+so it reads as the light brightening and never as a shape of the words;
+at the words themselves (the boxes grown WORDS_CORE 8 px, the links'
+LINKS_CORE 6) nothing is left darker than FLIP, a last hold for a darker
+thread the read-back's grid steps over. The fields and cores are drawn
+into a mask texture when the page moves (a ResizeObserver catching
+reflows that move no window: text spacing, zoom), and only the window
+pass reads it: the sky itself never knows where the words are. Nowhere
+else is anything lifted. On a light sky nothing is lifted at all (the
+darkest ground under any word on a light sky is 0.27 or more, the links
+on golden hour's sea at 2560x1440); only as a change crosses its
+twilight, and while it is lifted, the crossfade into a newer frame that
+ends the lift (its ground needing none, or holding the light ink the
+change is going to) is done within HURRY 0.3 s, and should the newer
+frame lie in the band too, the next one is drawn quicker (in four
+drawings, not nine), so the lift lasts under a second. The dimmed grey
+is worked out for RATIO on the credit's ground (under dark ink its
+darkest, or its mean less 3 sd, with a tenth to spare; under light ink
+its lightest on show, with a fifth: the read-back samples the credit on
+a grid and can step over a thin bright streak, as under the high deck of
+the light before sunrise on a 430x932 phone, where three hundredths left
+the grey at 4.47:1; or, where stars can stand behind it, the stars' top,
+whichever is lighter), the ring for RING 3.3:1 on the links' (their
+darkest with fifteen hundredths to spare, their lightest with a tenth:
+the sea's fine grain the samples step over; each, under light ink, on
+its ground as the other group's lift raises it). The flips: within a
+change between a light sky and a dark one each group flips once, the
+moment its ground allows the new ink (to light: once its lightest on
+show is at or below HI_MAX; to dark: once it is above it, or the change
+is three quarters done), never back against the change; and since one
+group's lift reaches the other's ground too (its field is as wide as the
+window), a group keeps light ink only where its ground, so raised, still
+holds it, else it goes dark with the other: toward light the two flip
+together, once both grounds hold it. In a sky's hold the sky's own ink;
+should light ink's ground ever grow too bright (the skies with light
+words keep their light under the ceiling, so it should not), dark ink at
+once, and light ink back no sooner than DWELL 8 s, on a ground BACK 0.9
+of HI_MAX: never a flicker. The words' colours are set only while the
+drawn sky shows (otherwise the stylesheet's are left alone); while it
+fades in over the still sky (2 s) they take the safer of the two sets
+(darker on a light sky, lighter on a dark one).
+
+THE TWILIGHT: any change between skies of different words eases into a
+waypoint where the sky about the words is even and well below the
+crossing (TWILIGHT, OKLab L 0.48, 0.47, 0.466, 0.466, 0.43 at 0, 5, 15,
+32, 49 degrees; as drawn about 0.10 under the words): the gradient
+alone, no warmth toward the light or shade away from it, no deck, event,
+ray or glow, a sun or moon gone well before; its hue the two skies'
+between, its chroma at least 0.045, a twilight purple where their hues
+cancel, so a crossing is never grey; and the sea lost in a low mist the
+colour of that sky (TWILIGHT_MIST 0.95), so under the links the ground
+is as even and as dark as about the name. So light ink reads at the
+twilight with room. No pair of inks reads at 4.5:1 on one ground with
+room for dither (the band from HI_MAX to FLIP, 9%): as the light crosses
+it, dark ink needs a lift and light ink cannot yet be set. So that
+moment is short and reads as the light, not as a shape: the twilight is
+set well below the crossing, so the light crosses on the steep part of
+its way in or out; the sky about the words is even well before the light
+reaches the band and stays even until it has passed it (EVEN 1.8: the
+warmth, the shade, the deck, the events, rays, glow and the sea's mist
+fade out that much sooner than the light going in, and come back that
+much later coming out), so each group's ground is all but one light as
+it crosses; dark ink's lift is a gain, the least its darkest ground
+needs, spread over a field as wide as the window; and while it is on,
+the crossfade into the newer frame that ends it is hurried (HURRY), or
+the next frame drawn quicker. Measured through the changes (the next sky
+forced, the page's clock stepped a twelfth of a second about each
+crossing and while lifted, half a second elsewhere; the inks, the
+read-back and the gains each step; the composite read straight back as
+shown and with every words-related mechanism off; the window audited
+role by role about once a second near the flip, the words hidden),
+sunset to afterglow and back, first light to dawn, day to moonlit and
+aurora to halo at 1440x900, sunset to afterglow and back at 844x390 and
+day to moonlit at 390x844: each group flipped once a change, the two
+together every time (toward light at 0.35-0.36 of the change, toward
+dark at 0.68-0.69); every text role 4.60:1 or more and the ring 3.28 or
+more through them; dark ink's lift over the whole window, x1.13-1.25 at
+its peak, on for 0.34-0.85 s a change and by a tenth or more for
+0.16-0.34 s (by a fifth or more only going back to sunset at 844x390,
+0.34 s, and at 390x844, 0.16 s): toward light it builds as the newer
+frame crossfades in and goes with the flip, toward dark it comes with
+the flip and eases out as the light grows: for a moment the whole window
+is that much brighter, and it steps as the ink changes; and from the
+aurora to the afterglow at 1440x900 (two skies with light words, through
+the cloud), no flip and no lift, every role 4.66:1 or more and the ring
+3.46. Its map at its strongest (at 1440x900, sunset to afterglow: x1.099
+at the words, x1.098 200-400 px from them and x1.097 400-800 px out, its
+steepest change 0.003 over 60 px, the words' boxes explaining none of
+it; at 844x390, x1.106 at the words and x1.105-1.107 everywhere else,
+0.006 over 60 px): a field, not a panel, the window brightening all but
+evenly, with no shape of the words in it. v3's first cut (a floor across
+the words' boxes, a gain eased out over 110 px) lifted for up to 2.5 s a
+change and showed, the half second before the flip, as a faint lighter
+field the shape of the words' boxes (x1.16; 7% of a 1440x900 window by a
+tenth or more); an earlier cut (the floor eased toward FLIP across the
+whole feather, a twilight just below the crossing) lifted for 7-10 s, by
+a tenth or more for 2.5-5.5 s, at most x1.33.
+
+KEEPING A GLOW OFF THE WORDS is the sky's own doing, never a veil, and
+nothing about the words is ever drawn less: no calm, no starless patch.
+(v2, and the first cut of v3, stepped the sky's events back to a fifth
+about the words, a calm, and drew no star, mote or raindrop there: both
+darkened the sky about the words, a darker oval in a 2560 px aurora, and
+both are gone; the sky pass never sees where the words are.) Light ink
+is held by the light ceiling (THE SKIES): the skies with light words
+keep all their own light under OKLab L 0.53 everywhere on the window,
+and so under the words too, stars and all. The moon, the one bright
+thing that passes the ceiling, stands with its footprint clear of the
+words (above). And the seas of the afterglow, the light before sunrise
+and the moonlit sky hold their light low (seaLit, above: the first two
+lie in the Earth's shadow, as those skies always meant; the moon's
+silver on the sea a little less), so under the links every night sea
+stays at 0.125 or below under their line boxes and 0.124 in the 2-6 px
+about them where the ring is drawn, at every window measured (14
+windows, 320x568 to 2560x1440), where the old veil had held a dark box
+around the links. A scroll redraws the lift on the next frame.
+
+Measured (Chromium, SwiftShader; each text element's own colour against
+every ground pixel under its line boxes, the words hidden; the lettered
+name's ink against every ground pixel behind its strokes, its hairlines
+too; the ring against the ground 2-6 px about each link): settled, all
+13 skies at 1440x900, 390x844 and 844x390 (the phones at three device px
+a CSS px; 8 to 28 s after the sky opened, partway through its hold) and
+at 2560x1440 at two moments of each (15 to 65 s into its hold; the
+aurora and the Milky Way at a third, the aurora's nine tenths into its
+change to the Milky Way), every text role 4.65:1 or more (the lettered
+name 6.08 at its strokes, the credit 4.65, the links 6.05) and the ring
+3.37 or more, at 2560x1440 4.66 and 3.45; the four night skies whose
+seas are lightest at ten more windows (320x568 to 1920x1080), every text
+role 4.68:1 or more (the name 6.26, the links 5.86) and the ring 3.42 or
+more; through the fade-in (0, 0.7 and 1.4 s; 390x844, 844x390 and
+1440x900 x a sky of each time of day, and 2560x1440 x fair weather and
+the moonlit sea), every text role 4.77:1 or more (the name 7.31, the
+links 6.08) and the ring 3.46 or more; under reduced motion (390x844 and
+1440x900, five skies), every text role 4.72:1 or more and the ring 3.41
+or more; on the still skies (no WebGL2, each hour; no script, the day
+sky and each hour's; the four windows), every text role 5.35:1 or more
+(the name 10.01) and the ring 3.40 or more; the 404 (390x844 and
+1440x900, five hours), every text role 8.20:1 or more (its heading
+10.66) and the ring 4.01 or more; each sky's ink its own on every
+window. The light ceiling (W8: on every audited frame of a sky with
+light words, the frame composited again with the words' machinery off,
+every pixel's OKLab L): on 85 audited frames of the six skies with light
+words (14 windows, 320x568 to 2560x1440) and on every step of a change
+between two of them (the aurora to the afterglow, through the cloud: 90
+steps), no pixel over 0.53 outside the moon's footprint, the highest
+0.5254 (the afterglow at 2560x1440), and the moon's place never moved by
+the keep-out. Through a change between a dark sky and a light one the
+ceiling comes and goes with the change, as the skies' other numbers do
+(brought down sooner it would press the ground under dark ink below FLIP
+before the flip, and lengthen the lift): so on the light-ink side of
+such a change much of the window stands a little over 0.53 (at most L
+0.695 in the eight changes measured), and light ink holds there by the
+read-back alone (every role 4.60:1 or more through them, above). And no
+darkening, proved two ways: every audited frame and every step of the
+changes composited again at the same instant with every words-related
+mechanism off (the window pass's mask zeroed, its floor 0 and its gain
+1; the sky pass has no words input at all, its only textures the two
+noise fields, checked on every frame), each read straight back from the
+canvas, channel by channel: on the 137 audited frames (190 million
+pixels) and on the 2,210 steps of the nine changes composited so (2,084
+million pixels), not one pixel darker and not one channel lower (and on
+the settled frames not one pixel lifted); and twin runs at 2560x1440
+(the aurora, the Milky Way and the moonlit sea; fair weather and the
+moonlit sea at 1440x900 too), the page as shipped against the page with
+every words-related mechanism off for the whole run, the same visit and
+the same steps of the clock (paused, stepped a frame at a time to the
+same moment of the sky): identical, every channel of every pixel.
 
 CALM AND COST: the clouds drift with one wind (SEA_DRIFT 0.45-0.8 px/s
 where the sea is nearest, less far off, the deck faster aloft; the
@@ -590,7 +789,9 @@ distance gone is kept, so a new window changes the wind, never where the
 clouds are) and the towers build and sink over minutes; the light
 changes over a minute. A cloud frame (the window at SCALE 0.5 of its CSS
 px, never over PX_MAX 640,000 px) is drawn in equal row slices over
-PERIOD 1.5 s and crossfaded into. The window is drawn (DRAW_FPS) 12
+PERIOD 1.5 s and crossfaded into (while dark ink's lift waits on it, in
+four drawings and crossfaded within HURRY: a moment's double work at a
+twilight). The window is drawn (DRAW_FPS) 12
 times a second while it rains (on twos), else 6, and after THIN 300 s 4
 (the frames over twice the period); the canvas at most CANVAS_DPR 1.25
 device px a CSS px. All GPU work happens on those drawing ticks, each
@@ -625,7 +826,7 @@ resize re-aims and redraws. The sky animates for as long as the page is
 open, as the birds do: WCAG 2.2.2 asks for a pause control, and the
 owner chose none; prefers-reduced-motion is the stop.
 
-THE WEATHER: one crypto.getRandomValues above sky.v2.js's INIT-END
+THE WEATHER: one crypto.getRandomValues above sky.v3.js's INIT-END
 marker (the cloud field, the towers, the wind, the stars, the order of
 the skies, the galaxy's lie, the aurora's folds, where the sun breaks
 through), and no clock:
@@ -636,22 +837,41 @@ VERIFY before changing the sky: stills of every sky (data-sky-scene
 written into the page in flight) and every hour at 1440x900, 390x844,
 844x390 and 768x1024 (Chromium with SwiftShader, the page's clock
 faked); time-lapses of the random order over 15 minutes and more, and
-stepped, frame-exact renders of each flip (the words hidden, the light measured where they stand);
-a probe through each flip (the served file patched in flight to expose
-the read-back and the bands: no lift past the sky's own mean after a
-flip, 1.04-1.08 at the crossing); the still skies re-derived from renders
-when the skies change (the towers left out);
-the contrast audit above, settled and through the fade-in; reduced
-motion, a lost and restored context, rotation (no blank frame), print,
-forced colours, the 404 page, no WebGL, no script; a forced-black sky
-(the fallback takes it); the governor on synthetic frame clocks; WebKit
-(Safari's engine); the bird suite and the live bird pass with the sky
-running. (In the harness, the GPU's name is faked and its fences report
-done, or SwiftShader's slowness would rightly get the still sky.)
+stepped, frame-exact renders of each flip (the words hidden, the light
+measured where they stand); a probe through each change between a light
+sky and a dark one (the next sky forced and the page's clock stepped, a
+twelfth of a second about each crossing and while lifted, the served
+file patched in flight to expose the read-back, the inks and the lift:
+one flip a group a change, every role 4.5:1 and the ring 3:1 on the
+screenshots through it, the lift's size, reach and how long), and a map
+of the lift at its strongest (its fall-off from the words, its steepest
+change over 60 px, how much of it the words' boxes would explain: a
+field, never a panel); the no-darkening proof (the same instant
+composited as shown and with every words-related mechanism off, the mask
+zeroed, the floor 0 and the gain 1, at the crossfade's weight the last
+drawing tick showed, each read straight back from the canvas in one
+task, and compared channel by channel over the whole window: not one
+lower; screenshots will not do for this, as a composite drawn outside
+the page's own frames can reach the screen a frame late, either way),
+and twin runs (the page as shipped and with every words-related
+mechanism off for the whole run, the same visit, the clock paused and
+stepped alike, frame against frame); W8, the light ceiling (every sky
+with light words drawn with the words' machinery off, every pixel's
+OKLab L against 0.53 outside the moon's footprint, on every audited
+frame); the night seas under the links at a dozen window shapes and
+several moments of a hold; the still skies re-derived from renders when
+the skies change (the towers left out); the contrast audit above,
+settled and through the fade-in; reduced motion, a lost and restored
+context, rotation (no blank frame), print, forced colours, the 404 page,
+no WebGL, no script; a forced-black sky (the fallback takes it); the
+governor on synthetic frame clocks; WebKit (Safari's engine); the bird
+suite and the live bird pass with the sky running. (In the harness, the
+GPU's name is faked and its fences report done, or SwiftShader's
+slowness would rightly get the still sky.)
 
 ## CSS
 
-One file: style.v12.css. Plain CSS. Custom properties for theming.
+One file: style.v13.css. Plain CSS. Custom properties for theming.
 All @font-face declarations (subsets + metric fallbacks) at top of file.
 Clamp-based spacing for fluid layout across viewports.
 WCAG AA contrast on all text over every sky (the script holds it on the
@@ -663,12 +883,26 @@ dissolves in over its own; :root[data-sky] choosing it and the words'
 colours, per time of day; each sky's colours hold against its
 whole gradient, wherever a window puts the words (text and the dimmed
 grey 4.7:1 or more, the focus ring 3.3:1; CI samples every gradient as
-the browser draws it and fails below 4.5 and 3). The canvas (.sky) is fixed behind
+the browser draws it and fails below 4.5 and 3). (Taken again once the
+skies with light words were held under their light ceiling and three of
+them held their sea's light low (seaLit): the night sky whole but its
+top, the colour hour.v2.js gives the browser's bar at first paint; the
+dusk sea, 92-100%. So the drawn sky dissolves in over its own, not over
+a lighter one. The dusk still sky's horizon band, 72-82%, stays a little
+darker than the drawn afterglow's (#6c423c, #6b4242, #684347 where the
+renders give #754944, #795254, #724f56): taken as drawn, it would need a
+far lighter dimmed grey for dusk under CI's whole-gradient rule.) The
+canvas (.sky) is fixed behind
 everything (z-index -1), unseen until drawn. One keyframe, `appear` (a
 bird's 1 s fade-in, Samara's, off under prefers-reduced-motion; the
 sky's 2 s dissolve over the still sky, kept: a dissolve is not motion);
 no transitions. :focus-visible is a 2px outline in the focus colour,
-offset 3px, on every focusable.
+offset 3px, on every focusable. The name's two rules live here (CSP:
+style-src 'self', no inline style): `.name svg` (display block, width
+min(25.25rem, 100vw less main's padding), height auto, aspect-ratio
+1310 / 314) and `.visually-hidden` (the clip pattern); print sets the
+drawing 16rem wide. `.words` is the words' role for a paragraph (the
+404's line).
 
 ## JS
 
@@ -679,24 +913,40 @@ Four files, one job each:
    address. A \<noscript\> fallback shows the email in HTML entities.
 2. hour.v2.js — the hour (in the head, before the first paint: tiny,
    Early-Hinted): which time of day the sky opens on.
-3. sky.v2.js — the sky (see Sky), deferred, before the birds.
-4. birds.v9.js — the birds (see Birds), deferred. Progressive
+3. sky.v3.js — the sky (see Sky), deferred, before the birds.
+4. birds.v10.js — the birds (see Birds), deferred. Progressive
    enhancement throughout: with JS off, the page is the typography on
    the still day sky.
 
 ## Type
 
-Two families, three roles. The owner asked for a grotesk and a mono
-(Diatype, Neue Haas Grotesk, Monument Grotesk Mono named); Geist and
-Geist Mono (Vercel with basement.studio, SIL Open Font License 1.1) are
-the free, licensed stand-ins, until a web licence for the Dinamo faces
-is bought:
+The name is lettering; everything else is two families. The owner asked
+for a grotesk and a mono (Diatype, Neue Haas Grotesk, Monument Grotesk
+Mono named); Geist and Geist Mono (Vercel with basement.studio, SIL Open
+Font License 1.1) are the free, licensed stand-ins, until a web licence
+for the Dinamo faces is bought:
 
-* the name (h1): Geist 500, clamp(2.75rem, 1.9rem + 4vw, 4.75rem), line
-  height 1, tracked in -0.045em
-* the words (the bio, the links, every paragraph to come): Geist 400,
-  1.0625rem, line height 1.55, -0.006em, a 22.5em measure; the bio's
-  first sentence 500 in full black, the rest dimmed
+* the name (the home page's h1): not a font but a drawing, "Derek Zhou"
+  in the hand of the reference lettering (a casual brush script, on one
+  line; the Z one stroke, a zigzag entering with a hook at its top left,
+  as the reference lettering's capitals enter), one SVG path
+  filled with currentColor, so it takes the words' ink (black on a light
+  sky, #fdfcf7 on a dark one, CanvasText in forced colours). The h1 is
+  `<span class="visually-hidden">Derek Zhou</span>` and the drawing
+  (aria-hidden, focusable="false"): a screen reader, a search engine and
+  the page's outline still get the words. 25.25rem wide where the window
+  allows (the old set name's weight of ink: Geist 500 at 76 px), else the
+  measure main's padding leaves (85% of a 320 px phone, 88% of 390); its
+  box reserved by aspect-ratio 1310 / 314 (the drawing's viewBox), so
+  nothing moves as the page loads. The drawing is used as approved: no
+  letter is redrawn here. For contrast it is text, its hairlines too:
+  4.5:1 against the ground behind every stroke.
+* a heading set in type (the 404's "404", any heading to come): Geist
+  500, clamp(2.75rem, 1.9rem + 4vw, 4.75rem), line height 1, tracked in
+  -0.045em
+* the words (the links, the 404's line, every paragraph to come): Geist
+  400, 1.0625rem (the footer's links .875rem), line height 1.55,
+  -0.006em, a 22.5em measure
 * the facts (the credit row; to come: dates, roles, labels, captions,
   code): Geist Mono 400, .8125rem, dimmed; no uppercase, no tracking
 
@@ -729,8 +979,11 @@ metric-matched fallbacks give CLS = 0 by construction: 'Geist Fallback'
 size-adjust the page's own text set in Geist over the same text in the
 system face and their ascent and descent Geist's (1.005, 0.295) over
 it; 'Geist Mono Fallback' (Menlo, Courier New) by the advance, 0.6 em.
-Checked: with Arial's metric twin standing in, the fallback wraps the
-bio in the same lines as Geist, the name within 1%. Both subsets are
+Checked (while the page still set its bio and name in type): with
+Arial's metric twin standing in, the fallback wrapped the bio in the same
+lines as Geist, the name within 1%. On the home page Geist sets the links
+(400) and the h1's hidden words (500), Geist Mono the credit; the 404
+sets its heading in Geist 500: both files are used, so both subsets are
 preloaded in index.html and Early-Hinted via Link headers on / in
 \_headers. Never preload a font no rule uses (Chrome warns, and every
 first visit pays for it).
@@ -763,7 +1016,12 @@ Title: "Derek Zhou — Technology Leader".
 
 ## Security
 
-All content directly in HTML. No innerHTML. No JS-generated DOM.
+All content directly in HTML. No innerHTML. No JS-generated DOM. The
+lettered name is an inline SVG in index.html (one path; no text,
+script, style, link or paint server in it), and CI step "The lettered
+name keeps its words" fails if the h1 loses its visually hidden words,
+the drawing loses aria-hidden or grows anything but its one
+currentColor path, or the stylesheet stops reserving its box.
 External JS and CSS files (enables strict CSP with no unsafe-inline —
 CI greps index.html and 404.html for inline style/handlers).
 \_headers file: script-src 'self'; style-src 'self'; connect-src 'none';
@@ -772,7 +1030,7 @@ COOP + CORP same-origin; Referrer-Policy no-referrer; broad
 Permissions-Policy denial; X-Permitted-Cross-Domain-Policies none.
 CI checks that security.txt has not expired.
 CI step "Absences are enforced" (scoped to index.html, 404.html, site.js,
-birds.v9.js, sky.v2.js, hour.v2.js, plus style.v12.css for cursors —
+birds.v10.js, sky.v3.js, hour.v2.js, plus style.v13.css for cursors —
 never to this prose) fails on: arrows/cookie/analytics/Loading/
 navigation-role vocabulary in the HTML; any exit, idle, hover-position,
 key, blur, title, favicon-swap or storage handler in the JS; any DOM
