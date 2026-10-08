@@ -8,7 +8,7 @@
    the opening sky the skies in a random order, changing smoothly, with no
    clock.
 
-   ONE CAMERA. The window is the birds' camera (birds.v9.js): it looks
+   ONE CAMERA. The window is the birds' camera (birds.v10.js): it looks
    out and up over a sea of cloud, the horizon a fifth of the window's
    height above its bottom edge (lower where the words come down that
    far). The birds aim it and lend it here (skyAir.aim); everything below
@@ -54,15 +54,33 @@
    last few. Colours blend in OKLab; a sun or moon fades where it stands.
    Each sky is our own, worked out from the light, not taken from a picture.
 
-   THE WORDS stay legible on every sky: where they stand, the light is
-   held inside a band (the veil: a feathered lift, or a dimming, of only
-   what would break it), and the words' colours follow the sky: dark on
-   a light sky, light on a dark one, the dimmed grey worked out afresh
-   for 4.7:1 on its ground, the focus ring 3.3:1 on the links'. The flip
-   from dark words to light and back happens halfway through a change,
-   the sky about the words held at a twilight there where both read at
-   4.7:1. The ground is read back from what was drawn (8 numbers,
-   without stalling).
+   THE WORDS stay legible on every sky, and the sky is never darkened
+   for them (the owner's word: not anywhere, not ever). Their ink follows
+   the ground: dark on a light sky, light on a dark one, the dimmed grey
+   worked out afresh for 4.7:1 on its ground, the focus ring 3.3:1 on the
+   links'; the name and credit, on the sky, and the links, on the sea, each
+   take theirs from their own ground. The ground is read back from what
+   was drawn (the darkest and lightest under the name, the credit and the
+   links, without stalling), and light ink is only ever set on a ground
+   that holds it: going from dark ink to light, the flip waits for the
+   ground to be dark enough; going back, it comes the moment the ground
+   grows too bright for light ink (once each way in a change: no
+   flicker). Under dark ink the light is lifted where it would break it
+   (by the gain the words' own darkest ground needs, eased out across a
+   field as wide as the window, so it reads as the light brightening; a
+   floor at the words themselves as a last hold: only as a change
+   crosses its twilight, for under a second). Nothing about the words is
+   ever drawn less: the sky's events, the stars, the motes and the rain
+   are drawn everywhere alike, the words or no words. Light ink is held
+   by the sky's own light: the six skies with light ink keep all of it,
+   everywhere on the window, under a light ceiling (OKLab L 0.53: their
+   horizons, glows, lit tops, the moon's silver, the aurora, the galaxy
+   and the wisps graded under it, a soft shoulder easing what passes it,
+   the stars' light bounded at the source), but for the moon, a declared
+   bright thing that stands where no words are (its glare drawn tight);
+   the twilight between a light sky and a dark one is even about the
+   words, and the seas of the skies after sunset, before sunrise and
+   under the moon hold their light low under the links.
 
    CALM. The clouds drift (well under a pixel a second near the window,
    less far off) and build and dissolve over minutes; the light changes
@@ -109,19 +127,24 @@
   var SEA_DRIFT = [0.45, 0.8];   // px/s: the sea's drift where it is nearest the window
   var TOWERS = 6;             // tower slots
   var BUILD = 90;             // s: a tower building out of the sea, or sinking back
-  var WORDS_CORE = 8;         // px: the veil's full hold about the words
-  var NAME_CORE = 20;         // px: ... and about the name (its letters reach below its box)
-  var WORDS_FEATHER = 110;    // px: its feather beyond (a Gaussian's fall)
-  var LINKS_CORE = 6, LINKS_FEATHER = 40;
+  var LIFT_FEATHER = 2.5;     // dark ink's lift about the words, eased out across a feather this many times the window's
+                              //  longer side (a Gaussian's fall): it reads as the light brightening, never as a shape
+  var WORDS_CORE = 8;         // px: the floor's last hold about the name and the credit (the lettering's ink lies inside its box) ...
+  var LINKS_CORE = 6;         // ... and about the links
+  var STAR_TOP = 0.0911;      // the stars' light, with the sky's own under it, never above this (OKLab L 0.45, under the light
+                              //  ceiling, L 0.53): softly bounded at the source, the same for every star on the whole sky
   var RATIO = 4.7;            // the words' contrast on the sky (WCAG's 4.5, with room for rounding and dither)
   var RING = 3.3;             // the focus ring's (3)
-  var FLIP = 0.186;           // the darkest sky black words read on at RATIO
-  var AIR = 0.578;            // the words' own air: under dark words the bio's ground no darker than this, so the
-                              //  bold black stays 2.6:1 against the dimmed grey (relaxed as a change nears the flip,
-                              //  and never lifted past the mean of the sky's own light there)
-  var AIR_LIGHT = 0.095;      // ... and under light words no lighter than this, so the near-white keeps 1.5:1 from
-                              //  the dimmed grey (relaxed the same way, and never dimmed below the sky's own mean:
-                              //  on a phone turned sideways the words come down onto the glow at the horizon)
+  var FLIP = 0.182;           // dark ink's floor: black on it reads at 4.64:1 (held per pixel, so only rounding and
+                              //  the dither, a 1/255 step, take it lower: 4.55:1)
+  var HURRY = 0.3;            // s: while dark ink's lift is on and the newer frame on show would end it, the crossfade
+                              //  into that frame is done within this, and should it not, the next frame is drawn
+                              //  quicker (in four drawings): the lift as brief as the frames allow
+  var DWELL = 8;              // s: light ink that had to give way to dark on a dark sky comes back no sooner,
+  var BACK = 0.9;             //  and only on a ground this share of the lightest it reads on (no flicker)
+  var KNEE = 0.08;            // a light-words sky's ceiling (OKLab L, its own light eased under it) begins to bend this far below it
+  var FOOT = 4.5;             // deg: a moon's footprint (its disc, corona and glare where they pass the light ceiling, drawn
+  var KEEP = 12;              //  tight), kept this many px clear of every block of words
   var DEG = Math.PI / 180;
 
   /* ---------------- the visit's streams (splitmix32) ---------------- */
@@ -188,8 +211,11 @@
      where thick, never grey); ms: light scattered on through the cloud;
      g: how far forward; powder: crevices lit by the cloud about them;
      iri: thin cloud by the sun in pastel. sea: how far below the eye its
-     tops lie, their height, softness, and how much they vary; fog, mist,
-     fogC: the air. deck: height, cover, opacity, darkening. towers: how
+     tops lie, their height, softness, and how much they vary; seaLit: how
+     much of the light reaches it (less where the sea lies in the Earth's
+     shadow, or the moon's silver is held low under the links), seaMist how
+     far it is lost in a low mist the colour of the sky about the words (at
+     a twilight); fog, mist, fogC: the air. deck: height, cover, opacity, darkening. towers: how
      many of the slots; tall. And the sky's own events: bow (a rainbow
      opposite the sun), glory (its rings on the cloud sea below), halo and
      dogs (the 22 degree ring and the sun dogs, in a high ice veil), belt
@@ -205,9 +231,9 @@
   var BASE = {
     hold: 90, move: 60, tint: [0.95, 0.03, 80], tintAmt: 0.3, tintPow: 3, deep: 0.08, sun: null, disc: null,
     thick: [0.76, 0.1, 238], ms: 1, g: 0.65, powder: 0.6, iri: 0,
-    sea: [1, 0.62, 0.05, 0.55], fog: 0.02, mist: 0.5, deck: [7, 0.25, 0.5, 0.05],
+    sea: [1, 0.62, 0.05, 0.55], seaLit: 1, seaMist: 0, fog: 0.02, mist: 0.5, deck: [7, 0.25, 0.5, 0.05],
     towers: 0.6, tall: 0.9, stars: 0, rain: 0, rainC: [0.92, 0.02, 205], shafts: 0, shaftC: [0.95, 0.05, 75],
-    bloom: 0.1, exposure: 1, sat: 1
+    bloom: 0.1, exposure: 1, sat: 1, ceil: 2
   };
   var SCENES = {
     dawn: {     // sunrise over the sea: lavender above, peach at the rising sun, mist, the Belt of Venus opposite
@@ -281,35 +307,35 @@
     },
     afterglow: {  // the sun just down: tops still pink, the sea in the Earth's shadow, the purple light
       group: 'dusk', words: 1, hold: 70, move: 60, near: ['bluehour', 'sunset', 'milkyway', 'moonlit'],
-      sky: [[0.64, 0.1, 52], [0.4, 0.065, 26], [0.34, 0.06, 330], [0.315, 0.062, 290], [0.29, 0.06, 274]],
-      tint: [0.7, 0.12, 48], tintAmt: 0.42, tintPow: 8, deep: 0.12,
+      sky: [[0.52, 0.1, 52], [0.4, 0.065, 26], [0.34, 0.06, 330], [0.315, 0.062, 290], [0.29, 0.06, 274]],
+      tint: [0.53, 0.12, 48], tintAmt: 0.42, tintPow: 8, deep: 0.12,
       lightC: [0.78, 0.12, 40], lightI: 0.75, light: { az: 62, el: -2 },
       disc: { az: 62, el: -3, r: 0.5, i: 0, halo: 9, haloI: 0.12, wide: 0.02, c: [0.75, 0.12, 45] },
       ambU: [0.48, 0.06, 290], ambUI: 0.65, ambD: [0.5, 0.05, 270], ambDI: 0.45, alb: [0.95, 0.02, 40],
-      thick: [0.55, 0.08, 300], g: 0.7, powder: 0.5, fog: 0.026, mist: 0.55, fogC: [0.55, 0.06, 300],
-      deck: [7, 0.4, 0.6, 0.1], deckC: [0.6, 0.08, 20], towers: 0.7, tall: 0.95, stars: 0.05,
-      shafts: 0.15, shaftC: [0.8, 0.1, 45], bloom: 0.15, belt: 0.6
+      thick: [0.55, 0.08, 300], g: 0.7, powder: 0.5, seaLit: 0.45, fog: 0.026, mist: 0.55, fogC: [0.5, 0.06, 300],
+      deck: [7, 0.4, 0.6, 0.1], deckC: [0.5, 0.08, 20], towers: 0.7, tall: 0.95, stars: 0.05,
+      shafts: 0.15, shaftC: [0.8, 0.1, 45], bloom: 0.15, belt: 0.6, ceil: 0.525
     },
     bluehour: {   // the blue hour over an amber band, noctilucent wisps low on the sunset side, the first stars
       group: 'dusk', words: 1, hold: 70, move: 60, near: ['moonlit', 'milkyway', 'aurora', 'afterglow', 'firstlight'],
-      sky: [[0.55, 0.1, 52], [0.37, 0.045, 15], [0.345, 0.05, 285], [0.3, 0.06, 270], [0.27, 0.058, 266]],
-      tint: [0.62, 0.11, 58], tintAmt: 0.4, tintPow: 7, deep: 0.1,
+      sky: [[0.52, 0.1, 52], [0.37, 0.045, 15], [0.345, 0.05, 285], [0.3, 0.06, 270], [0.27, 0.058, 266]],
+      tint: [0.53, 0.11, 58], tintAmt: 0.4, tintPow: 7, deep: 0.1,
       lightC: [0.6, 0.09, 58], lightI: 0.4, light: { az: 64, el: -7 },
       disc: { az: 64, el: -6, r: 0.5, i: 0, halo: 12, haloI: 0.14, wide: 0.03, c: [0.62, 0.11, 58] },
       ambU: [0.36, 0.05, 270], ambUI: 0.7, ambD: [0.4, 0.045, 265], ambDI: 0.5, alb: [0.9, 0.02, 260],
       thick: [0.38, 0.06, 270], ms: 0.9, powder: 0.4, fog: 0.026, mist: 0.6, fogC: [0.42, 0.05, 272],
       deck: [7, 0.3, 0.5, 0.15], deckC: [0.4, 0.05, 280], stars: 0.35, shafts: 0.1, shaftC: [0.62, 0.1, 58], bloom: 0.12,
-      nlc: 1, belt: 0.4
+      nlc: 1, belt: 0.4, ceil: 0.525
     },
     moonlit: {    // a moonlit sea: the moon high on the right in its corona, the cloud silvered
       group: 'night', words: 1, hold: 95, move: 60, near: ['milkyway', 'aurora', 'firstlight', 'bluehour'],
       sky: [[0.4, 0.035, 250], [0.345, 0.042, 258], [0.295, 0.046, 264], [0.255, 0.048, 267], [0.225, 0.046, 269]],
       tint: [0.42, 0.04, 250], tintAmt: 0.18, tintPow: 2, deep: 0.04,
       lightC: [0.84, 0.025, 245], lightI: 0.5, light: 'disc', sun: { az: 150, el: -30 },
-      disc: { x: 0.82, y: 0.14, r: 0.6, i: 1.7, halo: 70, haloI: 0.22, wide: 0.012, c: [0.94, 0.02, 245] },
+      disc: { x: 0.82, y: 0.14, xs: 0.9, ys: 0.08, r: 0.6, i: 1.7, halo: 600, haloI: 0.3, wide: 0.012, c: [0.94, 0.02, 245] },
       ambU: [0.34, 0.05, 262], ambUI: 0.72, ambD: [0.36, 0.04, 255], ambDI: 0.45, alb: [0.95, 0.01, 250],
-      thick: [0.46, 0.06, 262], powder: 0.5, fogC: [0.4, 0.045, 258],
-      deck: [7, 0.3, 0.4, 0.05], deckC: [0.4, 0.035, 255], towers: 0.5, tall: 0.85, stars: 0.6, bloom: 0.06, corona: 1
+      thick: [0.46, 0.06, 262], powder: 0.5, seaLit: 0.55, fogC: [0.4, 0.045, 258],
+      deck: [7, 0.3, 0.4, 0.05], deckC: [0.4, 0.035, 255], towers: 0.5, tall: 0.85, stars: 0.6, bloom: 0.06, corona: 1, ceil: 0.525
     },
     milkyway: {   // no moon: the galaxy's band over the sea, its dark lanes, a sky full of stars
       group: 'night', words: 1, hold: 95, move: 60, near: ['aurora', 'moonlit', 'firstlight'],
@@ -318,7 +344,7 @@
       lightC: [0.6, 0.02, 250], lightI: 0.15, light: { az: -30, el: 60 }, sun: { az: 170, el: -40 },
       ambU: [0.3, 0.045, 262], ambUI: 0.75, ambD: [0.32, 0.035, 255], ambDI: 0.5, alb: [0.92, 0.01, 250],
       thick: [0.3, 0.04, 262], ms: 0.8, g: 0.5, powder: 0.3, fog: 0.018, mist: 0.4, fogC: [0.34, 0.035, 255],
-      deck: [7, 0.12, 0.3, 0.05], deckC: [0.32, 0.03, 255], towers: 0.4, tall: 0.8, stars: 1, bloom: 0.04, galaxy: 1
+      deck: [7, 0.12, 0.3, 0.05], deckC: [0.32, 0.03, 255], towers: 0.4, tall: 0.8, stars: 1, bloom: 0.04, galaxy: 1, ceil: 0.525
     },
     aurora: {     // the aurora: green curtains folding slowly, red at their tops, their light on the cloud
       group: 'night', words: 1, hold: 100, move: 60, near: ['milkyway', 'moonlit', 'firstlight', 'bluehour'],
@@ -327,22 +353,22 @@
       lightC: [0.72, 0.09, 152], lightI: 0.38, light: { az: 10, el: 25 }, sun: { az: 180, el: -35 },
       ambU: [0.34, 0.055, 172], ambUI: 0.75, ambD: [0.3, 0.035, 250], ambDI: 0.45, alb: [0.92, 0.01, 240],
       thick: [0.3, 0.04, 250], ms: 0.8, g: 0.5, powder: 0.3, fog: 0.018, mist: 0.45, fogC: [0.33, 0.04, 220],
-      deck: [7, 0.1, 0.3, 0.05], deckC: [0.32, 0.03, 240], towers: 0.4, tall: 0.8, stars: 0.75, bloom: 0.1, aurora: 1
+      deck: [7, 0.1, 0.3, 0.05], deckC: [0.32, 0.03, 240], towers: 0.4, tall: 0.8, stars: 0.75, bloom: 0.1, aurora: 1, ceil: 0.525
     },
     firstlight: { // before the sunrise: tops lit first over a sea still in the Earth's shadow
       group: 'night', words: 1, hold: 70, move: 55, near: ['dawn', 'glory', 'moonlit'], land: false,
-      sky: [[0.62, 0.085, 58], [0.39, 0.055, 24], [0.335, 0.052, 320], [0.31, 0.056, 286], [0.285, 0.054, 274]],
-      tint: [0.75, 0.1, 58], tintAmt: 0.38, tintPow: 8, deep: 0.1,
+      sky: [[0.52, 0.085, 58], [0.39, 0.055, 24], [0.335, 0.052, 320], [0.31, 0.056, 286], [0.285, 0.054, 274]],
+      tint: [0.53, 0.1, 58], tintAmt: 0.38, tintPow: 8, deep: 0.1,
       lightC: [0.82, 0.1, 50], lightI: 0.6, light: { az: -62, el: -3 },
       disc: { az: -62, el: -3, r: 0.5, i: 0, halo: 10, haloI: 0.12, wide: 0.02, c: [0.8, 0.1, 55] },
       ambU: [0.46, 0.05, 285], ambUI: 0.65, ambD: [0.5, 0.04, 280], ambDI: 0.45, alb: [0.95, 0.015, 50],
-      thick: [0.5, 0.06, 290], g: 0.7, powder: 0.5, fogC: [0.52, 0.05, 290],
-      deck: [7, 0.35, 0.55, 0.1], deckC: [0.6, 0.07, 30], stars: 0.12, shafts: 0.15, shaftC: [0.8, 0.1, 55], bloom: 0.14, belt: 0.6
+      thick: [0.5, 0.06, 290], g: 0.7, powder: 0.5, seaLit: 0.6, fogC: [0.5, 0.05, 290],
+      deck: [7, 0.35, 0.55, 0.1], deckC: [0.5, 0.07, 30], stars: 0.12, shafts: 0.15, shaftC: [0.8, 0.1, 55], bloom: 0.14, belt: 0.6, ceil: 0.525
     }
   };
   var IDS = Object.keys(SCENES);
   var COLOURS = ['tint', 'lightC', 'ambU', 'ambD', 'alb', 'thick', 'fogC', 'deckC', 'rainC', 'shaftC'];
-  var NUMBERS = ['mist', 'tintAmt', 'tintPow', 'deep', 'lightI', 'ambUI', 'ambDI', 'ms', 'g', 'powder', 'iri', 'fog', 'towers', 'tall', 'stars', 'rain', 'shafts', 'bloom', 'exposure', 'sat'].concat(FX);
+  var NUMBERS = ['mist', 'seaLit', 'seaMist', 'tintAmt', 'tintPow', 'deep', 'lightI', 'ambUI', 'ambDI', 'ms', 'g', 'powder', 'iri', 'fog', 'towers', 'tall', 'stars', 'rain', 'shafts', 'bloom', 'exposure', 'sat', 'ceil'].concat(FX);
   IDS.forEach(function (n) {
     var S = SCENES[n], k;
     for (k in BASE) if (S[k] === undefined) S[k] = BASE[k];
@@ -354,15 +380,24 @@
   });
 
   /* the change between two skies. Most pass straight into each other; two
-     that need more pass through a waypoint, halfway: where the words flip
-     (dark to light, or back) the sky about them stands evenly at the
-     crossing (OKLab L 0.56, where dark words and light read alike), its
-     hue the two skies' between (never grey: a twilight's purple light where
-     they cancel), the glows low, so the veil has nothing to hold; and a
-     change between skies that are not neighbours goes through the cloud:
-     the sea swells into mist and clears into the next (the way the
-     reference passes between its places) */
-  var TWILIGHT = [0.585, 0.558, 0.553, 0.552, 0.51];    // (as drawn, with the haze and glows, the crossing itself)
+     that need more pass through a waypoint, halfway: where the words' ink
+     flips (dark to light, or back) a twilight, the sky about the words
+     even (the gradient alone: no warmth toward the light or shade away
+     from it, no deck, event, ray or glow, a sun or moon gone well before)
+     and well below the crossing (about a tenth under the words, as
+     drawn), so light ink reads there with room, and the light passes the
+     band no ink reads in without help (HI_MAX to FLIP) on the steep part
+     of its way in or out, dark ink's lift raising it only while it does,
+     for under a second; its hue the two skies' between (never grey: a
+     twilight's purple light where they cancel); the sea lost in a low mist
+     the colour of that sky, so under the links the ground is as even and
+     as dark as about the name; and a change between skies that are not
+     neighbours goes through the cloud: the sea swells into mist and clears
+     into the next (the way the reference passes between its places) */
+  var TWILIGHT = [0.48, 0.47, 0.466, 0.466, 0.43];      // (OKLab L at 0, 5, 15, 32 and 49 degrees, as drawn)
+  var TWILIGHT_MIST = 0.95;                             // (how far the sea is lost in it)
+  var EVEN = 1.8;                                       // (how much sooner the sky about the words is even, going in; how much later it is not, coming out)
+  var STRUCT = { tintAmt: 1, deep: 1, seaMist: 1, shafts: 1, bloom: 1 };   // (what makes the sky uneven about the words: below)
   var TWILIGHT_SEA = { 0: 1.12, 1: 0.8 };                // (the sea's light there, from dark words to light, and back)
   var ways = {};
   function way(A, B, far) {
@@ -379,12 +414,17 @@
         m = Math.hypot(c[1], c[2]); ch = Math.max(m * 0.7, 0.045);
         return m > 0.012 ? [TWILIGHT[j], c[1] / m * ch, c[2] / m * ch] : [TWILIGHT[j], ch * Math.cos(305 * DEG), ch * Math.sin(305 * DEG)];
       });
-      C.tintL = [0.6, C.tintL[1] * 0.7, C.tintL[2] * 0.7]; C.tintAmt *= 0.4;
+      /* even about the words: the light's warmth and the shade away from it, the high deck (its streaks and the
+         light they scatter forward), the sky's events, rays and glow all gone at the crossing itself, the sky the
+         gradient alone */
+      C.tintL = [0.6, C.tintL[1] * 0.7, C.tintL[2] * 0.7]; C.tintAmt = 0; C.deep = 0;
+      for (j = 0; j < FX.length; j++) C[FX[j]] = 0;
       C.fogCL = [0.62, C.fogCL[1] * 0.8, C.fogCL[2] * 0.8];
       C.deckCL = [0.55, C.deckCL[1] * 0.7, C.deckCL[2] * 0.7];
-      C.deck[2] *= 0.6; C.rain = 0; C.shafts *= 0.4; C.bloom = Math.min(C.bloom, 0.08);
+      C.deck[2] = 0; C.rain = 0; C.shafts = 0; C.bloom = Math.min(C.bloom, 0.03);
       f = TWILIGHT_SEA[A.words];                         // (the cloud sea under the links at the crossing as well)
       C.lightI *= 0.4 * f; C.ambUI *= 0.6 * f; C.ambDI *= 0.55 * f;
+      C.seaMist = TWILIGHT_MIST;
     }
     if (far) {                                           // (through the cloud)
       C.mist = Math.max(C.mist, 1.35); C.fog *= 1.7; C.towers *= 0.45; C.sea[0] *= 0.86; C.deck[1] = Math.min(1, C.deck[1] + 0.2);
@@ -459,14 +499,15 @@
 
   /* ---------------- the page: the window and the words ---------------- */
 
-  /* the words: the whole stack (the towers keep clear of it), the name,
-     the bio and credit (where the dimmed grey is), and the links */
+  /* the words: the whole stack (no tower is placed to rise behind it), the name
+     (lettered: its ink lies inside the h1's box), the credit (where the
+     dimmed grey is), and the links */
   var W = 0, H = 0, stackR = null, nameR = null, wordsR = null, links = [], dirty = true;
   function measure() {
     W = window.innerWidth; H = window.innerHeight;
     var a = document.querySelectorAll('footer a'), i;
     stackR = rectOf1('.stack'); nameR = rectOf1('.stack h1');
-    wordsR = union(rectOf1('.bio'), rectOf1('.credit'));
+    wordsR = rectOf1('.credit');
     links = [];
     for (i = 0; i < a.length && i < 2; i++) if (a[i].getBoundingClientRect().right > a[i].getBoundingClientRect().left) links.push(boxOf(a[i].getBoundingClientRect()));
     dirty = false;
@@ -501,11 +542,29 @@
     n = Math.hypot(d[0], d[1], d[2]);
     return [d[0] / n, d[1] / n, d[2] / n];
   }
+  function clearOf(x, y) {
+    var s = x < W / 2 ? -1 : 1, i, j, b, d, q, near;
+    for (i = 0; i < 80; i++) {
+      d = fromWindow(x, y);
+      for (j = 0, near = false; j < 3 && !near; j++) {        // (the nearest point of each block's zone, KEEP px about it,
+        b = j === 0 ? stackR : links[j - 1];                  //  at least FOOT and a tenth from the moon)
+        if (!b) continue;
+        q = fromWindow(clamp(x, b[0] - KEEP, b[2] + KEEP), clamp(y, b[1] - KEEP, b[3] + KEEP));
+        near = Math.acos(clamp(d[0] * q[0] + d[1] * q[1] + d[2] * q[2], -1, 1)) / DEG < FOOT * 1.1;
+      }
+      if (!near) break;
+      if (s > 0 ? x < W * 0.96 : x > W * 0.04) x += s * W * 0.01; else y -= H * 0.01;
+    }
+    return fromWindow(x, y);
+  }
   function dirOf(az, el) { return [Math.sin(az * DEG) * Math.cos(el * DEG), Math.sin(el * DEG), Math.cos(az * DEG) * Math.cos(el * DEG)]; }
-  /* a disc's direction: by its place on the window (x a share of the width, at el degrees up, or at y a share of the height) */
+  /* a disc's direction: by its place on the window (x a share of the width, at el degrees up, or at y a share of the
+     height). One placed by its height (the moon) stands higher and farther right on a window under 500 px tall (xs,
+     ys), its footprint KEEP clear of every block of words; and should the words reach it there on some other window,
+     it is slid out toward the window's nearer side, then up (never its light made less: the moon is moved whole) */
   function discDir(D) {
     if (D.az !== undefined) return dirOf(D.az, D.el);
-    if (D.y !== undefined) return fromWindow(D.x * W, D.y * H);
+    if (D.y !== undefined) return H < 500 && D.ys !== undefined ? clearOf(D.xs * W, D.ys * H) : clearOf(D.x * W, D.y * H);
     var k = (D.x * W - cam.x0) / cam.f, A = Math.cos(D.el * DEG), B = Math.sin(D.el * DEG) * cam.s,
         R = Math.sqrt(1 + k * k * cam.c * cam.c), az = Math.atan(k * cam.c) + Math.asin(clamp(k * B / (A * R), -1, 1));
     return dirOf(az / DEG, D.el);
@@ -515,7 +574,7 @@
 
   var NOW = {};               // the sky now (a frame's own sky is blended apart)
   function blend(t, P) {
-    var i, e, A, B, k, j, f, X, Y, q, C, u, env;
+    var i, e, A, B, k, j, f, X, Y, q, C, u, env, qs;
     while (seq[seq.length - 1].at < t + 30) nextSky();
     i = seq.length - 2;
     while (i > 0 && seq[i].at > t) i--;
@@ -527,18 +586,23 @@
       C = way(A, B, e.far);                               //  the light lingers there)
       if (k < 0.5) { Y = C; q = smooth(k * 2); } else { X = C; q = smooth(k * 2 - 1); }
     } else q = k = smooth(k);
+    /* (into a twilight, the sky about the words is even well before the light reaches the band no ink reads in
+       without help, and out of one it stays even until the light has passed it: the warmth, the shade, the deck,
+       the sky's events, rays and glow fade out sooner and come back later than the light, and the sea's mist
+       likewise, so the words' ground is all but one light as it crosses, and dark ink's lift is brief) */
+    qs = A.words === B.words ? q : k < 0.5 ? smooth(k * 2 * EVEN) : smooth((k * 2 - 1) * EVEN - (EVEN - 1));
     P.k = k; P.a = A; P.b = B; P.id = (k < 0.5 ? A : B).id; P.name = (k < 0.5 ? A : B).group;
     P.sky = [];
     for (j = 0; j < 5; j++) P.sky.push(linOf(lerp3(X.skyL[j], Y.skyL[j], q)));
     for (j = 0; j < COLOURS.length; j++) { f = COLOURS[j]; P[f] = linOf(lerp3(X[f + 'L'], Y[f + 'L'], q)); }
-    for (j = 0; j < NUMBERS.length; j++) { f = NUMBERS[j]; P[f] = mix(X[f], Y[f], q); }
-    P.sea = lerpN(X.sea, Y.sea, q); P.deck = lerpN(X.deck, Y.deck, q);
+    for (j = 0; j < NUMBERS.length; j++) { f = NUMBERS[j]; P[f] = mix(X[f], Y[f], STRUCT[f] || FX.indexOf(f) >= 0 ? qs : q); }
+    P.sea = lerpN(X.sea, Y.sea, q); P.deck = lerpN(X.deck, Y.deck, qs);
     P.words = mix(A.words, B.words, k);
-    P.flipW = A.words !== B.words ? Math.abs(k - 0.5) * 3 : 1;   // (how far from the twilight the words' flip is)
     P.light = arc(lightDir(A), lightDir(B), k);
     P.sun = arc(sunDir(A), sunDir(B), k);
-    P.discA = A.disc ? discOf(A.disc, smooth(1 - 2 * k)) : null;
-    P.discB = B.disc ? discOf(B.disc, smooth(2 * k - 1)) : null;
+    f = A.words !== B.words ? 2.6 : 2;                    // (into a twilight a sun or moon is gone well before the crossing)
+    P.discA = A.disc ? discOf(A.disc, smooth(1 - f * k)) : null;
+    P.discB = B.disc ? discOf(B.disc, smooth(f * k - (f - 1))) : null;
     u = t - e.at - e.hold * e.ev;                         // (the sun breaking through: once, about 26 s, in the hold)
     env = smooth(u / 8) * (1 - smooth((u - 18) / 8));
     P.sbreak *= env;
@@ -580,6 +644,7 @@
     c = toWindow(norm3([T.x, -1, T.z - T.R]), o);
     return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), c[1]];
   }
+  /* (where a tower is placed: not to rise behind the words; once risen it is never made to sink for them) */
   function hitsWords(b) {
     var m = 36;
     if (stackR && b[2] > stackR[0] - m && b[0] < stackR[2] + m && b[3] > stackR[1] - m && b[1] < stackR[3] + m) return true;
@@ -659,7 +724,7 @@
       b = towerBox(T, T.p);
       T.box = b;
       if (b[2] < -40 || b[0] > W + 40 || T.z < 8) { T.on = false; T.p = 0; T.wait = 0; continue; }   // gone beyond the edge: free
-      if (hitsWords(b)) want = 0;
+      /* (once risen, a tower is never made to sink for the words: drifting with the wind it may pass behind them) */
       if (still) T.p = want;
       else T.p = clamp(T.p + clamp(want - T.p, -1, 1) * dt / BUILD * (want > T.p ? 1 : 1.6), 0, 1);
       if (T.p <= 0 && want === 0) { T.on = false; T.wait = 20 + 40 * rTower(); }
@@ -750,9 +815,8 @@
     'uniform vec3 uL; uniform vec3 uLC; uniform vec3 uSun; uniform vec3 uSk[5]; uniform vec3 uTint; uniform vec4 uTintP;',
     'uniform vec4 uDa; uniform vec4 uDaP; uniform vec3 uDaC; uniform vec4 uDb; uniform vec4 uDbP; uniform vec3 uDbC;',
     'uniform vec3 uAmbU; uniform vec3 uAmbD; uniform vec3 uAlb; uniform vec3 uThick; uniform vec4 uMs;',
-    'uniform vec4 uSea; uniform vec4 uFog; uniform vec3 uFogC; uniform vec4 uDeck; uniform vec3 uDeckC;',
-    'uniform vec4 uFx1; uniform vec4 uFx2; uniform vec4 uFx3; uniform vec3 uGal; uniform vec3 uGc; uniform vec4 uAur; uniform vec4 uBrk; uniform sampler2D uMk;',
-    'float gWk = 1.0;',
+    'uniform vec4 uSea; uniform float uSeaL; uniform float uSeaM; uniform vec4 uFog; uniform vec3 uFogC; uniform vec4 uDeck; uniform vec3 uDeckC;',
+    'uniform vec4 uFx1; uniform vec4 uFx2; uniform vec4 uFx3; uniform vec3 uGal; uniform vec3 uGc; uniform vec4 uAur; uniform vec4 uBrk;',
     'uniform int uTwN; uniform vec4 uTw[72]; uniform vec4 uTb[6]; uniform vec4 uTx[6];',
     'out vec4 oC;',
     'const vec3 LUM = vec3(0.2126, 0.7152, 0.0722);',
@@ -774,7 +838,7 @@
     '}',
     'vec3 halo(vec3 rd, vec4 D, vec4 P, vec3 C) {',
     '  float cg = max(dot(rd, D.xyz), 0.0);',
-    '  vec3 c = C * (P.z * pow(cg, P.y) + P.w * pow(cg, P.y * 0.06));',
+    '  vec3 c = C * (P.z * pow(cg, P.y) + P.w * pow(cg, min(P.y * 0.06, 6.0)));',
     '  if (uFx3.z > 0.0 && P.x > 0.0) {',            // the corona: the moon through thin cloud, in rings
     '    float ps = ang(rd, D.xyz);',
     '    if (ps < 7.0) c += C * uFx3.z * 0.15 * (vec3(0.85, 0.9, 1.0) * exp(-ps * ps / 1.2) * 0.9 + vec3(0.95, 0.62, 0.42) * exp(-pow((ps - 1.75) / 0.3, 2.0)) * 0.5',
@@ -795,7 +859,7 @@
     '  float hs = 1.0 + max(-se, 0.0) * 1.1;',
     '  float sh = 1.0 - smoothstep(hs - 0.8, hs + 1.2, e), bl = smoothstep(hs - 0.4, hs + 2.0, e) * (1.0 - smoothstep(hs + 5.0, hs + 13.0, e));',
     '  c = mix(c, c * vec3(0.72, 0.78, 0.95), sh * side * 0.55);',
-    '  c += vec3(0.95, 0.6, 0.66) * bl * side * dot(c, LUM) * 0.35 * gWk;',
+    '  c += vec3(0.95, 0.6, 0.66) * bl * side * dot(c, LUM) * 0.35;',
     '}',
     /* the 22 degree halo and the sun dogs, in a high veil of ice */
     'vec3 ice(vec3 rd, float e, out float dim) {',
@@ -861,7 +925,7 @@
     '  c = mix(c, uFogC, 0.5 * (1.0 - smoothstep(0.0, 5.0, max(e, 0.0))));',
     '  belt(rd, e, c);',
     '  float dim; vec3 ic = ice(rd, e, dim);',
-    '  return c * (1.0 - dim * gWk) + (ic + pillar(rd, e) + galaxy(rd, e) + aurora(rd, e) + nlc(rd, e)) * gWk;',
+    '  return c * (1.0 - dim) + ic + pillar(rd, e) + galaxy(rd, e) + aurora(rd, e) + nlc(rd, e);',
     '}',
     'vec3 sky(vec3 rd) { return skyBase(rd) + halo(rd, uDa, uDaP, uDaC) + halo(rd, uDb, uDbP, uDbC); }',
     /* the haze far clouds fade into: the horizon's sky, with a third of the glow about the sun */
@@ -926,13 +990,13 @@
     '    sh *= clamp(1.0 - (hq - (h + s * tl)) * 2.2 / max(uSea.y, 1e-3), 0.3, 1.0);',
     '  }',
     '  float Tl = exp(-(1.0 - sh) * 2.5);',                                         // (through the cloud toward the light)
-    '  vec3 lit = mix(deepC(), uLC, Tl);',                                          // thin: the light's colour; deep: the sky's
+    '  vec3 lit = mix(deepC(), uLC, Tl) * uSeaL;',                                  // thin: the light's colour; deep: the sky's
     '  if (uBrk.w > 0.0) { vec2 dq = p.xz - uBrk.xy; float sp = exp(-dot(dq, dq) / (uBrk.z * uBrk.z)) * uBrk.w; lit = mix(lit, lit * vec3(1.0, 0.86, 0.66), sp * 0.6) * (1.0 + sp * 2.2); }',
     '  vec3 amb = mix(uAmbD, uAmbU, 0.5 + 0.5 * n.y) * mix(0.42, 1.0, hf * hf) * (1.0 + uMs.z * (1.0 - hf) * 0.35);',
     '  float cs = dot(rd, uL);',
-    '  vec3 c = uAlb * (lit * wrap * (0.55 + 0.45 * Tl) + amb) + uLC * hgN(cs, 0.75) * (1.0 - den * 0.8) * (0.3 + 0.7 * Tl) * (0.4 + 0.6 * hf) * 0.05;',
+    '  vec3 c = uAlb * (lit * wrap * (0.55 + 0.45 * Tl) + amb) + uLC * uSeaL * hgN(cs, 0.75) * (1.0 - den * 0.8) * (0.3 + 0.7 * Tl) * (0.4 + 0.6 * hf) * 0.05;',
     '  c += uLC * glory(rd) * 0.5 * (0.5 + 0.5 * hf);',
-    '  return mix(c, hz, clamp(fogOf(t) + mistOf(p.y, t) * 0.5, 0.0, 1.0));',
+    '  return mix(mix(c, hz, clamp(fogOf(t) + mistOf(p.y, t) * 0.5, 0.0, 1.0)), uSk[2], uSeaM);',   // (at a twilight, the sky's own light)
     '}',
     'void sea(vec3 rd, vec3 hz, float jit, out vec3 acc, out float T, out float tHit) {',
     '  acc = vec3(0.0); T = 1.0; tHit = 1e6;',
@@ -1040,7 +1104,6 @@
     '  vec3 dc = vec3(s.x - uC0.x, uC0.y - s.y, uCam.x);',
     '  vec3 rd = normalize(vec3(dc.x, dc.y * uCam.y + dc.z * uCam.z, dc.z * uCam.y - dc.y * uCam.z));',
     '  float jit = ign(gl_FragCoord.xy);',
-    '  gWk = 1.0 - 0.8 * texture(uMk, fc).a;',   // (behind the words the sky's events step back, fading out well beyond them)
     '  vec3 hz = haze(rd);',
     '  vec3 sAcc; float sT, tSea;',
     '  sea(rd, hz, jit, sAcc, sT, tSea);',
@@ -1052,7 +1115,7 @@
     '  float e = elev(rd), sw = showers(rd, e), lift;',            // the showers far off, and the bow standing on them
     '  vec3 bw = bow(rd, lift);',
     '  bg = mix(bg, uDeckC * 0.82, sw * 0.45);',
-    '  bg = bg * (1.0 + lift * gWk) + bw * gWk * (1.0 - dk.a * 0.5) * (0.6 + 0.6 * sw);',
+    '  bg = bg * (1.0 + lift) + bw * (1.0 - dk.a * 0.5) * (0.6 + 0.6 * sw);',
     '  vec3 far = sAcc + sT * bg + bw * 0.5 * smoothstep(15.0, 60.0, tSea) * step(rd.y, 0.0);',
     '  vec3 col = acc + T * far;',
     '  oC = vec4(ENC(col), T * sT * (1.0 - dk.a));',
@@ -1097,14 +1160,22 @@
     '}'
   ].join('\n');
   /* the cloud frame, finished: shafts and glow added, the highlights' shoulder (by the brightest channel, so a hue
-     keeps its hue as it brightens, and past white eases toward white), dithered before it is stored in 8 bits */
+     keeps its hue as it brightens, and past white eases toward white), a light-words sky's ceiling (its own light
+     eased under OKLab L ceil by a soft shoulder, hue kept, the same everywhere on the window but in a moon's
+     footprint), dithered before it is stored in 8 bits */
   var FINISH = [
     'uniform sampler2D uS; uniform sampler2D uSh; uniform sampler2D uBl; uniform vec2 uRes; uniform vec3 uShC; uniform vec4 uPost; out vec4 o;',
+    'uniform vec3 uCeil; uniform vec4 uFoot; uniform vec2 uWin; uniform vec4 uCam; uniform vec2 uC0;',
     'vec3 shoulder(vec3 x) {',
     '  float m = max(max(x.r, x.g), x.b);',
     '  if (m <= 0.82) return x;',
     '  float s = 0.82 + 0.18 * (1.0 - exp(-(m - 0.82) / 0.18));',
     '  return mix(x * (s / m), vec3(s), clamp((m - 1.0) / 2.0, 0.0, 1.0) * 0.6);',
+    '}',
+    'float okL(vec3 c) {',
+    '  vec3 q = pow(max(vec3(dot(c, vec3(0.4122214708, 0.5363325363, 0.0514459929)), dot(c, vec3(0.2119034982, 0.6806995451, 0.1073969566)),',
+    '    dot(c, vec3(0.0883024619, 0.2817188376, 0.6299787005))), 0.0), vec3(1.0 / 3.0));',
+    '  return dot(q, vec3(0.2104542553, 0.7936177850, -0.0040720468));',
     '}',
     'void main() {',
     '  vec2 uv = gl_FragCoord.xy / uRes;',
@@ -1113,26 +1184,37 @@
     '  c = shoulder(max(c * uPost.z, 0.0));',
     '  float Y = dot(c, vec3(0.2126, 0.7152, 0.0722));',
     '  c = clamp(mix(vec3(Y), c, uPost.w), 0.0, 1.0);',
+    '  if (uCeil.x - uCeil.y < 1.0) {',                    // (engaged as its knee comes under white: no step as a change brings it in)
+    '    float L = okL(c), K = uCeil.x - uCeil.y;',
+    '    if (L > K) {',
+    '      vec2 p = vec2(uv.x * uWin.x, (1.0 - uv.y) * uWin.y);',
+    '      vec3 dc = vec3(p.x - uC0.x, uC0.y - p.y, uCam.x);',
+    '      vec3 rd = normalize(vec3(dc.x, dc.y * uCam.y + dc.z * uCam.z, dc.z * uCam.y - dc.y * uCam.z));',
+    '      float keep = uFoot.w * (1.0 - smoothstep(uCeil.z - 0.5, uCeil.z, degrees(acos(clamp(dot(rd, uFoot.xyz), -1.0, 1.0)))));',
+    '      c = mix(c * pow((K + uCeil.y * (1.0 - exp(-(L - K) / uCeil.y))) / L, 3.0), c, keep);',
+    '    }',
+    '  }',
     '  vec3 e = mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));',
     '  e = clamp(e + (ign(gl_FragCoord.xy) + ign(gl_FragCoord.xy + vec2(37.0, 11.0)) - 1.0) / 255.0, 0.0, 1.0);',
     '  o = vec4(mix(e / 12.92, pow((e + 0.055) / 1.055, vec3(2.4)), step(0.04045, e)), s.a);',
     '}'
   ].join('\n');
-  /* what was drawn where the words stand (and the window's top edge): 8 numbers */
+  /* what was drawn where the words stand (and the window's top edge): the credit's darkest, lightest, mean and
+     spread (0, 1, 2, 4), the links' darkest and lightest (5, 7), the name's (6, 8), the top colour (3) */
   var STATS = [
-    'uniform sampler2D uF; uniform vec4 uRs; uniform vec4 uRl; out vec4 o;',
+    'uniform sampler2D uF; uniform vec4 uRs; uniform vec4 uRl; uniform vec4 uRn; out vec4 o;',
     'void main() {',
     '  int i = int(gl_FragCoord.x);',
-    '  if (i == 5 || i == 7) {',
-    '    float mn = 1.0, mx = 0.0;',
-    '    for (int y = 0; y < 6; y++) for (int x = 0; x < 16; x++) {',
-    '      float Y = dot(textureLod(uF, mix(uRl.xy, uRl.zw, (vec2(float(x), float(y)) + 0.5) / vec2(16.0, 6.0)), 0.0).rgb, vec3(0.2126, 0.7152, 0.0722));',
+    '  if (i >= 5) {',
+    '    vec4 r = i == 5 || i == 7 ? uRl : uRn; float mn = 1.0, mx = 0.0;',
+    '    for (int y = 0; y < 8; y++) for (int x = 0; x < 16; x++) {',
+    '      float Y = dot(textureLod(uF, mix(r.xy, r.zw, (vec2(float(x), float(y)) + 0.5) / vec2(16.0, 8.0)), 0.0).rgb, vec3(0.2126, 0.7152, 0.0722));',
     '      mn = min(mn, Y); mx = max(mx, Y);',
     '    }',
-    '    o = vec4(sqrt(i == 5 ? mn : mx), 0.0, 0.0, 1.0); return;',
+    '    o = vec4(sqrt(i == 5 || i == 6 ? mn : mx), 0.0, 0.0, 1.0); return;',
     '  }',
-    '  if (i == 3 || i == 6) {',
-    '    vec3 c = vec3(0.0); float y0 = i == 3 ? 0.995 : 0.005;',
+    '  if (i == 3) {',
+    '    vec3 c = vec3(0.0); float y0 = 0.995;',
     '    for (int x = 0; x < 16; x++) c += textureLod(uF, vec2((float(x) + 0.5) / 16.0, y0), 0.0).rgb;',
     '    c /= 16.0;',
     '    o = vec4(pow(c, vec3(1.0 / 2.2)), 1.0); return;',
@@ -1154,23 +1236,30 @@
     '  o = vec4(sqrt(v), 0.0, 0.0, 1.0);',
     '}'
   ].join('\n');
-  /* where the words stand, for the veil: the bio (r), the name (g), the links (b); and (a) the calm about the
-     bio and name that the sky's events step back in, its feather up to two and a half times the veil's on a
-     wide window (so a curtain or a band fades out toward the words, not at an edge); drawn when the page moves */
+  /* where the words stand, for dark ink's lift: about the stack (the name and the credit, r) and the links (g), a
+     field as wide as the window, falling off softly; at the words themselves (b, a), the floor's core. Drawn when
+     the page moves (the sky is never drawn by it: only the window pass reads it) */
   var MASK = [
-    'uniform vec4 uVp; uniform vec4 uR[4]; uniform vec3 uFe; out vec4 o;',
-    'float box(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); float q = length(max(d, 0.0)) / fe; return exp(-4.5 * q * q); }',
+    'uniform vec4 uVp; uniform vec4 uR[4]; uniform vec4 uFe; out vec4 o;',
+    'float dist(vec2 p, vec4 r) { vec2 d = max(vec2(r.x - p.x, r.y - p.y), vec2(p.x - r.z, p.y - r.w)); return length(max(d, 0.0)); }',
+    'float field(vec2 p, vec4 r, float fe) { if (r.z <= r.x) return 0.0; float q = dist(p, r) / fe; return exp(-4.5 * q * q); }',
+    'float core(vec2 p, vec4 r, float m) { if (r.z <= r.x) return 0.0; return 1.0 - smoothstep(m - 2.0, m + 2.0, dist(p, r)); }',
     'void main() {',
     '  vec2 fc = gl_FragCoord.xy / uVp.xy, p = vec2(fc.x * uVp.z, (1.0 - fc.y) * uVp.w);',
-    '  o = vec4(box(p, uR[0], uFe.x), box(p, uR[1], uFe.x), max(box(p, uR[2], uFe.y), box(p, uR[3], uFe.y)),',
-    '    max(box(p, uR[0], uFe.z), box(p, uR[1], uFe.z)));',   // (a: the words' calm, wider and softer)
+    '  o = vec4(max(field(p, uR[0], uFe.x), field(p, uR[1], uFe.x)), max(field(p, uR[2], uFe.y), field(p, uR[3], uFe.y)),',
+    '    max(core(p, uR[0], uFe.z), core(p, uR[1], uFe.z)), max(core(p, uR[2], uFe.w), core(p, uR[3], uFe.w)));',
     '}'
   ].join('\n');
   /* the window: two cloud frames crossfaded, the stars (twinkling slowly; crowded in the galaxy's band), light
-     drifting in the air, the rain, the veil about the words */
+     drifting in the air, the rain, all of them everywhere, and under dark ink its lift */
   var SHOW = HASH + [
     'uniform sampler2D uA; uniform sampler2D uB; uniform sampler2D uM; uniform float uK; uniform vec4 uVp;',
-    'uniform vec2 uBand; uniform vec2 uBandN; uniform vec2 uBandL;',
+    'uniform vec2 uFloor; uniform vec2 uGain; uniform float uStTop;',
+    /* (under dark ink, where the ground would break it, the light is raised: about each group of words by the gain
+       its own darkest ground needs, eased out across a field as wide as the window, so it reads as the light
+       brightening, not as a shape; at the words themselves no darker than the floor, a last hold for a dark thread
+       the samples step over. A gain of 1 or more, and a floor: nothing here lowers any light) */
+    'float lift(float Y, float fl, float g, float m, float c) { return max(Y * mix(1.0, g, m), mix(Y, max(Y, fl), c)); }',
     'uniform vec4 uSt; uniform vec4 uRn; uniform vec3 uRnC; uniform vec4 uCam; uniform vec2 uC0; uniform vec3 uGal; uniform float uGx;',
     'uniform vec4 uMo; uniform vec3 uMoC; uniform float uTm; out vec4 o;',
     'vec3 h32(vec2 c, float s) { return rnd3(vec3(mod(c, 4096.0) + 4096.0, s), 17u); }',
@@ -1216,7 +1305,7 @@
     '  vec2 p = vec2(fc.x * uVp.z, (1.0 - fc.y) * uVp.w);',
     '  vec4 c = mix(texture(uA, fc), texture(uB, fc), uK);',
     '  vec3 col = c.rgb;',
-    '  vec3 mk = texture(uM, fc).rgb; float m = max(mk.r, max(mk.g, mk.b));',
+    '  vec4 mk = texture(uM, fc);',
     '  if (uSt.x > 0.0) {',
     '    float band = 0.0;',
     '    if (uGx > 0.0) {',
@@ -1224,16 +1313,17 @@
     '      vec3 rd = normalize(vec3(dc.x, dc.y * uCam.y + dc.z * uCam.z, dc.z * uCam.y - dc.y * uCam.z));',
     '      band = exp(-pow(dot(rd, uGal), 2.0) / 0.03) * uGx;',
     '    }',
-    '    col += vec3(0.92, 0.94, 1.0) * (stars(p, 1.0 + band) + crowd(p, band)) * uSt.x * c.a * (1.0 - smoothstep(uSt.z - 70.0, uSt.z + 2.0, p.y));',
+    '    float s = (stars(p, 1.0 + band) + crowd(p, band)) * uSt.x * c.a * (1.0 - smoothstep(uSt.z - 70.0, uSt.z + 2.0, p.y)) * 0.94;',
+    /* (the stars' light bounded at the source, one way for every star on the whole sky: softly, into the room the
+       sky's own light leaves under their top, so none shines above it, nor above the light ceiling) */
+    '    float head = max(uStTop - dot(col, vec3(0.2126, 0.7152, 0.0722)), 0.0);',
+    '    col += vec3(0.92, 0.94, 1.0) / 0.94 * head * (1.0 - exp(-s / max(head, 1e-5)));',
     '  }',
-    '  if (uMo.x > 0.0) col += uMoC * motes(p) * uMo.x * 0.25 * (0.35 + 0.65 * exp(-length(p - uMo.zw) / (0.45 * uVp.z))) * (1.0 - m);',
-    '  if (uRn.x > 0.0) { float r = rain(p, 0.0) * 0.6 + rain(p, 1.0); col = mix(col, uRnC, clamp(r * uRn.x * 0.32 * (1.0 - m), 0.0, 1.0)); }',
+    '  if (uMo.x > 0.0) col += uMoC * motes(p) * uMo.x * 0.25 * (0.35 + 0.65 * exp(-length(p - uMo.zw) / (0.45 * uVp.z)));',
+    '  if (uRn.x > 0.0) { float r = rain(p, 0.0) * 0.6 + rain(p, 1.0); col = mix(col, uRnC, clamp(r * uRn.x * 0.32, 0.0, 1.0)); }',
     '  float Y = dot(col, vec3(0.2126, 0.7152, 0.0722));',
-    /* (held to the band where the words stand, and the hold eased out across the feather by its strength: a
-       threshold scaled by the mask, as at first, only crossed near the core and drew the veil's edge) */
-    '  float up = max(mix(Y, max(Y, uBand.x), mk.r), max(mix(Y, max(Y, uBandN.x), mk.g), mix(Y, max(Y, uBandL.x), mk.b)));',
-    '  float dn = min(mix(up, min(up, uBand.y), mk.r), min(mix(up, min(up, uBandN.y), mk.g), mix(up, min(up, uBandL.y), mk.b)));',
-    '  col *= dn / max(Y, 1e-4);',
+    '  float up = max(lift(Y, uFloor.x, uGain.x, mk.r, mk.b), lift(Y, uFloor.y, uGain.y, mk.g, mk.a));',
+    '  col *= up / max(Y, 1e-4);',
     '  col = clamp(col, 0.0, 1.0);',
     '  vec3 e = mix(col * 12.92, 1.055 * pow(col, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, col));',
     '  float n = ign(gl_FragCoord.xy) + ign(gl_FragCoord.xy + vec2(17.0, 59.0)) - 1.0;',
@@ -1395,7 +1485,7 @@
 
   /* ---------------- a cloud frame: set up, drawn in slices, finished ---------------- */
 
-  var t = 0, acc = 0, job = null, fresh = true, redo = false, shown = [null, null], doneAt = -1, fadeP = PERIOD, frames = 0;
+  var t = 0, acc = 0, job = null, fresh = true, redo = false, shown = [null, null], fk = 1, fkRate = 1 / PERIOD, frames = 0;
   function periodNow() { return PERIOD * LADDER[level].period * (t > THIN && !still ? 2 : 1); }
   function startJob(fast) {
     var per = periodNow(), ahead = fast || still ? 0 : per, S = blend(t + ahead, {}), p = progs.scene, i, n = 0, T, list = [], s, lift, R, j;
@@ -1425,6 +1515,8 @@
     gl.uniform3fv(U(p, 'uAmbD'), scale3(S.ambD, S.ambDI));
     gl.uniform3fv(U(p, 'uAlb'), S.alb);
     gl.uniform4fv(U(p, 'uSea'), S.sea);
+    gl.uniform1f(U(p, 'uSeaL'), S.seaLit);
+    gl.uniform1f(U(p, 'uSeaM'), S.seaMist);
     gl.uniform4f(U(p, 'uFog'), S.fog, S.mist, 0.35, 0);
     gl.uniform3fv(U(p, 'uFogC'), S.fogC);
     gl.uniform4fv(U(p, 'uDeck'), S.deck);
@@ -1463,7 +1555,6 @@
     gl.useProgram(p);
     bind(p, 0, 'uN3', tex.n3, gl.TEXTURE_3D);
     bind(p, 1, 'uN2', tex.n2);
-    bind(p, 2, 'uMk', work.m.t);
     gl.bindFramebuffer(gl.FRAMEBUFFER, work.s.f);
     gl.viewport(0, 0, cw, ch);
     gl.enable(gl.SCISSOR_TEST);
@@ -1487,14 +1578,20 @@
       up(work.b3.t, work.b2.t, work.u2); up(work.u2.t, work.b1.t, work.u1);
     }
     f = nextFinal();                                      // finished, into the spare frame
+    f.st = null;                                          // (its read-back to come)
     p = progs.finish; gl.useProgram(p);
     bind(p, 0, 'uS', work.s.t); bind(p, 1, 'uSh', work.sh.t); bind(p, 2, 'uBl', work.u1.t);
     gl.uniform2f(U(p, 'uRes'), cw, ch);
     gl.uniform3fv(U(p, 'uShC'), S.shaftC);
     gl.uniform4f(U(p, 'uPost'), sh > 0.005 ? sh : 0, S.bloom > 0.005 ? S.bloom : 0, S.exposure, S.sat);
+    gl.uniform3f(U(p, 'uCeil'), S.ceil, KNEE, FOOT);
+    gl.uniform4fv(U(p, 'uFoot'), footOf(S));
+    gl.uniform2f(U(p, 'uWin'), W, H);
+    gl.uniform4f(U(p, 'uCam'), cam.f, cam.c, cam.s, 0);
+    gl.uniform2f(U(p, 'uC0'), cam.x0, cam.y0);
     draw(p, f.f, cw, ch);
     shown = shown[1] ? [shown[1], f] : [f, f];
-    doneAt = t; fadeP = job.period; frames++;
+    fk = 0; fkRate = 1 / job.period; frames++;
     sweep();
     readStats(f, S);
     job = null;
@@ -1515,6 +1612,13 @@
     gl.uniform2f(U(p, 'uHalf'), 0.5 / src.w, 0.5 / src.h);
     draw(p, dst.f, dst.t.w, dst.t.h);
   }
+  /* a moon's footprint (its disc, corona and glare, where they may pass a light-words sky's ceiling: FOOT degrees
+     about it): its direction, and whether there is one */
+  function footOf(S) {
+    var D = S.discA && S.discA.i > 0.01 ? S.discA : null;
+    if (S.discB && S.discB.i > 0.01 && (!D || S.discB.i > D.i)) D = S.discB;
+    return D ? [D.d[0], D.d[1], D.d[2], 1] : [0, 0, 1, 0];
+  }
   /* where the sun stands on the window (or the moon), and whether it is in front of the camera */
   function sunOnWindow(S) {
     var D = S.discA && S.discB ? (S.k < 0.5 ? S.discA : S.discB) : (S.discA || S.discB), o = [0, 0, 0];
@@ -1523,30 +1627,30 @@
     return [o[0], o[1], o[2] > 0.05 ? 1 : 0];
   }
 
-  /* ---------------- the window: crossfaded, with stars, rain and the veil ---------------- */
+  /* ---------------- the window: crossfaded, with the stars, the rain and dark ink's lift ---------------- */
 
   var lastShow = -1, lastSteer = -1, lastNow = 0;
-  /* where the words stand, for the veil (drawn when the page moves) */
+  /* where the words stand, for dark ink's lift (drawn when the page moves) */
   function drawMask() {
     var p = progs.mask;
     gl.useProgram(p);
     gl.uniform4f(U(p, 'uVp'), cw, ch, W, H);
-    gl.uniform4fv(U(p, 'uR'), rectOf(wordsR, WORDS_CORE).concat(rectOf(nameR, NAME_CORE), rectOf(links[0], LINKS_CORE), rectOf(links[1], LINKS_CORE)));
-    gl.uniform3f(U(p, 'uFe'), WORDS_FEATHER, LINKS_FEATHER, WORDS_FEATHER * clamp(W / 400, 1, 2.5));   // (the calm: as the
-                                                         //  veil on a phone, where the words fill the sky, 2.5x on a wide window)
+    gl.uniform4fv(U(p, 'uR'), rectOf(wordsR).concat(rectOf(nameR), rectOf(links[0]), rectOf(links[1])));
+    gl.uniform4f(U(p, 'uFe'), LIFT_FEATHER * Math.max(W, H), LIFT_FEATHER * Math.max(W, H), WORDS_CORE, LINKS_CORE);
     draw(p, work.m.f, cw, ch);
     maskDirty = false;
   }
-  function rectOf(r, m) { return r ? [r[0] - m, r[1] - m, r[2] + m, r[3] + m] : [0, 0, 0, 0]; }
+  function rectOf(r) { return r ? r.slice(0, 4) : [0, 0, 0, 0]; }
+  function fadeK() { return still ? 1 : fk; }            // (how far the newer frame has crossfaded in)
   function show(S) {
-    var p = progs.show, k = still ? 1 : clamp((t - doneAt) / fadeP, 0, 1);
+    var p = progs.show, k = fadeK();
     gl.useProgram(p);
     bind(p, 0, 'uA', shown[0].t); bind(p, 1, 'uB', shown[1].t); bind(p, 2, 'uM', work.m.t);
     gl.uniform1f(U(p, 'uK'), k);
     gl.uniform4f(U(p, 'uVp'), canvas.width, canvas.height, W, H);
-    gl.uniform2f(U(p, 'uBand'), band.lo, band.hi);
-    gl.uniform2f(U(p, 'uBandN'), bandN.lo, bandN.hi);
-    gl.uniform2f(U(p, 'uBandL'), bandL.lo, bandL.hi);
+    gl.uniform2f(U(p, 'uFloor'), band.lo, bandL.lo);
+    gl.uniform2f(U(p, 'uGain'), band.gn, bandL.gn);
+    gl.uniform1f(U(p, 'uStTop'), STAR_TOP);
     gl.uniform4f(U(p, 'uSt'), S.stars, starSeed, cam.hy, Math.max(0.7, Math.min(1.1, canvas.width / W * 0.6)));
     gl.uniform4f(U(p, 'uRn'), still ? 0 : S.rain, Math.floor(t * 12), 0.18 * windDir, 0);
     gl.uniform3fv(U(p, 'uRnC'), S.rainC);
@@ -1565,7 +1669,7 @@
 
   /* ---------------- the words' colours, from what was drawn where they stand ---------------- */
 
-  var pbo = null, sync = null, statsOut = new Uint8Array(32), statsFor = null, pending = null, asked = false, meta = document.querySelector('meta[name="theme-color"]');
+  var pbo = null, sync = null, statsOut = new Uint8Array(36), statsFor = null, statsOf = null, pending = null, asked = false, meta = document.querySelector('meta[name="theme-color"]');
   var themeOpen = meta ? meta.getAttribute('content') : '', themeWas = '';
   var trusted = false, doubts = 0, waited = 0, fadeUntil = 0;
   /* the sky's light where the words stand, as the gradient alone would have it */
@@ -1588,25 +1692,26 @@
     if (lc) lc.loseContext();                             // (its memory freed)
     if (window.console) console.warn('sky: the drawn sky did not look right; the still sky stays');
   }
-  function distrust() { trusted = false; doubts = 0; waited = 0; asked = false; seen = seenT = null; lastSteer = -1; }
+  function distrust() { trusted = false; doubts = 0; waited = 0; asked = false; seen = seenT = null; inkS.ink = inkL.ink = -1; lastSteer = -1; }
   function hide() {
     canvas.classList.remove('on'); unwords();
     if (meta && themeOpen) { meta.setAttribute('content', themeOpen); themeWas = ''; }
   }
   function readStats(f, S) {
-    var R = wordsR || stackR, lk = links.length ? union(links[0], links[1] || null) : null, p = progs.stats;
+    var R = wordsR || stackR, lk = links.length ? union(links[0], links[1] || null) : null, N = nameR, p = progs.stats;
     if (!R) return;
     if (sync) { pending = { f: f, S: S }; return; }       // (one at a time: this one when the last is in)
-    pending = null; statsFor = S; asked = true;
-    if (!work.st) { work.st = pair(8, 1, 'rgba8'); pbo = gl.createBuffer(); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo); gl.bufferData(gl.PIXEL_PACK_BUFFER, 32, gl.STREAM_READ); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null); }
-    lk = lk || R;
+    pending = null; statsFor = S; statsOf = f; asked = true;
+    if (!work.st) { work.st = pair(9, 1, 'rgba8'); pbo = gl.createBuffer(); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo); gl.bufferData(gl.PIXEL_PACK_BUFFER, 36, gl.STREAM_READ); gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null); }
+    lk = lk || R; N = N || R;
     gl.useProgram(p);
     bind(p, 0, 'uF', f.t);
     gl.uniform4f(U(p, 'uRs'), R[0] / W, 1 - R[1] / H, R[2] / W, 1 - R[3] / H);
-    gl.uniform4f(U(p, 'uRl'), (lk[0] - 4) / W, 1 - (lk[1] - 4) / H, (lk[2] + 4) / W, 1 - (lk[3] + 4) / H);
-    draw(p, work.st.f, 8, 1);
+    gl.uniform4f(U(p, 'uRl'), (lk[0] - 8) / W, 1 - (lk[1] - 8) / H, (lk[2] + 8) / W, 1 - (lk[3] + 8) / H);   // (the ring is drawn 3-5 px about them)
+    gl.uniform4f(U(p, 'uRn'), N[0] / W, 1 - N[1] / H, N[2] / W, 1 - N[3] / H);
+    draw(p, work.st.f, 9, 1);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
-    gl.readPixels(0, 0, 8, 1, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    gl.readPixels(0, 0, 9, 1, gl.RGBA, gl.UNSIGNED_BYTE, 0);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     gl.flush();
@@ -1620,12 +1725,13 @@
     gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, statsOut);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     sq = function (i) { var v = statsOut[i * 4] / 255; return v * v; };
-    seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4), lmn: sq(5), lmx: sq(7) };
+    seenT = { mn: sq(0), mx: sq(1), mean: sq(2), sd: sq(4), lmn: sq(5), lmx: sq(7), nmn: sq(6), nmx: sq(8) };
+    if (statsOf) statsOf.st = seenT;                      // (the frame's own: the two on show crossfade)
     if (!trusted) {                                       // the sky drawn as it should be? (a GPU or driver that draws
       y = expected(statsFor);                             //  nonsense is let go, and the stylesheet's sky stays)
       if (y < 0 || (seenT.mean > y / 4 && seenT.mean < y * 4 + 0.05)) trust(true);
       else if (++doubts >= 2) { trust(false); return; }
-      else { seenT = null; if (still) redo = true; return; }   // (doubted once: drawn and read again)
+      else { seenT = null; if (statsOf) statsOf.st = null; if (still) redo = true; return; }   // (doubted once: drawn and read again)
     }
     for (i = 0; i < 3; i++) { v = statsOut[12 + i]; top += (v < 16 ? '0' : '') + v.toString(16); }
     if (meta && top !== themeWas) { meta.setAttribute('content', top); themeWas = top; }
@@ -1633,70 +1739,149 @@
     else pending = null;
   }
   var TEXT_LIGHT = [0.99, 0.006, 95], TEXT_LIGHT_Y = lumOf(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]))), tokensWere = {}, tokensKey = '';
-  var HI_MAX = (TEXT_LIGHT_Y + 0.05) / RATIO - 0.05;   // the lightest sky light words read on
-  /* the bands: the grounds the words are held to, followed smoothly from
-     what was drawn. Dark words want their ground no darker than FLIP,
-     light words no lighter than HI_MAX; the bio's ground sets the dimmed
-     grey, the links' the focus ring. Near the crossing the bands pinch
-     toward the one ground both read on, the words flip there (on the
-     cycle's own time), and they open again: nothing jumps but the words */
-  var seen = null, seenT = null, band = { lo: FLIP, hi: 1, mode: 0 }, bandN = { lo: FLIP, hi: 1 }, bandL = { lo: FLIP, hi: 1 };
-  function steer(dt, S) {
-    var f, k, m, w = Math.max(0.004, S.flipW), mode = S.words >= 0.5 ? 1 : 0;
-    if (!seenT) { opened(mode, mode ? 0 : FLIP, mode ? HI_MAX : 1, mode ? 0 : FLIP, mode ? HI_MAX : 1, w, 1); return; }
-    if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
-    k = still ? 1 : 1 - Math.exp(-dt / 0.6);
-    for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
-    m = seen.mean;
-    opened(mode, Math.max(seen.mn, m - 3 * seen.sd), Math.min(seen.mx, m + 3 * seen.sd), seen.lmn, seen.lmx, w, m);
+  var HI_MAX = (TEXT_LIGHT_Y + 0.05) / RATIO - 0.05;   // the lightest ground light ink reads on at RATIO
+  /* the ink and the grounds it stands on, followed from what was drawn, for
+     two groups of words each on its own ground: the name and the credit
+     (the stack, on the sky) and the links (on the sea below the horizon).
+     Dark ink reads on any ground: where the group's ground is darker than
+     FLIP, the light is raised by the gain its darkest needs (gainOf: FLIP
+     over the darkest on show), eased out across a field as wide as the
+     window (LIFT_FEATHER), so it reads as the light brightening and never
+     as a shape; at the words themselves the floor (FLIP) is a last hold for
+     a dark thread the samples step over; nowhere else is anything lifted
+     (on a light sky the ground is far above FLIP: nothing is lifted but as
+     a change crosses its twilight; and while the lift is on, the crossfade
+     into a newer frame that ends it is done within HURRY, or the next frame
+     drawn quicker, so it lasts under a second); the dimmed grey is
+     worked out on the credit's darkest with a tenth to spare (under light
+     ink on its lightest, with a fifth: the samples step over a thin bright
+     streak in a high deck; and where stars can stand behind it, on the
+     stars' top), the ring on the links' with fifteen hundredths (the sea's
+     fine grain the samples step over). Light ink reads only on a ground no
+     lighter than HI_MAX, and nothing here may make a ground darker: so
+     light ink is set only where the read-back shows the lightest ground
+     under the group holds it, on what is on show (the two frames crossfade,
+     linearly in light: their lightest, mixed as they are, bound it). In a
+     change from a light sky to a dark one, light ink comes the moment its
+     ground holds it (the twilight between is even and well below the
+     crossing, so it comes on the way in, where the light falls fast: the
+     lift holds a moment); in a change from a dark sky to a light one, light
+     ink stays until its ground grows too bright for it (on the way out of
+     the twilight), or the change is three quarters done. Never back against
+     the change: one flip a change for each group. A group's lift reaches
+     the other's ground too (its field is as wide as the window), so light
+     ink stays only where its ground, so raised, still holds it, else it
+     goes dark with the other group; toward light the two flip together,
+     once both grounds hold it. On a dark sky (or in a
+     change toward one) whose ground grew too bright for light ink (the
+     skies with light ink keep their light under the ceiling, so it should
+     not), dark ink at once, and light ink back no sooner than DWELL, on a ground a little
+     darker (BACK): never a flicker */
+  var seen = null, seenT = null, band = { lo: FLIP, g: FLIP, mode: 0, gn: 1 }, bandL = { lo: FLIP, g: FLIP, mode: 0, gn: 1 };   // (lo: the floor; g: the ground the grey or the ring is worked out on; gn: the gain about the words)
+  var inkS = { ink: -1, at: 0, gave: false }, inkL = { ink: -1, at: 0, gave: false };
+  function stackHi(s) { return Math.max(s.mx, s.nmx); }
+  function linksHi(s) { return s.lmx; }
+  function stackLo(s) { return Math.min(s.mn, s.nmn); }
+  function linksLo(s) { return s.lmn; }
+  function ends(lo, hi, want) {                           // (the newer frame on show would end dark ink's lift: its ground
+    var B = shown[1] && shown[1].st;                      //  needs none, or holds the light ink the change is going to)
+    return !!B && (lo(B) >= FLIP || (want === 1 && hi(B) <= HI_MAX));
   }
-  function opened(mode, lo, hi, llo, lhi, w, m) {
-    band.mode = mode;
-    if (mode === 0) {                                     // (the words' air no higher than the sky's own light about
-      band.lo = Math.max(FLIP, lo * 0.97, Math.min(AIR * clamp(w * 1.5 - 0.5, 0, 1), m));   //  them: never a box)
-      band.hi = Math.max(band.lo + 0.004, FLIP + w);
-      bandN.lo = FLIP; bandN.hi = FLIP + w;
-      bandL.lo = Math.max(FLIP, llo * 0.97); bandL.hi = Math.max(bandL.lo + 0.004, FLIP + w);
-    } else {
-      band.hi = Math.min(HI_MAX, hi * 1.03, Math.max(mix(HI_MAX, AIR_LIGHT, clamp(w * 1.5 - 0.5, 0, 1)), m));
-      band.lo = Math.min(band.hi - 0.004, Math.max(0, HI_MAX - w));
-      bandN.lo = Math.max(0, HI_MAX - w); bandN.hi = HI_MAX;
-      bandL.hi = Math.min(HI_MAX, lhi * 1.03); bandL.lo = Math.min(bandL.hi - 0.004, Math.max(0, HI_MAX - w));
+  function bound(f) {                                     // (a group's lightest on show)
+    var A = shown[0] && shown[0].st, B = shown[1] && shown[1].st;
+    return A && B && A !== B ? mix(f(A), f(B), fadeK()) : f(B || A || seenT);
+  }
+  function gainOf(f) { return seenT ? clamp(FLIP / Math.max(bound(f), 0.02), 1, 1.6) : 1; }   // (bound: as the frames on show crossfade)
+  function starsUnder(S, r) { return S.stars > 0.001 && r && r[1] < cam.hy + 2 ? STAR_TOP : 0; }   // (a star behind the words: at most the stars' top)
+  function decide(G, hi, S, turning, want) {
+    if (G.ink < 0) G.ink = S.words >= 0.5 ? 1 : 0;       // (the opening sky's own ink, until its ground is read)
+    if (want === 0) G.gave = false;
+    if (!seenT) return;
+    if (G.ink === 1) {
+      if (hi > HI_MAX) { G.gave = true; G.ink = 0; G.at = t; }                 // (light ink would break: dark, at once)
+      else if (turning && want === 0 && S.k >= 0.75) { G.ink = 0; G.at = t; G.gave = false; }
+    } else if (want === 1 && hi <= HI_MAX * (G.gave ? BACK : 1) && (!G.gave || t - G.at >= DWELL)) { G.ink = 1; G.at = t; G.gave = false; }
+  }
+  function steer(dt, S) {
+    var f, k, A, B, hS, hL, gS, gL, turning = S.a.words !== S.b.words && S.k > 0, want = turning ? S.b.words : S.a.words;
+    if (seenT) {
+      if (!seen) { seen = {}; for (f in seenT) seen[f] = seenT[f]; }
+      k = still ? 1 : 1 - Math.exp(-dt / 0.6);
+      for (f in seen) seen[f] += (seenT[f] - seen[f]) * k;
+    }
+    hS = seenT ? bound(stackHi) : 1; hL = seenT ? bound(linksHi) : 1;
+    decide(inkS, hS, S, turning, want);
+    decide(inkL, hL, S, turning, want);
+    /* (one group's lift reaches the other's ground too, its field being as wide as the window: so light ink stays only
+       where its ground, so raised, still holds it, else it goes dark with the other group; toward light the two then
+       flip together, once both grounds hold it) */
+    if (inkS.ink === 1 && inkL.ink === 0 && hS * gainOf(linksLo) > HI_MAX) { inkS.ink = 0; inkS.at = t; }
+    if (inkL.ink === 1 && inkS.ink === 0 && hL * gainOf(stackLo) > HI_MAX) { inkL.ink = 0; inkL.at = t; }
+    gS = inkS.ink === 0 ? gainOf(stackLo) : 1;           // (the gain about each: what its own darkest ground on show needs)
+    gL = inkL.ink === 0 ? gainOf(linksLo) : 1;
+    A = shown[0] && shown[0].st; B = shown[1] && shown[1].st;
+    band.mode = inkS.ink; bandL.mode = inkL.ink;
+    if (inkS.ink === 0) {                                 // (dark ink: the floor, and the grey on the credit's darkest)
+      band.lo = FLIP;
+      band.g = seen ? Math.max(FLIP, Math.max(seen.mn, seen.mean - 3 * seen.sd) * 0.9) : FLIP;
+    } else {                                              // (light ink: no floor at all; the grey on the credit's lightest, or a star)
+      band.lo = 0;
+      band.g = Math.min(HI_MAX, Math.max(seen ? Math.max(seen.mx, A ? A.mx : 0, B ? B.mx : 0) * 1.2 : HI_MAX, starsUnder(S, wordsR || stackR)) * gL);   // (a fifth to spare: a thin bright streak the samples step over; raised by the links' lift)
+    }
+    if (inkL.ink === 0) { bandL.lo = FLIP; bandL.g = seen ? Math.max(FLIP, seen.lmn * 0.85) : FLIP; }
+    else { bandL.lo = 0; bandL.g = Math.max(seen ? Math.max(seen.lmx, A ? A.lmx : 0, B ? B.lmx : 0) * 1.1 : HI_MAX, starsUnder(S, links.length ? union(links[0], links[1] || null) : null)) * gS; }
+    band.gn = gS; bandL.gn = gL;
+    if (!still && (band.gn > 1.0005 || bandL.gn > 1.0005)) {   // (lifted: the frame that ends it, sooner)
+      if (fk < 1 && ((band.gn > 1.0005 && ends(stackLo, stackHi, want)) || (bandL.gn > 1.0005 && ends(linksLo, linksHi, want)))) fkRate = Math.max(fkRate, (1 - fk) / HURRY);
+      else if (job) job.fast = true;                      // (the newer frame lies in the band too: the next one drawn quicker)
     }
   }
-  /* the words' colours for the bands: black, a warm grey and a dark ochre on a light sky; a near-white, a cool
-     grey and a light gold on a dark one. While the drawn sky fades in over the stylesheet's, the safer of the
-     two sets (and only while the drawn sky shows at all) */
-  var cssTok = null;
-  function words(now) {
-    var Yd, Yf, tk, key = band.mode + ':' + band.lo.toFixed(4) + ':' + band.hi.toFixed(4) + ':' + bandL.lo.toFixed(4) + ':' + bandL.hi.toFixed(4) + (now < fadeUntil ? 'f' : '');
-    if (!canvas.classList.contains('on')) { unwords(); return; }
-    if (key === tokensKey) return;
-    tokensKey = key; tk = {};
-    if (band.mode === 0) {
-      Yd = Math.min(0.108, (band.lo + 0.05) / RATIO - 0.05);
-      Yf = Math.min(0.155, (bandL.lo + 0.05) / RING - 0.05);
+  /* the words' colours for their ink and grounds: black, a warm grey and a dark ochre on a light sky; a
+     near-white, a cool grey and a light gold on a dark one; the stack's on the root (the birds' ink too), the
+     links' on the footer (their underline's grey and the focus ring on their own ground). While the drawn sky
+     fades in over the stylesheet's, the safer of the two sets (and only while the drawn sky shows at all) */
+  var cssTok = null, foot = document.querySelector('footer'), tokensWereL = {}, tokensKeyL = '';
+  function inkTokens(mode, g, lg) {                       // (g: the grey's ground; lg: the ring's)
+    var Yd, Yf, tk = {};
+    if (mode === 0) {
+      Yd = Math.min(0.108, (g + 0.05) / RATIO - 0.05);
+      Yf = Math.min(0.155, (lg + 0.05) / RING - 0.05);
       tk['--color-text'] = '#000000';
       tk['--color-dimmed'] = hex(ofLum(Math.max(Yd, 0), 0.009, 85));
       tk['--color-focus'] = hex(ofLum(Math.max(Yf, 0.004), 0.12, 75));
       tk['--color-selection'] = '#e6e2d6';
     } else {
-      Yd = Math.min(TEXT_LIGHT_Y, Math.max(0.4, RATIO * (band.hi + 0.05) - 0.05));
-      Yf = Math.min(TEXT_LIGHT_Y, Math.max(0.45, RING * (bandL.hi + 0.05) - 0.05));
+      Yd = Math.min(TEXT_LIGHT_Y, Math.max(0.4, RATIO * (g + 0.05) - 0.05));
+      Yf = Math.min(TEXT_LIGHT_Y, Math.max(0.45, RING * (lg + 0.05) - 0.05));
       tk['--color-text'] = hex(linOf(lab(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2])));
       tk['--color-dimmed'] = hex(ofLum(Yd, 0.014, 255));
       tk['--color-focus'] = hex(ofLum(Yf, 0.11, 85));
       tk['--color-selection'] = '#3b3f55';
     }
-    if (now < fadeUntil && cssTok && (cssTok.mode === band.mode)) {   // (darker on a light sky, lighter on a dark one: safe on both)
-      ['--color-dimmed', '--color-focus'].forEach(function (k) {
-        var a = lumHex(tk[k]), b = lumHex(cssTok[k]);
-        if (b >= 0 && (band.mode === 0 ? b < a : b > a)) tk[k] = cssTok[k];
-      });
-    }
-    for (var k in tk) if (tokensWere[k] !== tk[k]) { root.style.setProperty(k, tk[k]); tokensWere[k] = tk[k]; }
+    return tk;
   }
-  function unwords() { for (var k in tokensWere) root.style.removeProperty(k); tokensWere = {}; tokensKey = ''; }
+  function safer(tk, mode, fading) {                      // (darker on a light sky, lighter on a dark one: safe on both)
+    if (fading && cssTok && cssTok.mode === mode) ['--color-dimmed', '--color-focus'].forEach(function (k) {
+      var a = lumHex(tk[k]), b = lumHex(cssTok[k]);
+      if (b >= 0 && (mode === 0 ? b < a : b > a)) tk[k] = cssTok[k];
+    });
+    return tk;
+  }
+  function put(el, tk, were) { for (var k in tk) if (were[k] !== tk[k]) { el.style.setProperty(k, tk[k]); were[k] = tk[k]; } }
+  function words(now) {
+    var fading = now < fadeUntil, f4 = function (v) { return v.toFixed(4); };
+    var key = band.mode + ':' + f4(band.g) + ':' + f4(bandL.g) + (fading ? 'f' : ''),
+        keyL = bandL.mode + ':' + f4(bandL.g) + (fading ? 'f' : '');
+    if (!canvas.classList.contains('on')) { unwords(); return; }
+    if (key !== tokensKey) { tokensKey = key; put(root, safer(inkTokens(band.mode, band.g, bandL.g), band.mode, fading), tokensWere); }
+    if (foot && keyL !== tokensKeyL) { tokensKeyL = keyL; put(foot, safer(inkTokens(bandL.mode, bandL.g, bandL.g), bandL.mode, fading), tokensWereL); }
+  }
+  function unwords() {
+    var k;
+    for (k in tokensWere) root.style.removeProperty(k);
+    for (k in tokensWereL) foot.style.removeProperty(k);
+    tokensWere = {}; tokensKey = ''; tokensWereL = {}; tokensKeyL = '';
+  }
   function lumHex(h) {
     var m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(h).trim()), i, c = [];
     if (!m) return -1;
@@ -1728,14 +1913,14 @@
     var dt = last ? Math.min((now - last) / 1000, 1) : 0, step = Math.min(dt, STEP_MAX), fps;
     last = now; lastNow = now;
     if (dirty) relayout();
-    if (!still) { t += step; acc += step; blow(step); govern(dt, now); }
+    if (!still) { t += step; acc += step; fk = Math.min(1, fk + step * fkRate); blow(step); govern(dt, now); }
     fps = rate(NOW.sky ? NOW : blend(t, NOW));
     /* all the GPU's work is done on the sky's drawing ticks, each ending with
        the window drawn: a browser may show the canvas after any frame that
        drew at all (until the first sky is drawn the canvas is unseen, and the
        work goes on every frame) */
     afterTick = false;
-    if (nudge && shown[1] && trusted && !(still || redo || now - lastShow >= 1000 / fps - 4)) {   // (the words moved: the veil with them, now)
+    if (nudge && shown[1] && trusted && !(still || redo || now - lastShow >= 1000 / fps - 4)) {   // (the words moved: the lift with them, now)
       nudge = false;
       if (maskDirty) drawMask();
       steer(0, NOW); words(now); show(NOW); lastShow = now;
@@ -1810,9 +1995,9 @@
       run();
     },
     /* where the sky is (read only): this sky and the next, how far the change between them has gone, and
-       whether the words are light (for the score to keep in step) */
+       whether the name's ink is light (for the score to keep in step) */
     cycle: function () {
-      return NOW.a ? { sky: NOW.a.id, next: NOW.b.id, k: NOW.k, words: NOW.words >= 0.5 ? 1 : 0, group: NOW.name } : null;
+      return NOW.a ? { sky: NOW.a.id, next: NOW.b.id, k: NOW.k, words: inkS.ink < 0 ? (NOW.words >= 0.5 ? 1 : 0) : inkS.ink, group: NOW.name } : null;
     }
   };
 

@@ -57,8 +57,9 @@
    fade softening the entry), or out of the distance, and leaves beyond an
    edge or into the distance; nothing starts, stops, loops or turns back in
    view. A path is planned whole before its first bird enters: clear of the
-   name, bio and credit and of the footer links for the whole crossing,
-   clear of every other flight, one flight to a band.
+   name and credit and of the footer links for the whole crossing (until
+   its last bird is out of view, not only its leader), clear of every
+   other flight, one flight to a band.
 
    THE HAND: every mark drawn afresh 12 times a second (on twos), its
    vertices re-jittered 6 times a second (the boil). Through a beat the
@@ -129,7 +130,7 @@
 
   /* the sky */
   var OUT = 70;                // px beyond the window where a path begins and ends
-  var WORDS = 24;              // px of sky kept clear round the words (the name, bio and credit) ...
+  var WORDS = 24;              // px of sky kept clear round the words (the name and credit) ...
   var LINKS = 20;              // ... and round the footer links
   var ROOMY = 60;              // px: a path this far from the words and the window's edges is as good as any
   var EDGE = 10;               // px kept from each edge of the window a flight does not cross
@@ -137,6 +138,9 @@
   var FLIGHTS = [2, 3];        // flights in the sky at once, at most: more on a WIDE sky
   var WIDE = 900;              // px
   var STEP = 0.3;              // s: the planner's look-ahead step (a path is checked whole before a bird enters)
+  var GONE = 8;                // px: a bird this far beyond the window (or faded into the distance) is out of view, and
+                               //  only when every bird of a flight is, the flight is done (never when its leader leaves)
+  var LINGER = 30;             // s: a path on which a bird would stay in view this long after its leader has gone: not flown
   var TRIES = 16;              // paths tried per flight
   var QUOTA = 500;             // bird-steps of look-ahead a frame: planning is spread over frames, never a long one ...
   var LEAD = 4;                // s: ... so a flight is planned to set off this far ahead (still beyond the edge)
@@ -1157,17 +1161,23 @@
      end: every bird (only its bounding birds, on the probe pass) at its
      nearness clear of the words, inside the edges it does not cross, never
      too near, never on top of another of its flight on the window, and
-     APART from the other flights. Worked in slices of `budget` bird-steps:
-     0 while unfinished, 1 when clear all the way (it.near its room: the
-     more, the calmer), -1 */
+     APART from the other flights. Its end: past the leader's (dur), once
+     every bird is out of view (a bird on the near arm of a skein going
+     away is still in view when the leader has gone into the distance: the
+     flight flies on, checked all the way, and dur is when the last bird
+     has gone). Worked in slices of `budget` bird-steps: 0 while
+     unfinished, 1 when clear all the way (it.near its room: the more, the
+     calmer), -1 */
   function trialRun(F, it, A, budget) {
     var M = F.m, probe = it.probe ? F.probe : null, cnt = probe ? probe.length : M.length, bx = it.bx,
         c0 = A ? A.cost : 0, i, j, m, row, g, gx, gy, e, tau, hw, hh, tp = it.tp, turns = !F.soar && !F.still;
     it.spent = 0;
     for (;;) {
       tau = it.from + it.k * STEP;
-      if (tau > F.dur) return 1;
+      if (tau > F.dur && (probe || !it.seen)) { if (!probe && it.last > F.dur) F.dur = it.last; return 1; }   // (every bird out of view: done)
+      if (tau > F.dur + LINGER) return -1;
       if (it.spent >= budget) return 0;
+      it.seen = false; it.last = tau;
       if (!F.soar && !steady(F, tau)) return -1;
       row = A && A.t1 + it.k * STEP <= A.until ? aheadRow(A, it.k) : null;
       for (i = 0; i < cnt; i++) {
@@ -1178,6 +1188,7 @@
         if (tmp.a < 0.02) { tp[5 * i] = NaN; continue; }   // gone into the distance
         hw = m.d.hw * tmp.n; hh = (m.d.hh + BOB * m.d.span) * tmp.n;   // its ink at its nearness, and the room its bob takes
         e = F.soar && tau >= m.tj && tau < m.tx ? 0 : F.edges;   // a soaring bird circles wholly inside the window
+        if (inView(tmp.x, tmp.y, hw + GONE, hh + GONE)) it.seen = true;
         if (!inView(tmp.x, tmp.y, hw, hh)) { if (!e) return -1; tp[5 * i] = NaN; continue; }
         if (tmp.n > NEAR_MAX || !clearOfWords(tmp.x, tmp.y, hw, hh) || !withinEdges(tmp.x, tmp.y, hw, hh, e)) return -1;
         if (turns && !m.w.bound) {                        // never turning sharply on the window, all it does in seconds and all (but a finch's bound)
@@ -1214,7 +1225,7 @@
       c0 = A ? A.cost : 0;
     }
   }
-  function trialIt(from, probe) { return { from: from, k: 0, near: ROOMY, apart: 200, probe: probe, spent: 0, yLo: Infinity, yHi: -Infinity, xLo: Infinity, xHi: -Infinity, bx: new Float64Array(48), tp: new Float64Array(60).fill(NaN) }; }
+  function trialIt(from, probe) { return { from: from, k: 0, seen: false, last: -Infinity, near: ROOMY, apart: 200, probe: probe, spent: 0, yLo: Infinity, yHi: -Infinity, xLo: Infinity, xHi: -Infinity, bx: new Float64Array(48), tp: new Float64Array(60).fill(NaN) }; }
   /* the whole trial at once (a flight re-checked after the page moved) */
   function trial(F, from) {
     var it = trialIt(from, false);
@@ -1511,12 +1522,14 @@
       (s.face < 0 ? ' scaleX(-1)' : '');
   }
 
-  /* every bird where it is now, gliding smoothly; drawn afresh on the hand's frames */
+  /* every bird where it is now, gliding smoothly; drawn afresh on the hand's frames. A flight is done when it is
+     past its end and none of its birds is in view (the planner saw them all go by then) */
   function draw(fresh, boil, rest) {
-    var i, j, F, m, tau;
+    var i, j, F, m, tau, vis;
     for (i = flights.length - 1; i >= 0; i--) {
       F = flights[i]; tau = t - F.t0;
-      if (tau > F.dur) { land(F); continue; }
+      if (tau > F.dur + LINGER) { land(F); continue; }
+      vis = false;
       for (j = 0; j < F.m.length; j++) {
         m = F.m[j];
         spot(F, m, tau, tmp);
@@ -1528,7 +1541,9 @@
         }
         show(m.s);
         put(m);
+        vis = true;
       }
+      if (tau > F.dur && !vis) land(F);
     }
   }
 

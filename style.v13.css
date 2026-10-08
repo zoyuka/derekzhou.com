@@ -4,7 +4,8 @@
    filenames on change — assets are immutable-cached).
    Geist and Geist Mono: SIL Open Font License 1.1
    (assets/fonts/OFL.txt). Geist is one variable file
-   cut to the two weights the site sets, 400 and 500.
+   cut to the two weights the site sets, 400 and 500
+   (500: a heading set in type, the 404's).
    ------------------------------------------------ */
 
 @font-face {
@@ -92,8 +93,9 @@
 :root {
   color-scheme: light;
 
-  /* Two families, three roles (see CLAUDE.md, Type): Geist for the
-     name, the words and the links; Geist Mono for the facts */
+  /* Two families (see CLAUDE.md, Type): Geist for the words, the links
+     and a heading set in type (the 404's); Geist Mono for the facts. The
+     name is no font: it is lettering, drawn (.name) */
   --font-sans: 'Geist', 'Geist Fallback', 'Geist Fallback Android', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
 
@@ -144,8 +146,9 @@ body {
    (WebGL2) and fades it in over the stylesheet's still sky of the hour
    (data-sky, set by the hour's script before the first paint). The words'
    colours follow the sky: dark on a light one, light on a dark one; the
-   script refines them for the sky it drew (4.7:1 for the dimmed words).
-   With no script the page is the still day sky.
+   script refines them for the sky it drew (4.7:1 for the dimmed words; the
+   links' own, on the footer, for the sea under them), and never darkens the
+   sky for them. With no script the page is the still day sky.
    ------------------------------------------------ */
 
 .sky {
@@ -170,7 +173,13 @@ body {
    towers, and averaged: day (fair weather, the halo), dawn
    (sunrise, the glory), rain (silver rain, the rainbow), sunset (golden
    hour), dusk (the afterglow, the blue hour), night (a moonlit sea, the
-   Milky Way, the aurora); so the drawn sky dissolves in over its own */
+   Milky Way, the aurora); so the drawn sky dissolves in over its own.
+   (Taken again once the skies with light words were held under their
+   light ceiling: the night sky (its top kept, the browser bars' colour
+   the hour's script gives), the dusk sea at 92-100%; the dusk
+   sky's stops kept a little darker than the drawn afterglow's glow, so
+   the dimmed grey holds 4.7:1 over all of it, and the drawn sky dissolves
+   in over a sky no lighter than its own) */
 body {
   background: linear-gradient(to bottom, #a5d5f8 0%, #b9e0fa 26%, #c6e8f9 52%, #d6f0f8 72%, #dbf2f7 78%, #dbf1f5 82%, #dceef1 92%, #d9e9eb 100%) #c6e8f9;
 }
@@ -188,11 +197,11 @@ body {
 }
 
 :root[data-sky="dusk"] body {
-  background: linear-gradient(to bottom, #35304e 0%, #44344e 26%, #563a48 52%, #6c423c 72%, #6b4242 78%, #684347 82%, #5d4656 92%, #594556 100%) #563a48;
+  background: linear-gradient(to bottom, #35304e 0%, #44344e 26%, #563a48 52%, #6c423c 72%, #6b4242 78%, #684347 82%, #56414f 92%, #4d3b4b 100%) #563a48;
 }
 
 :root[data-sky="night"] body {
-  background: linear-gradient(to bottom, #282c3e 0%, #2c3144 26%, #2c3f4c 52%, #2f4250 72%, #314453 78%, #3c5058 82%, #3d5155 92%, #3c5054 100%) #2c3f4c;
+  background: linear-gradient(to bottom, #282c3e 0%, #303647 26%, #30434e 52%, #2e404f 72%, #314352 78%, #364953 82%, #3b4e53 92%, #384b4f 100%) #30434e;
 }
 
 /* the words on the still skies: each colour holds against its sky's whole
@@ -276,6 +285,7 @@ main {
   max-width: 30rem;
 }
 
+/* A heading set in type (the 404's "404") */
 h1 {
   font-weight: 500;
   font-size: clamp(2.75rem, 1.9rem + 4vw, 4.75rem);
@@ -283,21 +293,41 @@ h1 {
   letter-spacing: -0.045em;
 }
 
-.bio {
+/* The name, lettered (the home page's h1): one path in the words' colour
+   (currentColor), its box reserved by the drawing's own proportions, so
+   nothing moves when the fonts or anything else arrive. 25.25rem on any
+   window wide enough (the set name's weight of ink at 76 px), and on a
+   phone the measure main's padding leaves: 85% of a 320 px window, 88% of
+   390. The stack shrinks to its content, so the width is given outright. */
+.name svg {
+  display: block;
+  width: min(25.25rem, calc(100vw - 2 * clamp(1.5rem, 4vw, 3rem)));
+  height: auto;
+  aspect-ratio: 1310 / 314;
+}
+
+/* Words kept for every reader (the h1 is still "Derek Zhou" to a screen
+   reader, a search engine and the page's outline) and drawn for no one */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The words (the 404's line; every paragraph to come) */
+.words {
   font-size: 1.0625rem;
   line-height: 1.55;
   letter-spacing: -0.006em;
   max-width: 22.5em;
   margin-top: 2rem;
-}
-
-.bio strong {
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.dimmed {
-  color: var(--color-dimmed);
 }
 
 /* The facts (role, company, dates) in mono — no uppercase, no tracking. */
@@ -373,7 +403,7 @@ footer a, .back-link {
     background: #fff;
   }
 
-  h1 { font-size: 2rem; }
-  h1, .bio strong { color: #000; }
-  .dimmed, .credit { color: #555; }
+  h1 { font-size: 2rem; color: #000; }
+  .name svg { width: 16rem; }
+  .credit { color: #555; }
 }
